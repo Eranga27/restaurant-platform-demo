@@ -30,6 +30,7 @@ test("a guest orders kottu for pickup and watches it update live", async ({ page
   await page.getByLabel("Name").fill("E2E Customer");
   await page.getByLabel("Mobile number").fill("077 000 0199");
   await page.getByLabel("Email").fill("e2e@example.com");
+  await page.getByText("Pay at the counter", { exact: true }).click();
 
   const place = page.getByRole("button", { name: /^Place order · Rs\. / });
   // Waits for the server quote and Cloudflare's test Turnstile token.
@@ -57,8 +58,9 @@ test("a guest orders kottu for pickup and watches it update live", async ({ page
     .update({ status: "accepted" })
     .eq("public_token", token);
   expect(error).toBeNull();
+  // Live, or at worst on the page's periodic re-check.
   await expect(page.locator('[aria-current="step"]')).toContainText("Accepted", {
-    timeout: 15_000,
+    timeout: 30_000,
   });
 
   // The cart was emptied after ordering.
@@ -82,5 +84,7 @@ test("checkout re-prices on the server and blocks a sold-out dish", async ({ pag
   ).toBeVisible({
     timeout: 15_000,
   });
-  await expect(page.getByRole("button", { name: /Place order/ })).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: /Place order|Continue to payment/ }),
+  ).toBeDisabled();
 });

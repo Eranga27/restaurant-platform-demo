@@ -80,6 +80,11 @@ jobs:
     timeout-minutes: 30
     env:
       NEXT_TELEMETRY_DISABLED: "1"
+      # A made-up PayHere sandbox merchant: the payment journeys stand in for
+      # PayHere and sign notifications with this value. Not a real secret.
+      PAYHERE_MERCHANT_ID: "1211149"
+      PAYHERE_MERCHANT_SECRET: ci-test-merchant-secret
+      PAYHERE_SANDBOX: "true"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
@@ -115,6 +120,9 @@ jobs:
             if (select count(*) from public.branches) <> 3 then
               raise exception 'expected 3 branches';
             end if;
+            if not exists (select 1 from cron.job where jobname = 'expire-unpaid-orders') then
+              raise exception 'expected the unpaid-order expiry job';
+            end if;
             if (select count(*) from public.promo_codes) < 1 then
               raise exception 'expected seeded promo codes';
             end if;
@@ -146,7 +154,7 @@ jobs:
       - name: Order journeys
         env:
           E2E_DATABASE: "1"
-        run: npm run test:e2e -- tests/e2e/order.spec.ts --project=mobile
+        run: npm run test:e2e -- tests/e2e/order.spec.ts tests/e2e/payment.spec.ts --project=mobile
 
       - name: Upload Playwright report
         if: failure()
