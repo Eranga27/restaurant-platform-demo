@@ -20,9 +20,9 @@ jobs:
     env:
       NEXT_TELEMETRY_DISABLED: "1"
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - uses: actions/setup-node@v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: .nvmrc
           cache: npm
@@ -38,14 +38,19 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Unit tests
+      - name: Unit tests (includes RLS tests on PGlite)
         run: npm run test
+
+      - name: Seed SQL is up to date
+        run: |
+          npm run db:seed
+          git diff --exit-code supabase/seed.sql || (echo "::error::supabase/seed.sql is out of date. Run npm run db:seed and commit." && exit 1)
 
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
 
       - name: Cache Next.js build
-        uses: actions/cache@v6
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .next/cache
           key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**') }}
@@ -63,8 +68,48 @@ jobs:
 
       - name: Upload Playwright report
         if: failure()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: playwright-report
           path: playwright-report
           retention-days: 7
+
+  database:
+    name: Migrations and seed (Supabase Postgres)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
+        with:
+          version: 2.119.0
+
+      # Starts only Postgres, then rebuilds it from supabase/migrations and seed.sql.
+      - name: Start database
+        run: supabase db start
+
+      - name: Apply migrations and seed
+        run: supabase db reset --local
+
+      - name: Lint schema
+        run: supabase db lint --local --level warning --fail-on error
+
+      - name: Check seeded data and RLS
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
+          do $$
+          begin
+            if (select count(*) from public.menu_items) < 40 then
+              raise exception 'expected 40+ menu items';
+            end if;
+            if (select count(*) from public.branches) <> 3 then
+              raise exception 'expected 3 branches';
+            end if;
+            if exists (select 1 from pg_tables where schemaname = 'public' and not rowsecurity) then
+              raise exception 'a public table has RLS disabled';
+            end if;
+          end $$;
+          SQL

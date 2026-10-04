@@ -1,0 +1,254 @@
+{
+  "Metadata": {
+    "homeTitle": "{name} | {tagline}",
+    "homeDescription": "{description}",
+    "menuTitle": "Menu",
+    "menuDescription": "Rice and curry, kottu, hoppers, devilled dishes, short eats and desserts. Order for delivery or pickup from {name}.",
+    "branchesTitle": "Branches and opening hours",
+    "branchesDescription": "Find {name} in Colombo 07, Nugegoda and Kandy. Opening hours, directions and delivery areas.",
+    "aboutTitle": "Our story",
+    "aboutDescription": "How {name} brings Sri Lankan home cooking to the city.",
+    "contactTitle": "Contact us",
+    "contactDescription": "Call, message or email {name}.",
+    "faqTitle": "Frequently asked questions",
+    "faqDescription": "Delivery, payments, dietary needs, bookings and catering at {name}.",
+    "privacyTitle": "Privacy policy",
+    "termsTitle": "Terms of service",
+    "refundsTitle": "Refund and cancellation policy",
+    "notFoundTitle": "Page not found"
+  },
+  "Nav": {
+    "skipToContent": "Skip to content",
+    "home": "Home",
+    "menu": "Menu",
+    "branches": "Branches",
+    "about": "Our story",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "orderNow": "Order now",
+    "bookTable": "Book a table",
+    "openMenu": "Open navigation",
+    "closeMenu": "Close navigation",
+    "mainNavigation": "Main navigation",
+    "language": "Language",
+    "changeLanguage": "Change language"
+  },
+  "Footer": {
+    "about": "Sri Lankan home cooking from three kitchens across the island.",
+    "visit": "Visit us",
+    "explore": "Explore",
+    "legal": "Legal",
+    "privacy": "Privacy policy",
+    "terms": "Terms of service",
+    "refunds": "Refunds and cancellations",
+    "followUs": "Follow us",
+    "payments": "Pay with cash on delivery, card or mobile wallet.",
+    "copyright": "© {year} {name}. All rights reserved.",
+    "demoNotice": "{name} is a fictional restaurant. This website is a product demonstration.",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "email": "Email"
+  },
+  "Demo": {
+    "ribbon": "Demo site",
+    "ribbonDetail": "A fictional restaurant. Orders, payments and bookings are not real.",
+    "contactDisabled": "Calls and messages are turned off on the demo site."
+  },
+  "Poya": {
+    "banner": "Today is {name}. As on every Poya day, we don't serve alcohol."
+  },
+  "Common": {
+    "close": "Close",
+    "loading": "Loading",
+    "learnMore": "Learn more",
+    "rating": "{rating} out of 5 stars",
+    "kmAway": "{km} km away"
+  },
+  "Home": {
+    "heroEyebrow": "{tagline} · Colombo · Nugegoda · Kandy",
+    "heroTitle": "Sri Lankan home cooking, done properly.",
+    "heroSubtitle": "Kottu off the griddle, hoppers off the pan and curries slow-cooked the way our grandmothers made them. Delivered hot, or waiting for you at the table.",
+    "heroImageAlt": "A spread of Sri Lankan rice and curry dishes",
+    "highlightKitchens": "{count, plural, one {# kitchen} other {# kitchens}}",
+    "highlightHours": "Open daily",
+    "highlightCash": "Cash on delivery",
+    "highlightHalal": "Halal options",
+    "signatureTitle": "Our signatures",
+    "signatureSubtitle": "The dishes people cross town for.",
+    "viewFullMenu": "See the full menu",
+    "offersTitle": "On at Kithul & Co.",
+    "branchesTitle": "Find your nearest kitchen",
+    "branchesSubtitle": "Three branches, each with its own crowd of regulars.",
+    "useMyLocation": "Use my location",
+    "locating": "Finding you…",
+    "locationError": "We couldn't get your location. Pick a branch below.",
+    "nearest": "Nearest",
+    "allBranches": "All branches and opening hours",
+    "reviewsTitle": "What our guests say",
+    "storyTitle": "From a grandmother's kitchen in Galle",
+    "storyBody": "Kithul & Co. started with one rule: cook it the way it's cooked at home. Curry powder roasted and ground every morning, coconut milk pressed fresh, and kithul treacle from the same family in Sinharaja for three generations.",
+    "storyCta": "Read our story",
+    "eventsTitle": "Birthdays, office lunches and almsgivings",
+    "eventsBody": "From a dana for forty to a homecoming for two hundred, we cook, deliver and serve. Tell us the date and the headcount and we'll put together a menu.",
+    "eventsCta": "Plan an event"
+  },
+  "Menu": {
+    "title": "Our menu",
+    "subtitle": "Prices are per dish as described. A {serviceCharge}% service charge and VAT are added at checkout.",
+    "categories": "Menu categories",
+    "search": "Search the menu",
+    "searchPlaceholder": "Kottu, hoppers, biriyani…",
+    "clearSearch": "Clear search",
+    "filters": "Dietary filters",
+    "nutFree": "No nuts",
+    "orderingFrom": "Ordering from",
+    "results": "{count, plural, =0 {No dishes} one {# dish} other {# dishes}}",
+    "noResults": "Nothing matches your search.",
+    "clearFilters": "Clear search and filters",
+    "soldOut": "Sold out",
+    "notToday": "Not today",
+    "signature": "Signature",
+    "spiceChoice": "Choose your spice",
+    "viewItem": "View {name}"
+  },
+  "Dietary": {
+    "vegetarian": "Vegetarian",
+    "vegan": "Vegan",
+    "halal": "Halal",
+    "contains-nuts": "Contains nuts"
+  },
+  "Spice": {
+    "label": "Spice level",
+    "mild": "Mild",
+    "medium": "Medium",
+    "hot": "Sri Lankan Hot"
+  },
+  "Item": {
+    "required": "Required",
+    "optional": "Optional",
+    "chooseOne": "Choose one",
+    "chooseUpTo": "Choose up to {count}",
+    "free": "Free",
+    "instructions": "Special instructions",
+    "instructionsPlaceholder": "Less chilli, extra gravy, no onions…",
+    "instructionsHelp": "We'll do our best. Allergies? Call the branch before ordering.",
+    "quantity": "Quantity",
+    "decrease": "Decrease quantity",
+    "increase": "Increase quantity",
+    "addToOrder": "Add to order · {price}",
+    "orderingSoon": "Online ordering arrives in the next update. For now, browse away.",
+    "soldOutAt": "Sold out at {branch} today.",
+    "notServedToday": "Not served today: {holiday}."
+  },
+  "Branches": {
+    "title": "Our branches",
+    "subtitle": "Walk in, book a table or order for delivery from the kitchen nearest you.",
+    "mapLabel": "Map showing our branches",
+    "loadingMap": "Loading map…",
+    "openNow": "Open now",
+    "closed": "Closed",
+    "closesAt": "Closes at {time}",
+    "opensAt": "Opens {day} at {time}",
+    "opensToday": "Opens at {time}",
+    "hours": "Opening hours",
+    "closedAllDay": "Closed",
+    "delivery": "Delivers within {km} km",
+    "notTakingOrders": "Not taking online orders right now",
+    "directions": "Directions",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "seats": "{count} seats",
+    "days": {
+      "mon": "Monday",
+      "tue": "Tuesday",
+      "wed": "Wednesday",
+      "thu": "Thursday",
+      "fri": "Friday",
+      "sat": "Saturday",
+      "sun": "Sunday"
+    },
+    "daysShort": {
+      "mon": "Mon",
+      "tue": "Tue",
+      "wed": "Wed",
+      "thu": "Thu",
+      "fri": "Fri",
+      "sat": "Sat",
+      "sun": "Sun"
+    }
+  },
+  "About": {
+    "title": "Our story",
+    "lead": "We cook the food we grew up eating, and we don't take shortcuts.",
+    "p1": "Kithul & Co. began in 2014 as a twelve-seat lunch room off Flower Road. Our founder's grandmother ran a kitchen in Galle that fed half the street, and her recipe book, stained with turmeric and annotated in three languages, is still on the pass today.",
+    "p2": "Every morning our cooks roast and grind the curry powder, press coconut milk by hand and start the stocks for lamprais. The kithul treacle in our wattalappan and curd comes from the same tappers in the Sinharaja foothills we have bought from since the beginning.",
+    "p3": "Twelve years on we have three kitchens, in Colombo 07, Nugegoda and Kandy. The rooms are bigger, but the rule hasn't changed: if it isn't how it's made at home, it doesn't go on the menu.",
+    "valuesTitle": "What we hold to",
+    "value1Title": "Made fresh, every day",
+    "value1Body": "Curry powders, sambols and coconut milk are made in-house each morning.",
+    "value2Title": "Clear about what's in it",
+    "value2Body": "Halal, vegetarian, vegan and nut information on every dish, and staff who can answer questions.",
+    "value3Title": "Fair to our suppliers",
+    "value3Body": "Fish from the morning market, vegetables from Dambulla and treacle from the same families for twelve years."
+  },
+  "Contact": {
+    "title": "Get in touch",
+    "subtitle": "For orders, call your nearest branch. For everything else, we're happy to help.",
+    "general": "General enquiries",
+    "branchContacts": "Branch contacts",
+    "eventsTitle": "Events and catering",
+    "eventsBody": "Planning an almsgiving, birthday, office lunch or wedding? Message us with the date, guest count and location."
+  },
+  "Faq": {
+    "title": "Frequently asked questions",
+    "items": {
+      "delivery": {
+        "q": "Where do you deliver?",
+        "a": "Each branch delivers within a set distance, shown on the branches page. At checkout we check your pin on the map and match you with the nearest branch that delivers to you."
+      },
+      "fees": {
+        "q": "How much is delivery?",
+        "a": "There is a base fee for the first few kilometres and a small charge per kilometre after that. Delivery is free on larger orders. You'll see the exact fee before you pay."
+      },
+      "payment": {
+        "q": "How can I pay?",
+        "a": "Cash on delivery, or by card or mobile wallet through PayHere, Sri Lanka's secure payment gateway. We never see or store your card details."
+      },
+      "charges": {
+        "q": "Why is there a service charge?",
+        "a": "As at most Sri Lankan restaurants, a {serviceCharge}% service charge is added to the bill and shared among the team. VAT is added as required by law. Your bill shows every line clearly."
+      },
+      "dietary": {
+        "q": "Do you cater for dietary needs?",
+        "a": "Every dish is marked if it is vegetarian, vegan, halal or contains nuts, and you can filter the menu by these. If you have a serious allergy, please call the branch before ordering."
+      },
+      "spice": {
+        "q": "How spicy is \"Sri Lankan Hot\"?",
+        "a": "Properly hot. Mild suits most children and visitors, Medium is how we'd serve it at home, and Sri Lankan Hot is for those who like to sweat."
+      },
+      "poya": {
+        "q": "Do you serve alcohol on Poya days?",
+        "a": "No. In keeping with the law and tradition, our bar is closed on every Full Moon Poya day. We serve a vegetarian lunch special instead."
+      },
+      "bookings": {
+        "q": "Can I book a table?",
+        "a": "Yes. Book online or call the branch. For groups of more than twelve, please call so we can arrange the room."
+      },
+      "catering": {
+        "q": "Do you cater for almsgivings and events?",
+        "a": "We do, from small danas to weddings and homecomings. Get in touch with the date, guest count and location and we'll send you a menu and quote."
+      }
+    }
+  },
+  "Legal": {
+    "updated": "Last updated {date}",
+    "englishPrevails": "This policy is published in English. Translations are provided for convenience; the English version applies.",
+    "demoNotice": "This is template text for a fictional restaurant. It is not legal advice; a real business must have its policies reviewed before launch."
+  },
+  "NotFound": {
+    "title": "We couldn't find that page",
+    "body": "It may have moved, or the link may be mistyped. The kottu is still where you left it, though.",
+    "home": "Back to home",
+    "menu": "See the menu"
+  }
+}

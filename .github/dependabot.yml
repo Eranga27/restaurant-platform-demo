@@ -9,10 +9,21 @@ updates:
     groups:
       minor-and-patch:
         update-types: [minor, patch]
+    ignore:
+      # Majors that need a deliberate migration rather than a bot PR.
+      # @types/node follows the Node version we run (24, see .nvmrc).
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      # TypeScript 7 (native compiler) and ESLint 10: wait for Next.js and eslint-config-next support.
+      - dependency-name: typescript
+        update-types: ["version-update:semver-major"]
+      - dependency-name: eslint
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: chore
       include: scope
 
+  # Actions are pinned to commit SHAs (with a version comment); Dependabot updates both.
   - package-ecosystem: github-actions
     directory: /
     schedule:

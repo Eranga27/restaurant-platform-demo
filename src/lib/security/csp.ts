@@ -36,6 +36,7 @@ const TURNSTILE = "https://challenges.cloudflare.com";
 const IMAGE_HOSTS = [
   "https://images.unsplash.com",
   "https://images.pexels.com",
+  "https://tile.openstreetmap.org",
   "https://*.tile.openstreetmap.org",
 ];
 
