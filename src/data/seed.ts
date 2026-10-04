@@ -1364,3 +1364,71 @@ export const reviews: ReviewRow[] = [
     "2026-07-21T14:30:00+05:30",
   ),
 ];
+
+// ---------------------------------------------------------------------------
+// Promo codes (demo). Not readable through the API; validated on the server.
+// ---------------------------------------------------------------------------
+
+export type PromoCodeRow = {
+  id: string;
+  code: string;
+  description_i18n: Partial<I18nText>;
+  kind: "percent" | "fixed";
+  percent_bps: number | null;
+  amount_cents: number | null;
+  min_subtotal_cents: number;
+  max_discount_cents: number | null;
+  starts_at: string | null;
+  ends_at: string | null;
+  max_redemptions: number | null;
+  is_active: boolean;
+};
+
+const promo = (row: Omit<PromoCodeRow, "id">): PromoCodeRow => ({
+  id: stableId("promo-code", row.code),
+  ...row,
+});
+
+export const promoCodes: PromoCodeRow[] = [
+  promo({
+    code: "WELCOME10",
+    description_i18n: {
+      en: "10% off your order (up to Rs. 1,000) when you spend Rs. 2,000 or more.",
+    },
+    kind: "percent",
+    percent_bps: 1000,
+    amount_cents: null,
+    min_subtotal_cents: rs(2000),
+    max_discount_cents: rs(1000),
+    starts_at: null,
+    ends_at: null,
+    max_redemptions: null,
+    is_active: true,
+  }),
+  promo({
+    code: "KOTTU200",
+    description_i18n: { en: "Rs. 200 off orders of Rs. 1,500 or more." },
+    kind: "fixed",
+    percent_bps: null,
+    amount_cents: rs(200),
+    min_subtotal_cents: rs(1500),
+    max_discount_cents: null,
+    starts_at: null,
+    ends_at: null,
+    max_redemptions: null,
+    is_active: true,
+  }),
+  promo({
+    code: "AVURUDU26",
+    description_i18n: { en: "New Year special (ended)." },
+    kind: "percent",
+    percent_bps: 1500,
+    amount_cents: null,
+    min_subtotal_cents: 0,
+    max_discount_cents: rs(1500),
+    starts_at: "2026-04-10T00:00:00+05:30",
+    ends_at: "2026-04-20T00:00:00+05:30",
+    max_redemptions: null,
+    is_active: true,
+  }),
+];

@@ -22,6 +22,9 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactCompiler: true,
   poweredByHeader: false,
+  // Dev-only logging of Server Action arguments would print customers' names,
+  // phone numbers and addresses to the terminal.
+  logging: { serverFunctions: false },
   turbopack: {
     resolveAlias: {
       // What next-intl's createNextIntlPlugin() does when no experimental options are used.
