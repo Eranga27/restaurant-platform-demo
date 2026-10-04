@@ -21,6 +21,18 @@ Defined in `supabase/migrations/`. Tested on every `npm test` run against an in-
 - **New users** get a `customer` profile from a trigger. The role is never taken from user-supplied sign-up metadata.
 - Role checks are `SECURITY DEFINER` functions with an empty `search_path` that only report on the calling user.
 
+## Orders and sessions (Phase 2)
+
+- **Only the server creates orders.** `public.place_order()` is executable by `service_role` alone. Server Actions call it after Zod validation, a rate limit, a Turnstile check and a full re-price from database rows (`src/lib/orders/quote.ts`). The browser's cart carries IDs, options and quantities, never prices.
+- **The database re-checks the money.** Check constraints require the totals to add up, the discount to stay within the subtotal, and each line total to equal unit price × quantity. Delivery orders must have an address.
+- **Idempotent.** Each checkout carries a random idempotency key (unique in `orders`); a double-click or retry returns the first order instead of creating a second.
+- **Promo codes** aren't readable through the API. Redemptions are counted inside the same transaction as the order, so a code's limit can't be exceeded by racing requests.
+- **Reading orders:** customers see only their own (RLS on `user_id`); branch staff see only their branch's; admins see all. Nobody can update an order through the API yet (the dashboard's status changes arrive in Phase 4 through a guarded Server Action).
+- **Tracking links** carry a 32-character random token (192 bits) and render with `noindex` and a `no-referrer` referrer policy. The page is server-rendered with the secret key and shows only what the customer needs.
+- **Live updates** are a Realtime broadcast on the topic `order:<token>`, sent by a trigger. The payload is the status, payment status and timestamp only, so a listener learns nothing personal even if a token leaked.
+- **Sessions:** Supabase Auth cookies are `HttpOnly`, `SameSite=Lax`, `Secure` in production. The proxy refreshes them on strict routes; pages and actions still check `getUser()` themselves. Sign-up needs a 10+ character password with upper case, lower case and a digit, and passes Turnstile. Sign-in and sign-up are rate-limited per IP.
+- **Rate limits** (Upstash; disabled when it isn't configured): per IP: quotes 120 and checkout 5 per 10 minutes, sign-up 5 per hour; sign-in 10 per 15 minutes per IP and email.
+
 ## Headers
 
 Set for every response in `next.config.ts`, with the CSP set per request in `src/proxy.ts`.
@@ -50,13 +62,13 @@ Unit tests in `tests/unit/csp.test.ts` pin these rules. The smoke tests check th
 
 | Risk                                           | Control                                                                                                                                                      | Status                                                                          |
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
-| A01 Broken access control                      | RLS on every table, with tests per role; server-side role guard on every dashboard/admin route and action; unguessable order tokens                          | Catalogue RLS + tests done (Phase 1); orders and staff routes planned (2, 4, 6) |
+| A01 Broken access control                      | RLS on every table, with tests per role; server-side role guard on every dashboard/admin route and action; unguessable order tokens                          | Catalogue and order RLS + tests done (Phases 1, 2); staff routes planned (4, 6) |
 | A02 Cryptographic failures                     | HTTPS only (HSTS); secrets only in env vars; no card data ever touches our servers (PayHere hosted page)                                                     | Headers done (Phase 0)                                                          |
 | A03 Injection                                  | Zod validation on every server input; parameterised queries via supabase-js; no `dangerouslySetInnerHTML` (ESLint `react/no-danger`); CSP                    | Lint rule and CSP done (Phase 0)                                                |
-| A04 Insecure design                            | Server-side pricing; idempotency keys on orders; webhook-only payment confirmation; documented decisions                                                     | Planned (Phases 2, 3)                                                           |
+| A04 Insecure design                            | Server-side pricing; idempotency keys on orders; webhook-only payment confirmation; documented decisions                                                     | Pricing, idempotency done (Phase 2); payments planned (Phase 3)                 |
 | A05 Security misconfiguration                  | Security headers; `poweredByHeader: false`; env validation; storage bucket policies                                                                          | Headers done (Phase 0)                                                          |
 | A06 Vulnerable components                      | Dependabot; `npm audit` (production deps) in CI; CodeQL                                                                                                      | Done (Phase 0)                                                                  |
-| A07 Identification and authentication failures | Supabase Auth with secure cookies; TOTP MFA for admins and managers; rate limits and backoff on login                                                        | Planned (Phases 2, 4, 6)                                                        |
+| A07 Identification and authentication failures | Supabase Auth with secure cookies; TOTP MFA for admins and managers; rate limits and backoff on login                                                        | Cookies, passwords, rate limits done (Phase 2); MFA planned (Phases 4, 6)       |
 | A08 Software and data integrity failures       | PayHere `md5sig` verification and amount/currency check; lockfile + `npm ci`; branch protection with required CI                                             | CI done (Phase 0); PayHere planned (Phase 3)                                    |
 | A09 Logging and monitoring failures            | Audit log of staff/admin actions; raw payment payloads stored                                                                                                | Planned (Phases 3, 6)                                                           |
 | A10 Server-side request forgery                | No user-supplied URLs are fetched server-side; image hosts allow-listed in `next.config.ts`; promotion links limited to internal paths by a check constraint | Done (Phases 0, 1)                                                              |

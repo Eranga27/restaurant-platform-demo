@@ -43,6 +43,18 @@ npx supabase db push --include-seed
 
 Add the same three variables to the Vercel project (Settings → Environment Variables) so previews use the database too.
 
+Ordering, tracking and accounts need Supabase; without it the checkout shows a "not available" notice. For the demo, turn off **Authentication → Sign In / Providers → Email → Confirm email** in the Supabase dashboard. Supabase's built-in email service only delivers to the project's team members, so other people can't confirm their sign-up otherwise (docs/DECISIONS.md D10).
+
+### Testing orders
+
+The order journeys in `tests/e2e/order.spec.ts` need a database and are skipped by default. CI runs them against a local Supabase (`supabase start`, which needs Docker). To run them yourself against the database in `.env.local`, build first, then:
+
+```bash
+E2E_DATABASE=1 npx playwright test tests/e2e/order.spec.ts --project=mobile
+```
+
+Each run places a real (cash on delivery) test order in that database.
+
 ## Scripts
 
 | Script                            | What it does                                                                                                                  |
@@ -66,14 +78,15 @@ All variables are documented in [.env.example](.env.example). Public values (`NE
 ```
 src/
   app/            Routes: [locale]/(site) for the public site, (internal) for the styleguide
-  components/     ui/ (design system, shadcn/ui based), site/, home/, menu/, branches/
+  components/     ui/ (design system, shadcn/ui based), site/, home/, menu/, branches/, cart/, checkout/, track/, auth/
   config/         Brand defaults, fonts and photos: the main rebranding surface
   content/        Policy text
   data/seed.ts    Demo content (source of supabase/seed.sql and the no-database fallback)
+  emails/         Email templates (React Email)
   i18n/           Locale routing and message loading
-  lib/            Data access, pricing, money, hours, phone numbers, security, Supabase clients, env
+  lib/            Data access, cart, orders, pricing, money, hours, phone numbers, auth, email, security, Supabase clients, env
   messages/       UI text in English, Sinhala and Tamil
-  proxy.ts        Locale routing and per-request CSP; session refresh in Phase 2
+  proxy.ts        Locale routing, per-request CSP and session refresh
 supabase/         Migrations and generated seed data
 scripts/          Seed generator
 tests/            unit/ (Vitest, including database tests on PGlite) and e2e/ (Playwright)
