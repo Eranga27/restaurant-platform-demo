@@ -8,6 +8,7 @@ const eslintConfig = defineConfig([
   ...nextTs,
   prettier,
   {
+    files: ["**/*.{js,jsx,mjs,ts,tsx,mts}"],
     rules: {
       // User content is never rendered as HTML. The one exception (JSON-LD)
       // goes through a single reviewed helper with an inline disable.

@@ -16,7 +16,7 @@ At runtime, the `brand` JSON in the `settings` table overrides these defaults wi
 
 ## 2. Logo: `public/brand/`
 
-Replace `mark.svg`, the square mark used in the header and as the app icon, and copy it to `src/app/icon.svg` for the favicon. By default the brand name is set in the display font next to the mark. If the client has a full wordmark image, add it here and set `logo.wordmark` in `brand.ts`.
+Replace `mark.svg`, the square mark used in the header and as the app icon, copy it to `src/app/icon.svg`, and run `npm run brand:favicon` to regenerate `src/app/favicon.ico`. By default the brand name is set in the display font next to the mark. If the client has a full wordmark image, add it here and set `logo.wordmark` in `brand.ts`.
 
 ## 3. Photos: `src/config/media.ts`
 
