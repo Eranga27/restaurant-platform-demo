@@ -185,9 +185,10 @@ export async function placeOrder(
       .single<{ order_id: string; public_token: string; order_number: string; created: boolean }>();
 
     if (!error && data) {
-      if (data.created) {
+      // Online-payment orders are confirmed once PayHere reports the payment.
+      if (data.created && request.paymentMethod === "cod") {
         after(() =>
-          sendConfirmation(data.public_token).catch((e) =>
+          sendOrderConfirmation(data.public_token).catch((e) =>
             console.error("[order] email failed", e),
           ),
         );
@@ -220,6 +221,7 @@ const orderRow = z.object({
   customer_email: z.string().nullable(),
   type: z.enum(["delivery", "pickup"]),
   status: z.enum([
+    "awaiting_payment",
     "received",
     "accepted",
     "preparing",
@@ -240,7 +242,7 @@ const orderRow = z.object({
   delivery_fee_cents: z.number().int(),
   total_cents: z.number().int(),
   payment_method: z.enum(["cod", "payhere"]),
-  payment_status: z.enum(["pending", "paid", "failed", "refunded"]),
+  payment_status: z.enum(["pending", "paid", "failed", "refunded", "charged_back"]),
   locale: z.enum(["en", "si", "ta"]),
   rejection_reason: z.string().nullable(),
   created_at: z.string(),
@@ -309,7 +311,8 @@ export function trackingPath(token: string, locale: Locale): string {
   return `${locale === "en" ? "" : `/${locale}`}/track/${token}`;
 }
 
-async function sendConfirmation(token: string): Promise<void> {
+/** Emails the order confirmation, if the customer gave an email address. */
+export async function sendOrderConfirmation(token: string): Promise<void> {
   const order = await getOrderByToken(token);
   if (!order?.customer_email) return;
 
@@ -402,9 +405,11 @@ async function sendConfirmation(token: string): Promise<void> {
         itemsLabel: t("items"),
         totals,
         payment:
-          order.type === "delivery"
-            ? t("cod", { amount: formatLKR(order.total_cents) })
-            : t("codPickup", { amount: formatLKR(order.total_cents) }),
+          order.payment_status === "paid"
+            ? t("paidOnline", { amount: formatLKR(order.total_cents) })
+            : order.type === "delivery"
+              ? t("cod", { amount: formatLKR(order.total_cents) })
+              : t("codPickup", { amount: formatLKR(order.total_cents) }),
         track: t("track"),
         footer,
       },

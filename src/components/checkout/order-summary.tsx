@@ -24,6 +24,7 @@ type OrderSummaryProps = {
   onPromoChange: (code: string | null) => void;
   onRemoveLine: (key: string) => void;
   submitError: string | null;
+  paymentMethod: "cod" | "payhere";
   placing: boolean;
   canPlace: boolean;
   turnstile: ReactNode;
@@ -269,14 +270,16 @@ export function OrderSummary(props: OrderSummaryProps) {
         {props.placing ? (
           <>
             <Loader2 data-icon="inline-start" aria-hidden className="animate-spin" />
-            {t("placing")}
+            {props.paymentMethod === "payhere" ? t("redirectingToPayment") : t("placing")}
           </>
         ) : loading ? (
           t("calculating")
         ) : props.waitingForTurnstile ? (
           t("verifying")
         ) : (
-          t("placeOrder", { total: totals ? formatLKR(totals.totalCents) : "" })
+          t(props.paymentMethod === "payhere" ? "placeOrderAndPay" : "placeOrder", {
+            total: totals ? formatLKR(totals.totalCents) : "",
+          })
         )}
       </Button>
       <p className="text-center text-xs text-muted-foreground">

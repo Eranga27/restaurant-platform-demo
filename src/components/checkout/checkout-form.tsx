@@ -9,6 +9,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import { placeOrderAction } from "@/app/[locale]/(site)/checkout/actions";
+import { submitPaymentForm } from "@/components/payments/submit-payment-form";
 import { OpenStatus } from "@/components/site/open-status";
 import { Turnstile } from "@/components/security/turnstile";
 import { Button } from "@/components/ui/button";
@@ -55,6 +56,8 @@ type CheckoutFormProps = {
   branches: CheckoutBranch[];
   districts: DistrictOption[];
   features: { delivery: boolean; pickup: boolean };
+  /** Which payment methods this deployment offers. */
+  payments: { online: boolean; cash: boolean };
   charges: { serviceChargePercent: number; vatPercent: number; minimumOrderCents: number };
   initialContact: { name: string; phone: string; email: string };
   signedIn: boolean;
@@ -78,10 +81,17 @@ const fieldsSchema = z.object({
 type Fields = z.infer<typeof fieldsSchema>;
 
 type SubmitError =
-  "fixErrors" | "rate-limited" | "bot-check" | "promo-exhausted" | "unavailable" | "unknown";
+  | "fixErrors"
+  | "rate-limited"
+  | "bot-check"
+  | "promo-exhausted"
+  | "payment-unavailable"
+  | "unavailable"
+  | "unknown";
 
 export function CheckoutForm(props: CheckoutFormProps) {
-  const { branches, districts, features, charges, initialContact, signedIn, nonce } = props;
+  const { branches, districts, features, payments, charges, initialContact, signedIn, nonce } =
+    props;
   const t = useTranslations("Checkout");
   const locale = useLocale();
   const router = useRouter();
@@ -95,6 +105,9 @@ export function CheckoutForm(props: CheckoutFormProps) {
   const [turnstileReset, setTurnstileReset] = useState(0);
   const [placing, setPlacing] = useState(false);
   const [submitError, setSubmitError] = useState<SubmitError | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<"cod" | "payhere">(
+    payments.online ? "payhere" : "cod",
+  );
   // One key per checkout: a retried submit can never create a second order.
   const [idempotencyKey] = useState(() => crypto.randomUUID());
 
@@ -206,7 +219,7 @@ export function CheckoutForm(props: CheckoutFormProps) {
             }
           : null,
       notes: values.notes.trim() || null,
-      paymentMethod: "cod",
+      paymentMethod,
       idempotencyKey,
       turnstileToken,
       locale,
@@ -214,7 +227,9 @@ export function CheckoutForm(props: CheckoutFormProps) {
 
     if (response.ok) {
       cart.clear();
-      router.push(response.trackingPath);
+      // Leave the button spinning: the browser is on its way to PayHere or the tracking page.
+      if (response.payment) submitPaymentForm(response.payment);
+      else router.push(response.nextPath);
       return;
     }
 
@@ -520,31 +535,36 @@ export function CheckoutForm(props: CheckoutFormProps) {
         </Section>
 
         <Section title={t("paymentTitle")}>
-          <RadioGroup value="cod" className="gap-3">
-            <Label
-              htmlFor="pay-cod"
-              className="flex cursor-pointer items-start gap-3 rounded-xl border border-primary bg-primary/5 p-4 font-normal"
+          {payments.online || payments.cash ? (
+            <RadioGroup
+              value={paymentMethod}
+              onValueChange={(value) => setPaymentMethod(value as "cod" | "payhere")}
+              className="gap-3"
             >
-              <RadioGroupItem value="cod" id="pay-cod" className="mt-1" />
-              <span className="space-y-1">
-                <span className="flex items-center gap-2 font-semibold">
-                  <Banknote aria-hidden className="size-4" />
-                  {type === "delivery" ? t("cod") : t("codPickup")}
-                </span>
-                <span className="block text-sm text-muted-foreground">{t("codHint")}</span>
-              </span>
-            </Label>
-            <div className="flex items-start gap-3 rounded-xl border border-dashed p-4 opacity-70">
-              <RadioGroupItem value="payhere" id="pay-card" className="mt-1" disabled />
-              <span className="space-y-1">
-                <span className="flex items-center gap-2 font-semibold">
-                  <CreditCard aria-hidden className="size-4" />
-                  {t("card")}
-                </span>
-                <span className="block text-sm text-muted-foreground">{t("cardSoon")}</span>
-              </span>
-            </div>
-          </RadioGroup>
+              {payments.online && (
+                <PaymentOption
+                  id="pay-online"
+                  value="payhere"
+                  selected={paymentMethod === "payhere"}
+                  icon={<CreditCard aria-hidden className="size-4" />}
+                  title={t("payOnline")}
+                  hint={t("payOnlineHint")}
+                />
+              )}
+              {payments.cash && (
+                <PaymentOption
+                  id="pay-cod"
+                  value="cod"
+                  selected={paymentMethod === "cod"}
+                  icon={<Banknote aria-hidden className="size-4" />}
+                  title={type === "delivery" ? t("cod") : t("codPickup")}
+                  hint={t("codHint")}
+                />
+              )}
+            </RadioGroup>
+          ) : (
+            <p className="text-sm text-muted-foreground">{t("noPaymentMethod")}</p>
+          )}
         </Section>
       </div>
 
@@ -559,8 +579,15 @@ export function CheckoutForm(props: CheckoutFormProps) {
         onPromoChange={cart.setPromoCode}
         onRemoveLine={cart.remove}
         submitError={submitError}
+        paymentMethod={paymentMethod}
         placing={placing}
-        canPlace={Boolean(quote && quote.issues.length === 0 && !loading && turnstileToken)}
+        canPlace={Boolean(
+          quote &&
+          quote.issues.length === 0 &&
+          !loading &&
+          turnstileToken &&
+          (payments.online || payments.cash),
+        )}
         turnstile={
           <Turnstile
             nonce={nonce}
@@ -572,6 +599,34 @@ export function CheckoutForm(props: CheckoutFormProps) {
         waitingForTurnstile={!turnstileToken}
       />
     </form>
+  );
+}
+
+function PaymentOption(props: {
+  id: string;
+  value: "cod" | "payhere";
+  selected: boolean;
+  icon: React.ReactNode;
+  title: string;
+  hint: string;
+}) {
+  return (
+    <Label
+      htmlFor={props.id}
+      className={cn(
+        "flex cursor-pointer items-start gap-3 rounded-xl border p-4 font-normal transition-colors",
+        props.selected ? "border-primary bg-primary/5" : "hover:bg-muted/50",
+      )}
+    >
+      <RadioGroupItem value={props.value} id={props.id} className="mt-1" />
+      <span className="space-y-1">
+        <span className="flex items-center gap-2 font-semibold">
+          {props.icon}
+          {props.title}
+        </span>
+        <span className="block text-sm text-muted-foreground">{props.hint}</span>
+      </span>
+    </Label>
   );
 }
 

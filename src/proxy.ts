@@ -3,7 +3,8 @@ import createIntlMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { routing } from "@/i18n/routing";
-import { buildCsp, createNonce, needsStrictCsp } from "@/lib/security/csp";
+import { payhereOrigin } from "@/lib/payments/payhere";
+import { buildCsp, createNonce, needsStrictCsp, postsPaymentForm } from "@/lib/security/csp";
 import { hardenCookie } from "@/lib/supabase/cookies";
 
 const handleI18nRouting = createIntlMiddleware(routing);
@@ -27,7 +28,16 @@ export async function proxy(request: NextRequest) {
 
   const strict = needsStrictCsp(pathname);
   const nonce = strict ? createNonce() : undefined;
-  const csp = buildCsp({ nonce, isDev, supabaseOrigin: originOf(supabaseUrl) });
+  const payhere =
+    process.env.PAYHERE_MERCHANT_ID && process.env.PAYHERE_MERCHANT_SECRET
+      ? payhereOrigin(process.env.PAYHERE_SANDBOX !== "false")
+      : undefined;
+  const csp = buildCsp({
+    nonce,
+    isDev,
+    supabaseOrigin: originOf(supabaseUrl),
+    formTargets: payhere && postsPaymentForm(pathname) ? [payhere] : [],
+  });
 
   // Refresh an expiring session before the page renders. Only where a session
   // matters, so public static pages don't pay for a round trip to Supabase.

@@ -11,6 +11,7 @@ import { getBrand } from "@/lib/data/brand";
 import { getBranches } from "@/lib/data/catalogue";
 import { getDistricts } from "@/lib/data/places";
 import { orderingEnabled } from "@/lib/orders/service";
+import { onlinePaymentsEnabled } from "@/lib/payments/service";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
 
 // Per-request nonce (strict CSP) and the signed-in user: always dynamic.
@@ -75,6 +76,7 @@ export default async function CheckoutPage({ params }: PageProps<"/[locale]/chec
         }))}
         districts={districts}
         features={{ delivery: brand.features.delivery, pickup: brand.features.pickup }}
+        payments={{ online: onlinePaymentsEnabled(), cash: brand.features.cashOnDelivery }}
         charges={{
           serviceChargePercent: brand.charges.serviceChargeBps / 100,
           vatPercent: brand.charges.vatBps / 100,

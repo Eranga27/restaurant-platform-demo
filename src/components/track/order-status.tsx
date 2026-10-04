@@ -1,17 +1,19 @@
 "use client";
 
-import { Check, Copy, Radio } from "lucide-react";
+import { Check, Copy, CreditCard, Loader2, Radio } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { Link } from "@/i18n/navigation";
 import { publicEnv } from "@/lib/public-env";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
 export type OrderStatusValue =
+  | "awaiting_payment"
   | "received"
   | "accepted"
   | "preparing"
@@ -41,12 +43,18 @@ export function OrderStatus({
   initialStatus,
   branchName,
   rejectionReason,
+  unpaidOnline,
+  returningFromPayment,
 }: {
   token: string;
   type: "delivery" | "pickup";
   initialStatus: OrderStatusValue;
   branchName: string;
   rejectionReason: string | null;
+  /** An online-payment order that hasn't been paid. */
+  unpaidOnline: boolean;
+  /** Just back from PayHere: its notification may still be on its way. */
+  returningFromPayment: boolean;
 }) {
   const t = useTranslations("Track");
   const router = useRouter();
@@ -122,10 +130,43 @@ export function OrderStatus({
         </div>
       </div>
 
-      {status === "rejected" || status === "cancelled" ? (
+      {status === "awaiting_payment" ? (
+        returningFromPayment && unpaidOnline ? (
+          <div role="status" className="flex items-start gap-3 rounded-xl bg-muted p-4">
+            <Loader2 aria-hidden className="mt-0.5 size-5 shrink-0 animate-spin text-primary" />
+            <span className="space-y-1">
+              <span className="block font-semibold">{t("confirmingPayment")}</span>
+              <span className="block text-sm text-muted-foreground">
+                {t("confirmingPaymentHint")}
+              </span>
+              <Link
+                href={`/pay/${token}`}
+                className="inline-block text-sm font-medium text-primary underline underline-offset-2"
+              >
+                {t("paymentProblem")}
+              </Link>
+            </span>
+          </div>
+        ) : (
+          <div className="space-y-3 rounded-xl bg-highlight/15 p-4">
+            <p className="font-semibold">{t("awaitingPayment")}</p>
+            <p className="text-sm text-muted-foreground">{t("awaitingPaymentHint")}</p>
+            <Button asChild>
+              <Link href={`/pay/${token}`}>
+                <CreditCard data-icon="inline-start" aria-hidden />
+                {t("completePayment")}
+              </Link>
+            </Button>
+          </div>
+        )
+      ) : status === "rejected" || status === "cancelled" ? (
         <div role="alert" className="space-y-1 rounded-xl bg-destructive/10 p-4 text-destructive">
           <p className="font-semibold">
-            {status === "rejected" ? t("rejected", { branch: branchName }) : t("cancelled")}
+            {status === "rejected"
+              ? t("rejected", { branch: branchName })
+              : unpaidOnline
+                ? t("cancelledUnpaid")
+                : t("cancelled")}
           </p>
           {status === "rejected" && rejectionReason && (
             <p>{t("rejectedReason", { reason: rejectionReason })}</p>
@@ -184,7 +225,9 @@ export function OrderStatus({
         </ol>
       )}
       <p className="sr-only" role="status" aria-live="polite">
-        {t(`steps.${status === "rejected" || status === "cancelled" ? "received" : status}`)}
+        {status === "awaiting_payment"
+          ? t("awaitingPayment")
+          : t(`steps.${status === "rejected" || status === "cancelled" ? "received" : status}`)}
       </p>
     </section>
   );
