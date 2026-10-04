@@ -120,8 +120,8 @@ jobs:
             if (select count(*) from public.branches) <> 3 then
               raise exception 'expected 3 branches';
             end if;
-            if not exists (select 1 from cron.job where jobname = 'expire-unpaid-orders') then
-              raise exception 'expected the unpaid-order expiry job';
+            if (select count(*) from cron.job where jobname in ('expire-unpaid-orders', 'auto-reject-orders')) <> 2 then
+              raise exception 'expected the unpaid-order expiry and auto-reject jobs';
             end if;
             if (select count(*) from public.promo_codes) < 1 then
               raise exception 'expected seeded promo codes';
@@ -154,10 +154,11 @@ jobs:
       - name: Order journeys
         env:
           E2E_DATABASE: "1"
-        run: npm run test:e2e -- tests/e2e/order.spec.ts tests/e2e/payment.spec.ts --project=mobile
+        run: npm run test:e2e -- tests/e2e/order.spec.ts tests/e2e/payment.spec.ts tests/e2e/dashboard.spec.ts --project=mobile
 
+      # Kept on success too: the journeys attach screenshots of the staff screens.
       - name: Upload Playwright report
-        if: failure()
+        if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: playwright-report-database
