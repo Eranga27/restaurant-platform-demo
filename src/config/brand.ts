@@ -9,6 +9,7 @@ import { z } from "zod";
  * are bundled at build time, see `src/config/fonts.ts`.
  */
 
+const e164 = z.string().regex(/^\+94[0-9]{9}$/, "Expected a Sri Lankan number in E.164 format");
 const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/, "Expected a #RRGGBB colour");
 
 /** Percentages are stored as basis points so all money maths stays integer. 1000 = 10%. */
@@ -63,9 +64,10 @@ export const brandSchema = z.object({
   }),
   colors: brandColorsSchema,
   contact: z.object({
-    phone: z.string(),
+    /** E.164, e.g. +94110000700 */
+    phone: e164,
     email: z.email(),
-    whatsapp: z.string().nullable(),
+    whatsapp: e164.nullable(),
     address: z.string(),
   }),
   social: z.object({
@@ -111,9 +113,10 @@ export const defaultBrand = brandSchema.parse({
     foreground: "#2a1d14",
   },
   contact: {
-    phone: "+94 11 234 5678",
-    email: "hello@kithulandco.lk",
-    whatsapp: "+94 77 123 4567",
+    // 000 blocks: unlikely to be anyone's real number. Calls are disabled in demo mode.
+    phone: "+94110000700",
+    email: "hello@kithul.example",
+    whatsapp: "+94770000700",
     address: "42 Flower Road, Colombo 07",
   },
   social: {
@@ -147,11 +150,3 @@ export const defaultBrand = brandSchema.parse({
   currency: "LKR",
   timeZone: "Asia/Colombo",
 } satisfies Brand);
-
-/**
- * The brand currently in effect. Phase 1 merges the `settings` row over the
- * defaults here; until then this returns the defaults.
- */
-export async function getBrand(): Promise<Brand> {
-  return defaultBrand;
-}

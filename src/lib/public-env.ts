@@ -9,7 +9,10 @@ const TURNSTILE_TEST_SITE_KEY = "1x00000000000000000000AA";
 
 export const publicEnv = {
   siteUrl: stripTrailingSlash(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  demoMode: process.env.NEXT_PUBLIC_DEMO_MODE === "true",
+  /** On unless explicitly "false", so a fresh deployment is clearly marked as a demo. */
+  demoMode: process.env.NEXT_PUBLIC_DEMO_MODE !== "false",
+  /** Off by default: a fictional restaurant should not appear in search results. */
+  allowIndexing: process.env.NEXT_PUBLIC_ALLOW_INDEXING === "true",
   supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL || undefined,
   supabasePublishableKey:
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
