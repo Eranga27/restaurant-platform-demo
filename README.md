@@ -45,15 +45,25 @@ Add the same three variables to the Vercel project (Settings → Environment Var
 
 Ordering, tracking and accounts need Supabase; without it the checkout shows a "not available" notice. For the demo, turn off **Authentication → Sign In / Providers → Email → Confirm email** in the Supabase dashboard. Supabase's built-in email service only delivers to the project's team members, so other people can't confirm their sign-up otherwise (docs/DECISIONS.md D10).
 
+### Online payments (PayHere)
+
+Without PayHere keys, customers pay in cash. To take payments online (sandbox, no real money):
+
+1. Create a free account at [sandbox.payhere.lk](https://sandbox.payhere.lk).
+2. In **Integrations**, add the production domain (for this demo `restaurant-platform-demo-alpha.vercel.app`) and copy the Merchant ID and the Merchant Secret shown next to the domain.
+3. In Vercel, add `PAYHERE_MERCHANT_ID`, `PAYHERE_MERCHANT_SECRET` (mark it sensitive) and `PAYHERE_SANDBOX=true` for **Production** only, then redeploy.
+
+PayHere only accepts payments started from the registered domain and must be able to reach `/api/payments/payhere/notify`, so online payment works on production, not on previews or localhost (docs/DECISIONS.md D32). Sandbox test card: `4916 2175 0161 1292`, any future expiry, any name and CVV. `4024 0071 9434 9121` is declined.
+
 ### Testing orders
 
-The order journeys in `tests/e2e/order.spec.ts` need a database and are skipped by default. CI runs them against a local Supabase (`supabase start`, which needs Docker). To run them yourself against the database in `.env.local`, build first, then:
+The order and payment journeys in `tests/e2e/order.spec.ts` and `payment.spec.ts` need a database and are skipped by default. CI runs them against a local Supabase (`supabase start`, which needs Docker). To run them yourself against the database in `.env.local`, build first, then:
 
 ```bash
 E2E_DATABASE=1 npx playwright test tests/e2e/order.spec.ts --project=mobile
 ```
 
-Each run places a real (cash on delivery) test order in that database.
+The payment journeys also need `PAYHERE_MERCHANT_ID` and `PAYHERE_MERCHANT_SECRET` set to made-up values: they stand in for PayHere and sign its notifications themselves. Each run places real test orders in that database.
 
 ## Scripts
 
