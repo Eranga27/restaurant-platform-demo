@@ -153,19 +153,28 @@ describe("signed-in customers", () => {
 });
 
 describe("branch staff and admins", () => {
-  const overrideFor = (branchSlug: string) => `
-    insert into public.branch_menu_overrides (branch_id, menu_item_id, is_available)
-    select b.id, m.id, false from public.branches b, public.menu_items m
-    where b.slug = '${branchSlug}' and m.slug = 'egg-hoppers'
-    on conflict (branch_id, menu_item_id) do update set is_available = excluded.is_available
-    returning branch_id`;
+  const setAvailability = (branchSlug: string) => `
+    select public.set_item_availability(b.id, m.id, false) as available
+    from public.branches b, public.menu_items m
+    where b.slug = '${branchSlug}' and m.slug = 'egg-hoppers'`;
 
   it("staff can mark items sold out at their own branch only", async () => {
     await asRole(db, "authenticated", NUGEGODA_STAFF, async (tx) => {
-      expect((await tx.query(overrideFor("nugegoda"))).rows).toHaveLength(1);
+      expect((await tx.query(setAvailability("nugegoda"))).rows).toEqual([{ available: false }]);
     });
     await asRole(db, "authenticated", NUGEGODA_STAFF, async (tx) => {
-      await expect(tx.query(overrideFor("kandy"))).rejects.toThrow(/row-level security/);
+      await expect(tx.query(setAvailability("kandy"))).rejects.toThrow(/not_allowed/);
+    });
+  });
+
+  it("staff can't write branch prices or availability directly", async () => {
+    await asRole(db, "authenticated", NUGEGODA_STAFF, async (tx) => {
+      await expect(
+        tx.query(`
+          insert into public.branch_menu_overrides (branch_id, menu_item_id, price_cents)
+          select b.id, m.id, 1 from public.branches b, public.menu_items m
+          where b.slug = 'nugegoda' and m.slug = 'egg-hoppers'`),
+      ).rejects.toThrow(/row-level security/);
     });
   });
 
