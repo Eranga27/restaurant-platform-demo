@@ -35,7 +35,8 @@ const PICKUP_STEPS = ["received", "accepted", "preparing", "ready", "completed"]
 /**
  * Live status timeline. Listens on the order's Realtime broadcast topic
  * (`order:<token>`, sent by a database trigger) and refreshes the page data on
- * each change. Falls back to polling if the live connection drops.
+ * each change. Also re-checks on connecting and every so often, because a
+ * broadcast sent while the connection was opening or down is never replayed.
  */
 export function OrderStatus({
   token,
@@ -44,6 +45,7 @@ export function OrderStatus({
   branchName,
   rejectionReason,
   unpaidOnline,
+  paid,
   returningFromPayment,
 }: {
   token: string;
@@ -53,6 +55,7 @@ export function OrderStatus({
   rejectionReason: string | null;
   /** An online-payment order that hasn't been paid. */
   unpaidOnline: boolean;
+  paid: boolean;
   /** Just back from PayHere: its notification may still be on its way. */
   returningFromPayment: boolean;
 }) {
@@ -78,17 +81,23 @@ export function OrderStatus({
         if (next) setStatus(next);
         router.refresh();
       })
-      .subscribe((state) => setLive(state === "SUBSCRIBED"));
+      .subscribe((state) => {
+        setLive(state === "SUBSCRIBED");
+        // Catch up on anything that changed between rendering and connecting:
+        // broadcasts aren't replayed.
+        if (state === "SUBSCRIBED") router.refresh();
+      });
     return () => {
       void supabase.removeChannel(channel);
     };
   }, [token, router]);
 
-  // Polling fallback while not connected, until the order is finished.
+  // Re-check now and then until the order is finished: often while offline,
+  // and occasionally while live in case a broadcast was missed.
   const finished = status === "completed" || status === "rejected" || status === "cancelled";
   useEffect(() => {
-    if (live || finished) return;
-    const timer = setInterval(() => router.refresh(), 30_000);
+    if (finished) return;
+    const timer = setInterval(() => router.refresh(), live ? 20_000 : 10_000);
     return () => clearInterval(timer);
   }, [live, finished, router]);
 
@@ -171,7 +180,7 @@ export function OrderStatus({
           {status === "rejected" && rejectionReason && (
             <p>{t("rejectedReason", { reason: rejectionReason })}</p>
           )}
-          <p className="text-sm">{t("rejectedHelp")}</p>
+          <p className="text-sm">{paid ? t("rejectedHelpPaid") : t("rejectedHelp")}</p>
         </div>
       ) : (
         <ol className="space-y-0">
