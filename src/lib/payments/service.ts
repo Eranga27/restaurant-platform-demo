@@ -6,6 +6,7 @@ import { z } from "zod";
 import type { Locale } from "@/i18n/routing";
 import { getBrand } from "@/lib/data/brand";
 import { env } from "@/lib/env";
+import { alertBranchOfNewOrder } from "@/lib/notifications/new-order";
 import { orderingEnabled, sendOrderConfirmation, trackingPath } from "@/lib/orders/service";
 import { publicEnv } from "@/lib/public-env";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -214,8 +215,14 @@ export async function handlePayHereNotification(
   }
   if (data.outcome === "applied" && data.payment_status === "paid" && data.order_token) {
     const token = data.order_token;
+    const reachedBranch = data.order_status === "received";
     after(() =>
-      sendOrderConfirmation(token).catch((e) => console.error("[payment] email failed", e)),
+      Promise.all([
+        sendOrderConfirmation(token).catch((e) => console.error("[payment] email failed", e)),
+        reachedBranch
+          ? alertBranchOfNewOrder(token).catch((e) => console.error("[payment] alert failed", e))
+          : null,
+      ]),
     );
   }
   return { ok: true, outcome: data.outcome };
@@ -239,7 +246,10 @@ export async function payOnDeliveryInstead(token: string): Promise<boolean> {
   }
   if (data === true) {
     after(() =>
-      sendOrderConfirmation(token).catch((e) => console.error("[payment] email failed", e)),
+      Promise.all([
+        sendOrderConfirmation(token).catch((e) => console.error("[payment] email failed", e)),
+        alertBranchOfNewOrder(token).catch((e) => console.error("[payment] alert failed", e)),
+      ]),
     );
   }
   return data === true;

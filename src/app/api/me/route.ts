@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { getStaff } from "@/lib/auth/staff";
 import { getCurrentUser } from "@/lib/supabase/server";
 
 /**
@@ -8,8 +9,11 @@ import { getCurrentUser } from "@/lib/supabase/server";
  */
 export async function GET() {
   const user = await getCurrentUser();
+  const staff = user ? await getStaff() : null;
   return NextResponse.json(
-    user ? { signedIn: true, name: user.name, email: user.email } : { signedIn: false },
+    user
+      ? { signedIn: true, name: user.name, email: user.email, staff: staff !== null }
+      : { signedIn: false },
     { headers: { "Cache-Control": "private, no-store" } },
   );
 }

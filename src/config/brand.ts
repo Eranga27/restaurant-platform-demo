@@ -82,6 +82,10 @@ export const brandSchema = z.object({
   hoursSummary: z.string(),
   features: featureFlagsSchema,
   charges: chargesSchema,
+  orders: z.object({
+    /** Orders not accepted within this many minutes are rejected automatically. 0 turns it off. */
+    autoRejectMinutes: z.number().int().min(0).max(120),
+  }),
   currency: z.literal("LKR"),
   timeZone: z.string(),
 });
@@ -150,6 +154,7 @@ export const defaultBrand = brandSchema.parse({
     },
     minimumOrderCents: 1500_00,
   },
+  orders: { autoRejectMinutes: 10 },
   currency: "LKR",
   timeZone: "Asia/Colombo",
 } satisfies Brand);
