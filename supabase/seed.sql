@@ -322,3 +322,9 @@ insert into public.reviews (id, branch_id, author_name, rating, body, status, cr
   ('36d24bcf-6add-8e06-8ab9-0048ab5a2f92', 'ffc2297a-852a-8f50-b9b2-e426e7dfb4cd', 'Priya S.', 5, 'Catered my mother''s almsgiving for forty. Everything was on time, labelled, and the vegetable curries were outstanding.', 'approved', '2026-07-30T11:00:00+05:30'),
   ('c1459157-1e7f-8ba8-bcf5-39244cfd8bdf', 'bf4db4fb-e61a-8ce2-8138-eb5aeda9ecd1', 'Tom H.', 4, 'First proper Sri Lankan meal of our trip. Staff explained every dish and the ''Medium'' spice was still an adventure for us.', 'approved', '2026-07-21T14:30:00+05:30')
 on conflict (id) do nothing;
+
+insert into public.promo_codes (id, code, description_i18n, kind, percent_bps, amount_cents, min_subtotal_cents, max_discount_cents, starts_at, ends_at, max_redemptions, is_active) values
+  ('06f7c0ce-c054-874b-af3d-48b68f154320', 'WELCOME10', '{"en":"10% off your order (up to Rs. 1,000) when you spend Rs. 2,000 or more."}'::jsonb, 'percent', 1000, null, 200000, 100000, null, null, null, true),
+  ('38ffeff5-98e8-823e-b920-a694859858d2', 'KOTTU200', '{"en":"Rs. 200 off orders of Rs. 1,500 or more."}'::jsonb, 'fixed', null, 20000, 150000, null, null, null, null, true),
+  ('d369e9db-da5a-88df-9f3b-6fd524ac36c6', 'AVURUDU26', '{"en":"New Year special (ended)."}'::jsonb, 'percent', 1500, null, 0, 150000, '2026-04-10T00:00:00+05:30', '2026-04-20T00:00:00+05:30', null, true)
+on conflict (id) do nothing;

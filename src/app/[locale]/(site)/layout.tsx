@@ -31,7 +31,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/[locale]">)
       </a>
       <DemoRibbon />
       <PoyaBanner holiday={holiday} />
-      <SiteHeader brand={brand} />
+      <SiteHeader brand={brand} branches={branches.map((b) => ({ id: b.id, name: b.name }))} />
       <main id="main" tabIndex={-1} className="flex flex-1 flex-col outline-none">
         {children}
       </main>

@@ -217,6 +217,7 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
 
       <ItemSheet
         item={openItem}
+        branchId={branchId}
         branchName={branchName}
         branchPriceCents={openItem ? (overrides[openItem.id]?.priceCents ?? null) : null}
         availability={openItem ? availabilityOf(openItem) : "available"}

@@ -32,6 +32,25 @@ const SUPABASE_STUB = `
 
   grant usage on schema public, auth to anon, authenticated, service_role;
   grant execute on function auth.uid() to anon, authenticated, service_role;
+
+  -- Supabase gives service_role (the secret key) full access to new tables.
+  alter default privileges in schema public grant all on tables to service_role;
+  alter default privileges in schema public grant all on sequences to service_role;
+
+  -- Realtime broadcast from the database. The stub records each message so
+  -- tests can assert on it.
+  create schema if not exists realtime;
+  create table realtime.sent (
+    id bigserial primary key,
+    topic text not null,
+    event text not null,
+    payload jsonb not null,
+    private boolean not null
+  );
+  create or replace function realtime.send(payload jsonb, event text, topic text, private boolean default true)
+  returns void language sql as $$
+    insert into realtime.sent (topic, event, payload, private) values (topic, event, payload, private)
+  $$;
 `;
 
 const root = (path: string) => fileURLToPath(new URL(`../../../${path}`, import.meta.url));
