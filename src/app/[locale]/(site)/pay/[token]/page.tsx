@@ -21,7 +21,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t("metaTitle"), robots: { index: false, follow: false } };
 }
 
-export default async function PayPage({ params, searchParams }: PageProps<"/[locale]/pay/[token]">) {
+export default async function PayPage({
+  params,
+  searchParams,
+}: PageProps<"/[locale]/pay/[token]">) {
   const [{ token, locale: rawLocale }, query] = await Promise.all([params, searchParams]);
   const locale = rawLocale as Locale;
   const order = await getOrderByToken(token);

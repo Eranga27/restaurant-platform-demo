@@ -74,6 +74,7 @@ export default async function TrackPage({
         branchName={branchName}
         rejectionReason={order.rejection_reason}
         unpaidOnline={order.payment_method === "payhere" && order.payment_status !== "paid"}
+        paid={order.payment_status === "paid"}
         returningFromPayment={query.payment === "return"}
       />
 

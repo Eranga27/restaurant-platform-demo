@@ -165,8 +165,7 @@ const notificationSchema = z.object({
 const NOT_STORED = new Set(["card_holder_name", "card_no", "card_expiry", "md5sig"]);
 
 export type NotificationResult =
-  | { ok: true; outcome: string }
-  | { ok: false; status: 400 | 401 | 404 | 500; reason: string };
+  { ok: true; outcome: string } | { ok: false; status: 400 | 401 | 404 | 500; reason: string };
 
 export async function handlePayHereNotification(
   params: URLSearchParams,

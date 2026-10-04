@@ -325,8 +325,8 @@
     "cod": "Cash on delivery",
     "codPickup": "Pay at the counter",
     "codHint": "Pay when your order arrives. Please have the exact amount if you can.",
-    "card": "Card or mobile wallet",
-    "cardSoon": "PayHere card and wallet payments arrive in the next update.",
+    "payOnline": "Pay online",
+    "payOnlineHint": "Visa, Mastercard, Amex or a mobile wallet, through PayHere's secure page. You'll come straight back here.",
     "promo": "Promo code",
     "promoPlaceholder": "e.g. WELCOME10",
     "applyPromo": "Apply",
@@ -343,7 +343,9 @@
     "total": "Total",
     "calculating": "Updating prices…",
     "placeOrder": "Place order · {total}",
+    "placeOrderAndPay": "Continue to payment · {total}",
     "placing": "Placing your order…",
+    "redirectingToPayment": "Taking you to PayHere…",
     "verifying": "Checking you're human…",
     "agree": "By placing your order you agree to our <terms>terms</terms> and <refunds>refund policy</refunds>.",
     "required": "Required",
@@ -368,8 +370,10 @@
       "rate-limited": "Too many attempts. Please wait a few minutes and try again.",
       "bot-check": "We couldn't confirm you're human. Please try again.",
       "unavailable": "Online ordering isn't available right now. Please call the branch.",
-      "unknown": "Something went wrong placing your order. Nothing was charged. Please try again."
-    }
+      "unknown": "Something went wrong placing your order. Nothing was charged. Please try again.",
+      "payment-unavailable": "That payment method isn't available right now. Please choose another."
+    },
+    "noPaymentMethod": "Online ordering is paused. Please call the branch to order."
   },
   "Track": {
     "metaTitle": "Order {number}",
@@ -410,7 +414,17 @@
     "cod": "Cash on delivery: please have {amount} ready.",
     "codPickup": "Pay {amount} at the counter.",
     "callBranch": "Questions? Call {branch}",
-    "orderAgain": "Back to the menu"
+    "orderAgain": "Back to the menu",
+    "paidOnline": "Paid online: {amount}.",
+    "paymentPending": "To pay online: {amount}.",
+    "awaitingPayment": "Waiting for your payment",
+    "awaitingPaymentHint": "The branch starts on your order as soon as it's paid. Unpaid orders are cancelled after 30 minutes.",
+    "completePayment": "Complete payment",
+    "confirmingPayment": "Confirming your payment…",
+    "confirmingPaymentHint": "PayHere is letting us know. This usually takes a few seconds, and this page updates by itself.",
+    "paymentProblem": "Payment didn't go through?",
+    "cancelledUnpaid": "This order was cancelled because the payment wasn't completed.",
+    "rejectedHelpPaid": "Your online payment will be refunded to the card or wallet you paid with. Please call the branch if you have questions."
   },
   "Email": {
     "subject": "Order {number} received: {brand}",
@@ -427,7 +441,8 @@
     "codPickup": "Pay {amount} at the counter when you collect.",
     "track": "Track your order",
     "footer": "{brand} · {phone}. You're getting this email because you placed an order on our website.",
-    "demoFooter": "This is a demonstration website for a fictional restaurant. No food will be delivered."
+    "demoFooter": "This is a demonstration website for a fictional restaurant. No food will be delivered.",
+    "paidOnline": "Paid online: {amount}. Thank you!"
   },
   "Auth": {
     "signInTitle": "Sign in",
@@ -453,6 +468,29 @@
       "rate-limited": "Too many attempts. Please wait a few minutes and try again.",
       "bot-check": "We couldn't confirm you're human. Please try again.",
       "unavailable": "Accounts aren't available on this demo yet.",
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
+  "Pay": {
+    "metaTitle": "Pay for your order",
+    "eyebrow": "Order {number}",
+    "title": "Complete your payment",
+    "intro": "{branch} starts on your order as soon as it's paid.",
+    "amount": "Amount to pay",
+    "payNow": "Pay securely with PayHere",
+    "redirecting": "Taking you to PayHere…",
+    "payCashDelivery": "Pay cash on delivery instead",
+    "payCashPickup": "Pay at the counter instead",
+    "onlineUnavailable": "Online payment isn't available right now.",
+    "secure": "You'll enter your card or wallet details on PayHere's page. We never see or store them.",
+    "cancelledNotice": "You cancelled the payment. Your order is saved: try again, or pay another way.",
+    "failedNotice": "Your last payment didn't go through and nothing was charged. Try again, or pay another way.",
+    "sandboxTitle": "Demo payments (PayHere sandbox)",
+    "sandboxBody": "No real money moves. Use the test card 4916 2175 0161 1292 with any future expiry date, name and CVV. The card 4024 0071 9434 9121 shows a declined payment.",
+    "errors": {
+      "rate-limited": "Too many attempts. Please wait a few minutes and try again.",
+      "attempts-exhausted": "This order has had too many payment attempts. Please call the branch.",
+      "unavailable": "Online payment isn't available right now.",
       "unknown": "Something went wrong. Please try again."
     }
   }

@@ -17,6 +17,14 @@ alter table public.orders add constraint orders_status_check check (
   )
 );
 
+alter table public.order_status_events drop constraint order_status_events_status_check;
+alter table public.order_status_events add constraint order_status_events_status_check check (
+  status in (
+    'awaiting_payment', 'received', 'accepted', 'preparing', 'ready', 'out_for_delivery',
+    'completed', 'rejected', 'cancelled'
+  )
+);
+
 alter table public.orders drop constraint orders_payment_status_check;
 alter table public.orders add constraint orders_payment_status_check check (
   payment_status in ('pending', 'paid', 'failed', 'refunded', 'charged_back')
