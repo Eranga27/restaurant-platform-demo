@@ -74,6 +74,15 @@ describe("buildCsp", () => {
     expect(connect).toContain("wss://abc.supabase.co");
     expect(connect).not.toContain("*.supabase.co");
   });
+
+  it("allows a local Supabase's plain websocket", () => {
+    const connect = directive(
+      buildCsp({ isDev: false, supabaseOrigin: "http://127.0.0.1:54321" }),
+      "connect-src",
+    );
+    expect(connect).toContain("http://127.0.0.1:54321");
+    expect(connect).toContain("ws://127.0.0.1:54321");
+  });
 });
 
 describe("createNonce", () => {

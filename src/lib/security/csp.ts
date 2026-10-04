@@ -42,7 +42,8 @@ const IMAGE_HOSTS = [
 
 export function buildCsp({ nonce, isDev, supabaseOrigin }: CspOptions): string {
   const supabase = supabaseOrigin ?? "https://*.supabase.co";
-  const supabaseWs = supabase.replace(/^https:/, "wss:");
+  // Realtime's websocket: wss:// for the hosted project, ws:// for a local Supabase.
+  const supabaseWs = supabase.replace(/^http/, "ws");
 
   const scriptSrc = nonce
     ? ["'self'", `'nonce-${nonce}'`, "'strict-dynamic'"]
