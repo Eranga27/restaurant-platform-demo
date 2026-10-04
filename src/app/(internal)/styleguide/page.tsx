@@ -23,6 +23,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { defaultBrand } from "@/config/brand";
 import { formatLKR } from "@/lib/money";
+import en from "@/messages/en.json";
 
 import { TokenSwatch } from "./token-swatch";
 
@@ -163,12 +164,12 @@ export default function StyleguidePage() {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {DIETARY_TAGS.map((tag) => (
-            <DietaryBadge key={tag} tag={tag} />
+            <DietaryBadge key={tag} tag={tag} label={en.Dietary[tag]} />
           ))}
         </div>
         <div className="flex flex-wrap items-center gap-6">
           {SPICE_LEVELS.map((level) => (
-            <SpiceLevelIndicator key={level} level={level} />
+            <SpiceLevelIndicator key={level} level={level} label={en.Spice[level]} />
           ))}
         </div>
       </Section>
@@ -183,8 +184,8 @@ export default function StyleguidePage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-wrap items-center gap-2">
-              <SpiceLevelIndicator level="hot" />
-              <DietaryBadge tag="halal" />
+              <SpiceLevelIndicator level="hot" label={en.Spice.hot} />
+              <DietaryBadge tag="halal" label={en.Dietary.halal} />
             </CardContent>
             <CardFooter className="justify-between">
               <Price cents={1650_00} />
@@ -197,7 +198,7 @@ export default function StyleguidePage() {
               <CardDescription>Crisp-edged rice flour hoppers with lunu miris.</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-wrap items-center gap-2">
-              <DietaryBadge tag="vegetarian" />
+              <DietaryBadge tag="vegetarian" label={en.Dietary.vegetarian} />
               <Badge variant="highlight">Offer</Badge>
             </CardContent>
             <CardFooter className="justify-between">
@@ -247,7 +248,7 @@ export default function StyleguidePage() {
                 <div key={level} className="flex items-center gap-2">
                   <RadioGroupItem value={level} id={`sg-spice-${level}`} />
                   <Label htmlFor={`sg-spice-${level}`} className="font-normal">
-                    <SpiceLevelIndicator level={level} />
+                    <SpiceLevelIndicator level={level} label={en.Spice[level]} />
                   </Label>
                 </div>
               ))}

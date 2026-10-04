@@ -156,6 +156,18 @@
   --shadow-lifted: 0 2px 4px rgb(66 38 18 / 0.06), 0 12px 32px rgb(66 38 18 / 0.12);
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Slow settle on the home hero image. Disabled by prefers-reduced-motion below. */
+  --animate-hero-settle: hero-settle 14s var(--ease-out-soft) both;
+
+  @keyframes hero-settle {
+    from {
+      transform: scale(1.08);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
 }
 
 @layer base {

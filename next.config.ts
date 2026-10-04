@@ -22,6 +22,19 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   reactCompiler: true,
   poweredByHeader: false,
+  turbopack: {
+    resolveAlias: {
+      // What next-intl's createNextIntlPlugin() does when no experimental options are used.
+      // Set directly because the plugin eagerly loads @swc/core, whose self-extracting
+      // native binary refuses to load from folders other users can write to (common on
+      // Windows dev machines). We build with Turbopack only, so no webpack alias is needed.
+      "next-intl/config": "./src/i18n/request.ts",
+    },
+  },
+  experimental: {
+    // One 404 for URLs outside every root layout (the site and staff areas each have their own).
+    globalNotFound: true,
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     remotePatterns: [
