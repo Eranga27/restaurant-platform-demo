@@ -4,6 +4,22 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [0.2.0] - Phase 1: Public site and menu
+
+### Added
+
+- Public site in English, Sinhala and Tamil (next-intl): English at `/`, Sinhala at `/si`, Tamil at `/ta`, with a language switcher in the header. Sinhala and Tamil cover the navigation, home, menu and branch pages; anything untranslated falls back to English. Translations are drafts awaiting native-speaker review.
+- Header with mobile navigation, footer, skip link, demo ribbon and a Poya day banner.
+- Home page: photo hero, signature dishes, current offers, branch finder with live open/closed status and "use my location", guest reviews, story and events sections.
+- Menu: 53 dishes in 9 categories with sticky category tabs, search, dietary filters (vegetarian, vegan, halal, no nuts), per-branch prices and sold-out states. Alcohol is shown as unavailable on Poya days.
+- Dish sheet with portion and add-on choices, spice level, special instructions, quantity and a live total. Every dish has a shareable link (`/menu?item=…`). Ordering itself arrives in Phase 2.
+- Branches page with an OpenStreetMap map, opening hours, delivery radius and directions.
+- About, Contact, FAQ, Privacy, Terms and Refund pages.
+- Database schema with Row Level Security on every table: roles and profiles, branches, menu, options, per-branch overrides, promotions, holidays, reviews and settings.
+- Demo data from a single source (`src/data/seed.ts`, generated into `supabase/seed.sql`). The site reads it directly when Supabase isn't configured.
+- SEO: per-page metadata with canonical and hreflang links, Restaurant, Menu and FAQ structured data, a generated share image, sitemap and robots.txt. Indexing is off for demo deployments.
+- Tests for the database access rules (on PGlite), item pricing, opening hours, phone numbers and distances, plus Playwright journeys for every public page. CI also applies the migrations and seed to the Supabase Postgres image.
+
 ## [0.1.0] - Phase 0: Setup
 
 ### Added

@@ -10,6 +10,17 @@ How the platform is protected, and the checklist the final review (Phase 8) work
 4. **The server recalculates every price.** The cart is only item IDs, options and quantities.
 5. **A payment is real only when PayHere's server-to-server notification verifies.** The browser's return URL proves nothing.
 
+## Database access (RLS)
+
+Defined in `supabase/migrations/`. Tested on every `npm test` run against an in-memory Postgres (`tests/unit/db/`), and in CI against the real Supabase Postgres image.
+
+- **Deny by default.** Each migration revokes all table privileges from `anon` and `authenticated`, then grants back only what's needed. RLS is enabled on every table; CI fails if any public table has it off.
+- **Public catalogue** (branches, menu, options, availability, running promotions, holidays, approved reviews, settings): readable by anyone; inactive rows are hidden.
+- **Catalogue writes:** admins only, through `public.is_admin()`. Branch staff and managers can change availability (sold out) for their own branch only, through `public.is_branch_staff()`.
+- **Profiles:** users read their own profile and can change only `full_name` and `phone` (column-level grant). Role and branch can't be changed through the API.
+- **New users** get a `customer` profile from a trigger. The role is never taken from user-supplied sign-up metadata.
+- Role checks are `SECURITY DEFINER` functions with an empty `search_path` that only report on the calling user.
+
 ## Headers
 
 Set for every response in `next.config.ts`, with the CSP set per request in `src/proxy.ts`.
@@ -37,18 +48,18 @@ Unit tests in `tests/unit/csp.test.ts` pin these rules. The smoke tests check th
 
 ## OWASP Top 10 (2021) checklist
 
-| Risk                                           | Control                                                                                                                                   | Status                                       |
-| ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| A01 Broken access control                      | RLS on every table, with tests per role; server-side role guard on every dashboard/admin route and action; unguessable order tokens       | Planned (Phases 1, 4, 6, 8)                  |
-| A02 Cryptographic failures                     | HTTPS only (HSTS); secrets only in env vars; no card data ever touches our servers (PayHere hosted page)                                  | Headers done (Phase 0)                       |
-| A03 Injection                                  | Zod validation on every server input; parameterised queries via supabase-js; no `dangerouslySetInnerHTML` (ESLint `react/no-danger`); CSP | Lint rule and CSP done (Phase 0)             |
-| A04 Insecure design                            | Server-side pricing; idempotency keys on orders; webhook-only payment confirmation; documented decisions                                  | Planned (Phases 2, 3)                        |
-| A05 Security misconfiguration                  | Security headers; `poweredByHeader: false`; env validation; storage bucket policies                                                       | Headers done (Phase 0)                       |
-| A06 Vulnerable components                      | Dependabot; `npm audit` (production deps) in CI; CodeQL                                                                                   | Done (Phase 0)                               |
-| A07 Identification and authentication failures | Supabase Auth with secure cookies; TOTP MFA for admins and managers; rate limits and backoff on login                                     | Planned (Phases 2, 4, 6)                     |
-| A08 Software and data integrity failures       | PayHere `md5sig` verification and amount/currency check; lockfile + `npm ci`; branch protection with required CI                          | CI done (Phase 0); PayHere planned (Phase 3) |
-| A09 Logging and monitoring failures            | Audit log of staff/admin actions; raw payment payloads stored                                                                             | Planned (Phases 3, 6)                        |
-| A10 Server-side request forgery                | No user-supplied URLs are fetched server-side; image hosts allow-listed in `next.config.ts`                                               | Done (Phase 0)                               |
+| Risk                                           | Control                                                                                                                                                      | Status                                                                          |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| A01 Broken access control                      | RLS on every table, with tests per role; server-side role guard on every dashboard/admin route and action; unguessable order tokens                          | Catalogue RLS + tests done (Phase 1); orders and staff routes planned (2, 4, 6) |
+| A02 Cryptographic failures                     | HTTPS only (HSTS); secrets only in env vars; no card data ever touches our servers (PayHere hosted page)                                                     | Headers done (Phase 0)                                                          |
+| A03 Injection                                  | Zod validation on every server input; parameterised queries via supabase-js; no `dangerouslySetInnerHTML` (ESLint `react/no-danger`); CSP                    | Lint rule and CSP done (Phase 0)                                                |
+| A04 Insecure design                            | Server-side pricing; idempotency keys on orders; webhook-only payment confirmation; documented decisions                                                     | Planned (Phases 2, 3)                                                           |
+| A05 Security misconfiguration                  | Security headers; `poweredByHeader: false`; env validation; storage bucket policies                                                                          | Headers done (Phase 0)                                                          |
+| A06 Vulnerable components                      | Dependabot; `npm audit` (production deps) in CI; CodeQL                                                                                                      | Done (Phase 0)                                                                  |
+| A07 Identification and authentication failures | Supabase Auth with secure cookies; TOTP MFA for admins and managers; rate limits and backoff on login                                                        | Planned (Phases 2, 4, 6)                                                        |
+| A08 Software and data integrity failures       | PayHere `md5sig` verification and amount/currency check; lockfile + `npm ci`; branch protection with required CI                                             | CI done (Phase 0); PayHere planned (Phase 3)                                    |
+| A09 Logging and monitoring failures            | Audit log of staff/admin actions; raw payment payloads stored                                                                                                | Planned (Phases 3, 6)                                                           |
+| A10 Server-side request forgery                | No user-supplied URLs are fetched server-side; image hosts allow-listed in `next.config.ts`; promotion links limited to internal paths by a check constraint | Done (Phases 0, 1)                                                              |
 
 ## Known dev-only advisories
 

@@ -21,7 +21,27 @@ cp .env.example .env.local
 npm run dev
 ```
 
-Open http://localhost:3000. The app runs with an empty `.env.local`; each integration falls back to safe local behaviour until you add its keys (emails print to the console, bot checks use Cloudflare's test keys, and so on).
+Open http://localhost:3000. The app runs with an empty `.env.local`; each integration falls back to safe local behaviour until you add its keys (emails print to the console, bot checks use Cloudflare's test keys, and so on). Without Supabase, the menu, branches and offers come straight from the demo data in `src/data/seed.ts`.
+
+### Connecting Supabase
+
+1. Create a free project at [supabase.com](https://supabase.com) (Singapore is the closest region to Sri Lanka).
+2. Copy the project URL, publishable key and secret key into `.env.local`.
+3. Sign in to the CLI once, link the project and push the schema and demo data:
+
+```bash
+npx supabase login
+```
+
+```bash
+npx supabase link --project-ref <your-project-ref>
+```
+
+```bash
+npx supabase db push --include-seed
+```
+
+Add the same three variables to the Vercel project (Settings → Environment Variables) so previews use the database too.
 
 ## Scripts
 
@@ -35,6 +55,7 @@ Open http://localhost:3000. The app runs with an empty `.env.local`; each integr
 | `npm test`                        | Unit tests (Vitest)                                                                                                           |
 | `npm run test:e2e`                | Browser tests (Playwright) against a production build. Run `npm run build` first, and `npx playwright install chromium` once. |
 | `npm run check`                   | Everything CI runs, except the browser tests                                                                                  |
+| `npm run db:seed`                 | Regenerate `supabase/seed.sql` from `src/data/seed.ts`                                                                        |
 
 ## Environment variables
 
@@ -44,13 +65,18 @@ All variables are documented in [.env.example](.env.example). Public values (`NE
 
 ```
 src/
-  app/            Routes (App Router)
-  components/ui/  Design-system components (shadcn/ui based)
-  config/         Brand defaults and fonts: the main rebranding surface
-  lib/            Money, security, Supabase clients, env
-  proxy.ts        Per-request headers (CSP); i18n and session refresh later
-supabase/         Migrations and seed data
-tests/            unit/ (Vitest) and e2e/ (Playwright)
+  app/            Routes: [locale]/(site) for the public site, (internal) for the styleguide
+  components/     ui/ (design system, shadcn/ui based), site/, home/, menu/, branches/
+  config/         Brand defaults, fonts and photos: the main rebranding surface
+  content/        Policy text
+  data/seed.ts    Demo content (source of supabase/seed.sql and the no-database fallback)
+  i18n/           Locale routing and message loading
+  lib/            Data access, pricing, money, hours, phone numbers, security, Supabase clients, env
+  messages/       UI text in English, Sinhala and Tamil
+  proxy.ts        Locale routing and per-request CSP; session refresh in Phase 2
+supabase/         Migrations and generated seed data
+scripts/          Seed generator
+tests/            unit/ (Vitest, including database tests on PGlite) and e2e/ (Playwright)
 docs/             Plan, decisions, security, credits, rebranding
 ```
 
