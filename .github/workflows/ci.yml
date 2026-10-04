@@ -38,8 +38,13 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
-      - name: Unit tests
+      - name: Unit tests (includes RLS tests on PGlite)
         run: npm run test
+
+      - name: Seed SQL is up to date
+        run: |
+          npm run db:seed
+          git diff --exit-code supabase/seed.sql || (echo "::error::supabase/seed.sql is out of date. Run npm run db:seed and commit." && exit 1)
 
       - name: Audit production dependencies
         run: npm audit --omit=dev --audit-level=high
@@ -68,3 +73,43 @@ jobs:
           name: playwright-report
           path: playwright-report
           retention-days: 7
+
+  database:
+    name: Migrations and seed (Supabase Postgres)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: supabase/setup-cli@v3
+        with:
+          version: 2.119.0
+
+      # Starts only Postgres, then rebuilds it from supabase/migrations and seed.sql.
+      - name: Start database
+        run: supabase db start
+
+      - name: Apply migrations and seed
+        run: supabase db reset --local
+
+      - name: Lint schema
+        run: supabase db lint --local --level warning --fail-on error
+
+      - name: Check seeded data and RLS
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@127.0.0.1:54322/postgres
+        run: |
+          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
+          do $$
+          begin
+            if (select count(*) from public.menu_items) < 40 then
+              raise exception 'expected 40+ menu items';
+            end if;
+            if (select count(*) from public.branches) <> 3 then
+              raise exception 'expected 3 branches';
+            end if;
+            if exists (select 1 from pg_tables where schemaname = 'public' and not rowsecurity) then
+              raise exception 'a public table has RLS disabled';
+            end if;
+          end $$;
+          SQL
