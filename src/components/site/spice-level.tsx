@@ -5,21 +5,23 @@ import { cn } from "@/lib/utils";
 export const SPICE_LEVELS = ["mild", "medium", "hot"] as const;
 export type SpiceLevel = (typeof SPICE_LEVELS)[number];
 
-const LEVELS: Record<SpiceLevel, { label: string; flames: number; className: string }> = {
-  mild: { label: "Mild", flames: 1, className: "text-spice-mild" },
-  medium: { label: "Medium", flames: 2, className: "text-spice-medium" },
-  hot: { label: "Sri Lankan Hot", flames: 3, className: "text-spice-hot" },
+const LEVELS: Record<SpiceLevel, { flames: number; className: string }> = {
+  mild: { flames: 1, className: "text-spice-mild" },
+  medium: { flames: 2, className: "text-spice-medium" },
+  hot: { flames: 3, className: "text-spice-hot" },
 };
 
-/** Read-only spice indicator. The selectable version lives in the item sheet (Phase 1). */
+/** Spice indicator. Presentational: callers pass the translated label (messages: Spice.*). */
 export function SpiceLevelIndicator({
   level,
+  label,
   className,
 }: {
   level: SpiceLevel;
+  label: string;
   className?: string;
 }) {
-  const { label, flames, className: tone } = LEVELS[level];
+  const { flames, className: tone } = LEVELS[level];
   return (
     <span className={cn("inline-flex items-center gap-1.5 text-xs font-medium", tone, className)}>
       <span aria-hidden className="inline-flex">
