@@ -1,26 +1,208 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design tokens. Defaults match src/config/brand.ts; at runtime the root
+ * layout can override the brand colours from the `settings` table.
+ * Light mode first (docs/PLAN.md §8). Dark mode tokens come later.
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --radius: 0.75rem;
+
+  /* Surfaces */
+  --background: #fbf6ee; /* coconut cream */
+  --foreground: #2a1d14; /* roasted ink */
+  --card: #fffdf9;
+  --card-foreground: #2a1d14;
+  --popover: #fffdf9;
+  --popover-foreground: #2a1d14;
+
+  /* Brand */
+  --primary: #6b3a1d; /* kithul treacle */
+  --primary-foreground: #fffaf2;
+  --secondary: #2f5a3a; /* curry leaf */
+  --secondary-foreground: #f6fbf5;
+  --highlight: #e0a526; /* turmeric */
+  --highlight-foreground: #2a1a0e;
+
+  /* Neutral UI (shadcn naming: `accent` is the subtle hover surface) */
+  --muted: #f2e9dc;
+  --muted-foreground: #6e5b4b;
+  --accent: #f4e6cc;
+  --accent-foreground: #2a1d14;
+  --border: #e6d8c4;
+  --input: #9a8369; /* 3:1 on background and cards (WCAG 1.4.11) */
+  --ring: #b8741a; /* 3.5:1 on the background, for visible focus */
+
+  /* Feedback */
+  --destructive: #b3261e;
+  --destructive-foreground: #fff8f6;
+  --success: #2f6b3d;
+  --success-foreground: #f4fbf5;
+  --warning: #a35c00;
+  --warning-foreground: #fffaf0;
+  --info: #1f5f7a;
+  --info-foreground: #f2f9fc;
+
+  /* Spice levels */
+  --spice-mild: #4f7a2b;
+  --spice-medium: #9a5a00;
+  --spice-hot: #b3261e;
+
+  /* Dietary badges */
+  --diet-veg: #2f6b3d;
+  --diet-vegan: #3d6b1f;
+  --diet-halal: #1f5f7a;
+  --diet-nuts: #8a4b14;
+
+  /* Charts (reports) */
+  --chart-1: #6b3a1d;
+  --chart-2: #2f5a3a;
+  --chart-3: #e0a526;
+  --chart-4: #b3261e;
+  --chart-5: #1f5f7a;
+
+  /* Staff sidebar (dashboard, admin) */
+  --sidebar: #f6eee2;
+  --sidebar-foreground: #2a1d14;
+  --sidebar-primary: #6b3a1d;
+  --sidebar-primary-foreground: #fffaf2;
+  --sidebar-accent: #ecdfca;
+  --sidebar-accent-foreground: #2a1d14;
+  --sidebar-border: #e2d2bb;
+  --sidebar-ring: #b8741a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+  --color-spice-mild: var(--spice-mild);
+  --color-spice-medium: var(--spice-medium);
+  --color-spice-hot: var(--spice-hot);
+  --color-diet-veg: var(--diet-veg);
+  --color-diet-vegan: var(--diet-vegan);
+  --color-diet-halal: var(--diet-halal);
+  --color-diet-nuts: var(--diet-nuts);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Latin first; the browser falls back per glyph to the Sinhala/Tamil faces. */
+  --font-sans:
+    var(--font-body-latin), var(--font-sinhala), var(--font-tamil), ui-sans-serif, system-ui,
+    sans-serif;
+  --font-display:
+    var(--font-display-latin), var(--font-sinhala), var(--font-tamil), Georgia, ui-serif, serif;
+  --font-heading: var(--font-display);
+
+  /* Fluid display sizes for headings; body text uses Tailwind's default scale. */
+  --text-display-2xl: clamp(2.75rem, 1.4rem + 5.6vw, 5.75rem);
+  --text-display-2xl--line-height: 1.02;
+  --text-display-xl: clamp(2.25rem, 1.35rem + 3.8vw, 4.25rem);
+  --text-display-xl--line-height: 1.05;
+  --text-display-lg: clamp(1.875rem, 1.35rem + 2.2vw, 3rem);
+  --text-display-lg--line-height: 1.1;
+  --text-display-md: clamp(1.5rem, 1.25rem + 1.1vw, 2.125rem);
+  --text-display-md--line-height: 1.15;
+
+  /* Warm-tinted shadows */
+  --shadow-soft: 0 1px 2px rgb(66 38 18 / 0.06), 0 4px 16px rgb(66 38 18 / 0.06);
+  --shadow-lifted: 0 2px 4px rgb(66 38 18 / 0.06), 0 12px 32px rgb(66 38 18 / 0.12);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/60;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-display);
+    font-variation-settings: "SOFT" 50;
+    letter-spacing: -0.01em;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--highlight) 45%, transparent);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

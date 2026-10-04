@@ -1,0 +1,31 @@
+# Free Supabase projects pause after about a week without activity. This pings
+# the REST API once a day during the demo period. Phase 8 adds the nightly
+# demo-data reset to this workflow (docs/DECISIONS.md D12).
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: "23 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ping Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_PUBLISHABLE_KEY" ]; then
+            echo "::notice::SUPABASE_URL / SUPABASE_PUBLISHABLE_KEY secrets not set; skipping."
+            exit 0
+          fi
+          curl --fail --silent --show-error --max-time 30 \
+            -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+            "$SUPABASE_URL/rest/v1/" -o /dev/null
+          echo "Supabase responded."

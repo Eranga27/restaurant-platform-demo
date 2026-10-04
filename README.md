@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Restaurant Platform Demo
 
-## Getting Started
+A white-label restaurant website and ordering platform, built as a sales demo for Sri Lankan restaurants. The demo brand is **Kithul & Co.**, a fictional chain with branches in Colombo 07, Nugegoda and Kandy.
 
-First, run the development server:
+- **Plan:** [docs/PLAN.md](docs/PLAN.md). Changes to the plan: [docs/DECISIONS.md](docs/DECISIONS.md)
+- **Security:** [docs/SECURITY.md](docs/SECURITY.md)
+- **Rebranding for a new client:** [docs/REBRANDING.md](docs/REBRANDING.md)
+- **Changelog:** [CHANGELOG.md](CHANGELOG.md)
+
+## Stack
+
+Next.js 16 (App Router, TypeScript strict), Tailwind CSS 4, shadcn/ui, Supabase (Postgres, Auth, Realtime, Storage), Zod, Vitest, Playwright. Hosted on Vercel. Everything runs on free tiers.
+
+## Getting started
+
+Requires Node.js 24 (see `.nvmrc`).
 
 ```bash
+npm install
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. The app runs with an empty `.env.local`; each integration falls back to safe local behaviour until you add its keys (emails print to the console, bot checks use Cloudflare's test keys, and so on).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Script                            | What it does                                                                                                                  |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`                     | Development server                                                                                                            |
+| `npm run build` / `npm start`     | Production build and server                                                                                                   |
+| `npm run lint`                    | ESLint                                                                                                                        |
+| `npm run format` / `format:check` | Prettier write / check                                                                                                        |
+| `npm run typecheck`               | `tsc --noEmit`                                                                                                                |
+| `npm test`                        | Unit tests (Vitest)                                                                                                           |
+| `npm run test:e2e`                | Browser tests (Playwright) against a production build. Run `npm run build` first, and `npx playwright install chromium` once. |
+| `npm run check`                   | Everything CI runs, except the browser tests                                                                                  |
 
-## Learn More
+## Environment variables
 
-To learn more about Next.js, take a look at the following resources:
+All variables are documented in [.env.example](.env.example). Public values (`NEXT_PUBLIC_*`) are read in `src/lib/public-env.ts`; server values are validated in `src/lib/env.ts`, which must only be imported from server code.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project layout
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+  app/            Routes (App Router)
+  components/ui/  Design-system components (shadcn/ui based)
+  config/         Brand defaults and fonts: the main rebranding surface
+  lib/            Money, security, Supabase clients, env
+  proxy.ts        Per-request headers (CSP); i18n and session refresh later
+supabase/         Migrations and seed data
+tests/            unit/ (Vitest) and e2e/ (Playwright)
+docs/             Plan, decisions, security, credits, rebranding
+```
 
-## Deploy on Vercel
+## Workflow
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Each phase of the plan is built on a `feat/phase-N-*` branch, merged into `main` through a pull request (CI must pass, and Vercel posts a preview URL), then tagged `v0.N.0`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Licence
+
+Copyright © 2026. All rights reserved. The source is public for review only; no licence to use, copy or modify it is granted.
