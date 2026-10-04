@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { buildCsp, createNonce, needsStrictCsp } from "@/lib/security/csp";
+import { buildCsp, createNonce, needsStrictCsp, postsPaymentForm } from "@/lib/security/csp";
 
 function directive(csp: string, name: string): string | undefined {
   return csp
@@ -18,6 +18,8 @@ describe("needsStrictCsp", () => {
     "/admin",
     "/dashboard/orders",
     "/track/abc123",
+    "/pay/abc123",
+    "/si/pay/abc123",
     "/login",
   ])("is strict for %s", (path) => {
     expect(needsStrictCsp(path)).toBe(true);
@@ -37,7 +39,26 @@ describe("needsStrictCsp", () => {
   });
 });
 
+describe("postsPaymentForm", () => {
+  it("is true only where the customer is sent on to the payment gateway", () => {
+    expect(postsPaymentForm("/checkout")).toBe(true);
+    expect(postsPaymentForm("/ta/pay/abc123")).toBe(true);
+    expect(postsPaymentForm("/track/abc123")).toBe(false);
+    expect(postsPaymentForm("/payments-faq")).toBe(false);
+  });
+});
+
 describe("buildCsp", () => {
+  it("lets forms post only to the site, plus any given payment gateway", () => {
+    expect(directive(buildCsp({ isDev: false }), "form-action")).toBe("form-action 'self'");
+    expect(
+      directive(
+        buildCsp({ isDev: false, formTargets: ["https://sandbox.payhere.lk"] }),
+        "form-action",
+      ),
+    ).toBe("form-action 'self' https://sandbox.payhere.lk");
+  });
+
   it("uses a nonce and strict-dynamic, with no unsafe-inline scripts, when given a nonce", () => {
     const csp = buildCsp({ nonce: "abc", isDev: false });
     const scriptSrc = directive(csp, "script-src");
