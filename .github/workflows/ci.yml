@@ -75,22 +75,29 @@ jobs:
           retention-days: 7
 
   database:
-    name: Migrations and seed (Supabase Postgres)
+    name: Database, orders and live tracking (local Supabase)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 30
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - run: npm ci
 
       - uses: supabase/setup-cli@45a513f8c64c0bc8e0e3dfe572b5c95be85f6359 # v3.0.1
         with:
           version: 2.119.0
 
-      # Starts only Postgres, then rebuilds it from supabase/migrations and seed.sql.
-      - name: Start database
-        run: supabase db start
-
-      - name: Apply migrations and seed
-        run: supabase db reset --local
+      # Database, auth, REST API and Realtime: what ordering and live tracking
+      # need. Applies supabase/migrations and seed.sql on start.
+      - name: Start Supabase
+        run: supabase start -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,supavisor,storage-api,postgres-meta
 
       - name: Lint schema
         run: supabase db lint --local --level warning --fail-on error
@@ -108,8 +115,43 @@ jobs:
             if (select count(*) from public.branches) <> 3 then
               raise exception 'expected 3 branches';
             end if;
+            if (select count(*) from public.promo_codes) < 1 then
+              raise exception 'expected seeded promo codes';
+            end if;
             if exists (select 1 from pg_tables where schemaname = 'public' and not rowsecurity) then
               raise exception 'a public table has RLS disabled';
             end if;
           end $$;
           SQL
+
+      # Local development keys, not secrets.
+      - name: Point the app at the local Supabase
+        run: |
+          supabase status -o env > supabase.env
+          set -a; . ./supabase.env; set +a
+          {
+            echo "NEXT_PUBLIC_SUPABASE_URL=${API_URL}"
+            echo "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${PUBLISHABLE_KEY:-$ANON_KEY}"
+            echo "SUPABASE_SECRET_KEY=${SECRET_KEY:-$SERVICE_ROLE_KEY}"
+            echo "NEXT_PUBLIC_SITE_URL=http://localhost:3100"
+          } >> "$GITHUB_ENV"
+          rm supabase.env
+
+      - name: Build
+        run: npm run build
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: Order journeys
+        env:
+          E2E_DATABASE: "1"
+        run: npm run test:e2e -- tests/e2e/order.spec.ts --project=mobile
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: playwright-report-database
+          path: playwright-report
+          retention-days: 7
