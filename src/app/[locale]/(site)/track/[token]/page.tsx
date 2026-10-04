@@ -35,9 +35,10 @@ export default async function TrackPage({ params }: PageProps<"/[locale]/track/[
   const order = await getOrderByToken(token);
   if (!order) notFound();
 
-  const [t, tc, format, brand] = await Promise.all([
+  const [t, tc, spice, format, brand] = await Promise.all([
     getTranslations("Track"),
     getTranslations("Checkout"),
+    getTranslations("Spice"),
     getFormatter(),
     getBrand(),
   ]);
@@ -117,10 +118,11 @@ export default async function TrackPage({ params }: PageProps<"/[locale]/track/[
                   <span className="font-medium">
                     {item.quantity}× {localize(item.name_i18n, locale)}
                   </span>
-                  {(item.options.length > 0 || item.instructions) && (
+                  {(item.options.length > 0 || item.spice_level || item.instructions) && (
                     <span className="block text-xs text-muted-foreground">
                       {[
                         ...item.options.map((o) => localize(o.value, locale)),
+                        item.spice_level && spice(item.spice_level),
                         item.instructions && `“${item.instructions}”`,
                       ]
                         .filter(Boolean)

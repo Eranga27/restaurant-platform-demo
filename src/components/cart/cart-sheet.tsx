@@ -102,7 +102,7 @@ export function CartSheet({ settings }: { settings: CartSettings }) {
                           <Plus aria-hidden />
                         </Button>
                       </div>
-                      <span className="text-sm font-semibold tabular-nums">
+                      <span className="text-sm font-semibold whitespace-nowrap tabular-nums">
                         {formatLKR(line.unitPriceCents * line.quantity)}
                       </span>
                     </div>

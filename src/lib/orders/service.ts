@@ -317,6 +317,7 @@ async function sendConfirmation(token: string): Promise<void> {
   const [brand, messages] = await Promise.all([getBrand(), loadMessages(locale)]);
   const t = createTranslator({ locale, messages, namespace: "Email" });
   const tc = createTranslator({ locale, messages, namespace: "Checkout" });
+  const spice = createTranslator({ locale, messages, namespace: "Spice" });
   const branchName = localize(order.branches.name_i18n, locale);
   const when = order.scheduled_for
     ? new Intl.DateTimeFormat(`${locale}-LK`, {
@@ -381,6 +382,7 @@ async function sendConfirmation(token: string): Promise<void> {
         name: localize(item.name_i18n, locale),
         details: [
           ...item.options.map((o) => localize(o.value, locale)),
+          item.spice_level ? spice(item.spice_level) : null,
           item.instructions ? `“${item.instructions}”` : null,
         ]
           .filter(Boolean)
