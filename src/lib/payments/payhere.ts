@@ -39,6 +39,11 @@ export function parsePayHereAmount(value: string): number | null {
   return Number(match[1]) * 100 + Number(match[2]);
 }
 
+// MD5 is what PayHere's protocol specifies for both the checkout hash and the
+// notification signature; a stronger hash would simply be rejected. It is used
+// as a keyed checksum over the request, never to store the secret, and
+// signatures are compared in constant time. (CodeQL's weak-algorithm alert on
+// this line is expected.)
 const md5Upper = (value: string) =>
   createHash("md5").update(value, "utf8").digest("hex").toUpperCase();
 
