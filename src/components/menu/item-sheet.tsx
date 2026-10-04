@@ -21,6 +21,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
+import { useCart } from "@/lib/cart/store";
 import type { MenuItemView, MenuOptionView } from "@/lib/data/catalogue";
 import { formatLKR } from "@/lib/money";
 import {
@@ -37,6 +38,7 @@ const MAX_INSTRUCTIONS = 200;
 
 type ItemSheetProps = {
   item: MenuItemView | null;
+  branchId: string;
   branchName: string;
   branchPriceCents: number | null;
   availability: ItemAvailability;
@@ -63,10 +65,12 @@ export function ItemSheet(props: ItemSheetProps) {
 
 function ItemSheetBody({
   item,
+  branchId,
   branchName,
   branchPriceCents,
   availability,
   holidayName,
+  onClose,
   closeLabel,
 }: ItemSheetProps & { item: MenuItemView; closeLabel: string }) {
   const t = useTranslations("Item");
@@ -93,8 +97,38 @@ function ItemSheetBody({
   }
 
   function addToOrder() {
-    // The cart and checkout arrive in Phase 2.
-    toast.info(t("orderingSoon"));
+    const cart = useCart.getState();
+    if (cart.branchId !== branchId) cart.setBranch(branchId);
+    // Readable summary of the non-default choices, for the cart and receipts.
+    const defaults = defaultSelection(item);
+    const details = item.options.flatMap((option) =>
+      option.values
+        .filter((v) => (selection[option.id] ?? []).includes(v.id))
+        .filter(
+          (v) => option.selection === "multiple" || !(defaults[option.id] ?? []).includes(v.id),
+        )
+        .map((v) => v.name),
+    );
+    if (item.spiceSelectable) details.push(spice(spiceLevel));
+    const note = instructions.trim();
+    if (note) details.push(`“${note}”`);
+
+    cart.add({
+      menuItemId: item.id,
+      selection,
+      spiceLevel: item.spiceSelectable ? spiceLevel : null,
+      instructions: note || null,
+      quantity,
+      slug: item.slug,
+      name: item.name,
+      imageUrl: item.imageUrl,
+      details,
+      unitPriceCents: unitPrice,
+    });
+    onClose();
+    toast.success(t("added", { name: item.name }), {
+      action: { label: t("viewOrder"), onClick: () => useCart.getState().setOpen(true) },
+    });
   }
 
   return (

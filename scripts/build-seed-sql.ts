@@ -58,6 +58,7 @@ const sql = [
   insert("promotions", seed.promotions, "(id)"),
   insert("holidays", seed.holidays, "(id)"),
   insert("reviews", seed.reviews, "(id)"),
+  insert("promo_codes", seed.promoCodes, "(id)"),
 ].join("\n");
 
 const target = fileURLToPath(new URL("../supabase/seed.sql", import.meta.url));
@@ -66,5 +67,5 @@ console.log(
   `Wrote ${target}: ${seed.branches.length} branches, ${seed.categories.length} categories, ` +
     `${seed.menuItems.length} menu items, ${seed.itemOptions.length} option groups, ` +
     `${seed.itemOptionValues.length} option values, ${seed.promotions.length} promotions, ` +
-    `${seed.holidays.length} holidays, ${seed.reviews.length} reviews.`,
+    `${seed.holidays.length} holidays, ${seed.reviews.length} reviews, ${seed.promoCodes.length} promo codes.`,
 );

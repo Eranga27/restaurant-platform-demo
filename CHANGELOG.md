@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [0.3.0] - Phase 2: Cart, checkout and order tracking
+
+### Added
+
+- Cart: add dishes with their options from the dish sheet, change quantities, remove items. It's kept in the browser between visits and opens from the header.
+- Checkout for delivery or pickup, now or scheduled (15-minute slots up to 3 days ahead). For delivery, customers drop a pin on the map and the nearest branch that delivers there is picked. Fields: district and city, address with landmark, contact details, order notes. Payment is cash on delivery; PayHere arrives in Phase 3.
+- Server-side pricing: every quote and order is re-priced from the database: branch prices, sold-out items, Poya day alcohol rules, delivery radius and minimum order, opening hours, promo codes, then service charge, VAT and distance-based delivery fee.
+- Promo codes WELCOME10, KOTTU200 and an expired AVURUDU26 for the demo.
+- Order tracking page at an unguessable link, with live status updates (Supabase Realtime) and a fallback that refreshes every 30 seconds.
+- Order confirmation email (React Email through Resend, or written to the server log when Resend isn't set up).
+- Customer sign-up, sign-in and sign-out (email and password). Signed-in customers' orders are linked to their account.
+- Bot protection with Cloudflare Turnstile and per-IP rate limits (Upstash) on checkout, sign-in and sign-up.
+- Database: cities, promo codes, orders, order items, status history and promo redemptions, with Row Level Security and a single `place_order()` function that creates the order, its items and its first status event in one transaction.
+- Tests for order pricing, quotes, schedule slots and the order database rules. A Playwright order journey (guest pickup order watched live, and a sold-out dish blocked) runs in CI against a local Supabase.
+
+### Changed
+
+- Session cookies are HttpOnly; the header checks the signed-in user through `/api/me`.
+- Server-function logging is off in development so that order details don't appear in the terminal.
+
 ## [0.2.0] - Phase 1: Public site and menu
 
 ### Added
