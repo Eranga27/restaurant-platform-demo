@@ -11,6 +11,8 @@ import { AcceptingToggle } from "./accepting-toggle";
 
 const TABS = [
   { key: "orders", label: "Orders", href: "/dashboard" },
+  { key: "reservations", label: "Reservations", href: "/dashboard/reservations" },
+  { key: "events", label: "Events", href: "/dashboard/events" },
   { key: "menu", label: "Menu availability", href: "/dashboard/menu" },
 ] as const;
 
@@ -55,7 +57,7 @@ export function DashboardShell({
               ))}
             </nav>
           )}
-          <nav aria-label="Dashboard" className="flex gap-1">
+          <nav aria-label="Dashboard" className="flex flex-wrap gap-1">
             {TABS.map((tab) => (
               <Link
                 key={tab.key}

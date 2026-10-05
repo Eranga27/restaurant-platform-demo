@@ -59,7 +59,7 @@ export async function Hero({ brand, branchCount }: { brand: Brand; branchCount: 
               variant="outline"
               className="border-white/40 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white"
             >
-              <Link href="/branches">
+              <Link href="/reservations">
                 <CalendarDays data-icon="inline-start" aria-hidden />
                 {nav("bookTable")}
               </Link>

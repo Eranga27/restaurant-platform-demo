@@ -24,6 +24,8 @@ export async function SiteHeader({
   const items = [
     { href: "/menu", label: t("menu") },
     { href: "/branches", label: t("branches") },
+    { href: "/reservations", label: t("bookTable") },
+    { href: "/events", label: t("events") },
     { href: "/about", label: t("about") },
     { href: "/contact", label: t("contact") },
   ];

@@ -214,7 +214,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             size="lg"
             className="bg-highlight text-highlight-foreground hover:bg-highlight/90"
           >
-            <Link href="/contact">{t("eventsCta")}</Link>
+            <Link href="/events">{t("eventsCta")}</Link>
           </Button>
         </div>
       </section>

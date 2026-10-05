@@ -14,14 +14,16 @@ export const STRICT_CSP_PREFIXES = [
   "/admin",
   "/checkout",
   "/dashboard",
+  "/events",
   "/login",
   "/pay",
+  "/reservations",
   "/signup",
   "/track",
 ] as const;
 
 /** Pages that post the customer on to the payment gateway. */
-export const PAYMENT_FORM_PREFIXES = ["/checkout", "/pay"] as const;
+export const PAYMENT_FORM_PREFIXES = ["/checkout", "/events", "/pay"] as const;
 
 function matches(pathname: string, prefixes: readonly string[]): boolean {
   const path = pathname.replace(LOCALE_PREFIX, "") || "/";

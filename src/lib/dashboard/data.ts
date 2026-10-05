@@ -213,3 +213,89 @@ export async function getBranchAvailability(branchId: string): Promise<MenuAvail
     }))
     .filter((c) => c.items.length > 0);
 }
+
+// ---------------------------------------------------------------------------
+// Reservations and events
+// ---------------------------------------------------------------------------
+
+const reservationRow = z.object({
+  id: z.uuid(),
+  reference: z.string(),
+  guest_name: z.string(),
+  guest_phone: z.string(),
+  starts_at: z.string(),
+  ends_at: z.string(),
+  party_size: z.number().int(),
+  seating: z.enum(["any", "indoor", "outdoor"]),
+  occasion: z.enum(["birthday", "anniversary", "business", "other"]).nullable(),
+  notes: z.string().nullable(),
+  status: z.enum(["confirmed", "seated", "completed", "no_show", "cancelled"]),
+  cancel_reason: z.string().nullable(),
+});
+
+export type DashboardReservation = z.infer<typeof reservationRow>;
+
+/** A day's bookings at the branch (Sri Lanka calendar day), through RLS. */
+export async function getDayReservations(
+  branchId: string,
+  date: string,
+): Promise<DashboardReservation[]> {
+  const start = new Date(`${date}T00:00:00+05:30`);
+  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("reservations")
+    .select(
+      "id, reference, guest_name, guest_phone, starts_at, ends_at, party_size, seating, occasion, notes, status, cancel_reason",
+    )
+    .eq("branch_id", branchId)
+    .gte("starts_at", start.toISOString())
+    .lt("starts_at", end.toISOString())
+    .order("starts_at");
+  if (error) throw new Error(`Failed to load bookings: ${error.message}`);
+  return z.array(reservationRow).parse(data ?? []);
+}
+
+const inquiryRow = z.object({
+  id: z.uuid(),
+  reference: z.string(),
+  contact_name: z.string(),
+  contact_phone: z.string(),
+  contact_email: z.string(),
+  event_type: z.enum(["birthday", "office", "dana", "wedding", "homecoming", "other"]),
+  service: z.enum(["at_branch", "catering"]),
+  event_date: z.string(),
+  event_time: z.string().nullable(),
+  guests: z.number().int(),
+  package_id: z.string().nullable(),
+  budget_cents: z.number().int().nullable(),
+  venue: z.string().nullable(),
+  notes: z.string().nullable(),
+  status: z.enum(["new", "quoted", "confirmed", "done", "declined", "cancelled"]),
+  quote_cents: z.number().int().nullable(),
+  deposit_cents: z.number().int().nullable(),
+  quote_notes: z.string().nullable(),
+  accepted_at: z.string().nullable(),
+  deposit_status: z.enum(["none", "pending", "paid", "refunded", "charged_back"]),
+  close_reason: z.string().nullable(),
+  created_at: z.string(),
+});
+
+export type DashboardInquiry = z.infer<typeof inquiryRow>;
+
+/** Open enquiries and upcoming events at the branch, plus ones closed in the last 30 days. */
+export async function getBranchInquiries(branchId: string): Promise<DashboardInquiry[]> {
+  const supabase = await createClient();
+  const since = new Date(Date.now() - 30 * 86_400_000).toISOString();
+  const { data, error } = await supabase
+    .from("event_inquiries")
+    .select(
+      "id, reference, contact_name, contact_phone, contact_email, event_type, service, event_date, event_time, guests, package_id, budget_cents, venue, notes, status, quote_cents, deposit_cents, quote_notes, accepted_at, deposit_status, close_reason, created_at",
+    )
+    .eq("branch_id", branchId)
+    .or(`status.in.(new,quoted,confirmed),updated_at.gte.${since}`)
+    .order("event_date")
+    .limit(200);
+  if (error) throw new Error(`Failed to load enquiries: ${error.message}`);
+  return z.array(inquiryRow).parse(data ?? []);
+}

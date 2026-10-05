@@ -20,6 +20,8 @@ describe("needsStrictCsp", () => {
     "/track/abc123",
     "/pay/abc123",
     "/si/pay/abc123",
+    "/reservations",
+    "/events/abc123",
     "/login",
   ])("is strict for %s", (path) => {
     expect(needsStrictCsp(path)).toBe(true);
@@ -43,6 +45,7 @@ describe("postsPaymentForm", () => {
   it("is true only where the customer is sent on to the payment gateway", () => {
     expect(postsPaymentForm("/checkout")).toBe(true);
     expect(postsPaymentForm("/ta/pay/abc123")).toBe(true);
+    expect(postsPaymentForm("/events/abc123")).toBe(true);
     expect(postsPaymentForm("/track/abc123")).toBe(false);
     expect(postsPaymentForm("/payments-faq")).toBe(false);
   });

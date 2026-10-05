@@ -6,6 +6,7 @@ import { z } from "zod";
 import type { Locale } from "@/i18n/routing";
 import { getBrand } from "@/lib/data/brand";
 import { env } from "@/lib/env";
+import { eventPath, sendEventEmail } from "@/lib/events/service";
 import { alertBranchOfNewOrder } from "@/lib/notifications/new-order";
 import { orderingEnabled, sendOrderConfirmation, trackingPath } from "@/lib/orders/service";
 import { publicEnv } from "@/lib/public-env";
@@ -106,44 +107,141 @@ export async function startPayment(token: string): Promise<StartPaymentResult> {
   }
   const order = payableOrder.parse(data);
   const brand = await getBrand();
-  const name = splitName(order.customer_name);
   const base = publicEnv.siteUrl;
-  const currency = "LKR";
+  return {
+    ok: true,
+    form: payhereForm(config, {
+      reference: attempt.reference,
+      amountCents: attempt.amount_cents,
+      items: `${brand.name} order ${order.order_number}`,
+      customer: {
+        name: order.customer_name,
+        phone: order.customer_phone,
+        email: order.customer_email ?? "",
+        address:
+          order.type === "delivery"
+            ? (order.delivery_address ?? "")
+            : `Pickup: ${order.branches.address_line}`,
+        city: (order.type === "delivery" ? order.delivery_city : order.branches.city) ?? "",
+      },
+      returnUrl: `${base}${trackingPath(order.public_token, order.locale)}?payment=return`,
+      cancelUrl: `${base}${payPath(order.public_token, order.locale)}?payment=cancelled`,
+    }),
+  };
+}
 
+/** The signed PayHere checkout form for one payment attempt. */
+function payhereForm(
+  config: PayHereConfig,
+  payment: {
+    reference: string;
+    amountCents: number;
+    items: string;
+    customer: { name: string; phone: string; email: string; address: string; city: string };
+    returnUrl: string;
+    cancelUrl: string;
+  },
+): PaymentForm {
+  const name = splitName(payment.customer.name);
+  const currency = "LKR";
   const fields: Record<string, string> = {
     merchant_id: config.merchantId,
-    return_url: `${base}${trackingPath(order.public_token, order.locale)}?payment=return`,
-    cancel_url: `${base}${payPath(order.public_token, order.locale)}?payment=cancelled`,
-    notify_url: `${base}/api/payments/payhere/notify`,
-    order_id: attempt.reference,
-    items: payhereText(`${brand.name} order ${order.order_number}`),
+    return_url: payment.returnUrl,
+    cancel_url: payment.cancelUrl,
+    notify_url: `${publicEnv.siteUrl}/api/payments/payhere/notify`,
+    order_id: payment.reference,
+    items: payhereText(payment.items),
     currency,
-    amount: formatPayHereAmount(attempt.amount_cents),
+    amount: formatPayHereAmount(payment.amountCents),
     first_name: payhereText(name.first, 50),
     last_name: payhereText(name.last, 50),
-    email: order.customer_email ?? "",
-    phone: localPhone(order.customer_phone),
-    address: payhereText(
-      order.type === "delivery"
-        ? (order.delivery_address ?? "")
-        : `Pickup: ${order.branches.address_line}`,
-    ),
-    city: payhereText(
-      (order.type === "delivery" ? order.delivery_city : order.branches.city) ?? "",
-      50,
-    ),
+    email: payment.customer.email,
+    phone: localPhone(payment.customer.phone),
+    address: payhereText(payment.customer.address),
+    city: payhereText(payment.customer.city, 50),
     country: "Sri Lanka",
     hash: checkoutHash(
       {
         merchantId: config.merchantId,
-        orderId: attempt.reference,
-        amountCents: attempt.amount_cents,
+        orderId: payment.reference,
+        amountCents: payment.amountCents,
         currency,
       },
       config.merchantSecret,
     ),
   };
-  return { ok: true, form: { action: payhereCheckoutUrl(config.sandbox), fields } };
+  return { action: payhereCheckoutUrl(config.sandbox), fields };
+}
+
+// ---------------------------------------------------------------------------
+// Event deposits
+// ---------------------------------------------------------------------------
+
+const depositInquiry = z.object({
+  reference: z.string(),
+  public_token: z.string(),
+  contact_name: z.string(),
+  contact_phone: z.string(),
+  contact_email: z.string(),
+  service: z.enum(["at_branch", "catering"]),
+  venue: z.string().nullable(),
+  locale: z.enum(["en", "si", "ta"]),
+  branches: z.object({ address_line: z.string(), city: z.string() }),
+});
+
+/** A new deposit attempt for an accepted event quote, as a signed PayHere form. */
+export async function startDepositPayment(token: string): Promise<StartPaymentResult> {
+  const config = payhereConfig();
+  if (!config || !orderingEnabled()) return { ok: false, reason: "unavailable" };
+  if (!TOKEN.test(token)) return { ok: false, reason: "not-needed" };
+
+  const supabase = createAdminClient();
+  const { data: attempt, error } = await supabase
+    .rpc("start_deposit_payment", { inquiry_token: token })
+    .single<{ payment_id: string; reference: string; amount_cents: number }>();
+  if (error || !attempt) {
+    if (error?.message.includes("deposit_not_due") || error?.message.includes("inquiry_not_found"))
+      return { ok: false, reason: "not-needed" };
+    if (error?.message.includes("payment_attempts_exhausted"))
+      return { ok: false, reason: "attempts-exhausted" };
+    console.error("[payment] start_deposit_payment failed", error?.code, error?.message);
+    return { ok: false, reason: "unknown" };
+  }
+
+  const { data, error: loadError } = await supabase
+    .from("event_inquiries")
+    .select(
+      "reference, public_token, contact_name, contact_phone, contact_email, service, venue, locale, branches (address_line, city)",
+    )
+    .eq("public_token", token)
+    .single();
+  if (loadError || !data) {
+    console.error("[payment] enquiry load failed", loadError?.message);
+    return { ok: false, reason: "unknown" };
+  }
+  const inquiry = depositInquiry.parse(data);
+  const brand = await getBrand();
+  const page = `${publicEnv.siteUrl}${eventPath(inquiry.public_token, inquiry.locale)}`;
+  return {
+    ok: true,
+    form: payhereForm(config, {
+      reference: attempt.reference,
+      amountCents: attempt.amount_cents,
+      items: `${brand.name} event deposit ${inquiry.reference}`,
+      customer: {
+        name: inquiry.contact_name,
+        phone: inquiry.contact_phone,
+        email: inquiry.contact_email,
+        address:
+          inquiry.service === "catering" && inquiry.venue
+            ? inquiry.venue
+            : inquiry.branches.address_line,
+        city: inquiry.branches.city,
+      },
+      returnUrl: `${page}?payment=return`,
+      cancelUrl: `${page}?payment=cancelled`,
+    }),
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -200,9 +298,10 @@ export async function handlePayHereNotification(
     })
     .single<{
       outcome: string;
-      order_token: string | null;
+      kind: "order" | "deposit" | null;
+      token: string | null;
       payment_status: string | null;
-      order_status: string | null;
+      status: string | null;
     }>();
   if (error || !data) {
     console.error("[payment] apply_payhere_notification failed", error?.code, error?.message);
@@ -213,17 +312,25 @@ export async function handlePayHereNotification(
     // Needs a person: Phase 6 lists these in the admin panel for a refund.
     console.error(`[payment] ${data.outcome} for ${n.order_id}`);
   }
-  if (data.outcome === "applied" && data.payment_status === "paid" && data.order_token) {
-    const token = data.order_token;
-    const reachedBranch = data.order_status === "received";
-    after(() =>
-      Promise.all([
-        sendOrderConfirmation(token).catch((e) => console.error("[payment] email failed", e)),
-        reachedBranch
-          ? alertBranchOfNewOrder(token).catch((e) => console.error("[payment] alert failed", e))
-          : null,
-      ]),
-    );
+  if (data.outcome === "applied" && data.payment_status === "paid" && data.token) {
+    const token = data.token;
+    if (data.kind === "deposit") {
+      after(() =>
+        sendEventEmail(token, "confirmed").catch((e) =>
+          console.error("[payment] event email failed", e),
+        ),
+      );
+    } else {
+      const reachedBranch = data.status === "received";
+      after(() =>
+        Promise.all([
+          sendOrderConfirmation(token).catch((e) => console.error("[payment] email failed", e)),
+          reachedBranch
+            ? alertBranchOfNewOrder(token).catch((e) => console.error("[payment] alert failed", e))
+            : null,
+        ]),
+      );
+    }
   }
   return { ok: true, outcome: data.outcome };
 }

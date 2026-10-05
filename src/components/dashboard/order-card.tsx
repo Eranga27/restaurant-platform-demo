@@ -22,15 +22,9 @@ import { formatLKR } from "@/lib/money";
 import { formatPhone } from "@/lib/phone";
 import { cn } from "@/lib/utils";
 
-type NextStatus = "accepted" | "preparing" | "ready" | "out_for_delivery" | "completed";
+import { ACTION_ERRORS as ERRORS } from "./errors";
 
-const ERRORS: Record<Exclude<ActionResult, { ok: true }>["error"], string> = {
-  "not-allowed": "You can't change orders at this branch.",
-  invalid: "That change isn't valid.",
-  "invalid-transition": "This order has already moved on. The board has been refreshed.",
-  "reason-required": "Please give a reason.",
-  unknown: "Something went wrong. Please try again.",
-};
+type NextStatus = "accepted" | "preparing" | "ready" | "out_for_delivery" | "completed";
 
 const REJECT_REASONS = [
   "An item is sold out",

@@ -53,6 +53,17 @@ Defined in `supabase/migrations/`. Tested on every `npm test` run against an in-
 - **Alerts** (push, Telegram) contain no customer details.
 - **Print tickets** are dashboard pages behind the same checks.
 
+## Bookings and events (Phase 5)
+
+- **Only the server writes bookings and enquiries.** `book_table()`, `create_event_inquiry()`, `respond_to_quote()`, `cancel_reservation_by_guest()` and `start_deposit_payment()` are secret-key only, called after Zod validation, a rate limit and (for new ones) Turnstile.
+- **Capacity is enforced by the database** under a per-branch lock, so the last seats can't be double-booked.
+- **Availability reveals nothing personal:** the booking form only learns whether each time is free or full.
+- **Private links** (32-character random tokens) for bookings and enquiries; booking pages send no referrer. The enquiry page keeps the default policy because PayHere checks the Referer for deposits (origin only, cross-site).
+- **Staff changes go through functions** that check the branch and role: staff seat, finish, mark no-shows and cancel bookings (with a reason); only managers of the branch and admins quote, decline, confirm or close events.
+- **Deposits** are verified exactly like order payments (signature, amount, currency, out-of-order handling); a deposit paid for a closed enquiry is flagged for a refund.
+- **RLS:** guests read their own bookings and enquiries (when signed in), branch staff their branch's, admins all. No API role can write them.
+- **Rate limits:** availability 120 per 10 minutes, bookings 10 per hour, enquiries 5 per hour, link actions (cancel, accept, decline) 20 per 10 minutes, per IP.
+
 ## Headers
 
 Set for every response in `next.config.ts`, with the CSP set per request in `src/proxy.ts`.

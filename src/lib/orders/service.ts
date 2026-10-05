@@ -1,7 +1,5 @@
 import "server-only";
 
-import { randomBytes, randomInt } from "node:crypto";
-
 import { after } from "next/server";
 import { createTranslator } from "next-intl";
 import { z } from "zod";
@@ -19,6 +17,7 @@ import { formatLKR } from "@/lib/money";
 import { alertBranchOfNewOrder } from "@/lib/notifications/new-order";
 import { formatPhone } from "@/lib/phone";
 import { publicEnv } from "@/lib/public-env";
+import { privateToken, shortReference } from "@/lib/references";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 import { quoteOrder, type PromoRecord, type Quote, type QuoteIssue } from "./quote";
@@ -114,16 +113,6 @@ export type PlaceOrderResult =
   | { ok: false; reason: "issues"; issues: QuoteIssue[]; quote: Quote }
   | { ok: false; reason: "promo-exhausted" | "unavailable" | "unknown" };
 
-// No 0/O, 1/I/L, 2/Z, 5/S, 8/B: easy to read out over the phone.
-const ORDER_NUMBER_ALPHABET = "ACDEFGHJKMNPQRTUVWXY34679";
-
-function orderNumber(): string {
-  return Array.from(
-    { length: 6 },
-    () => ORDER_NUMBER_ALPHABET[randomInt(ORDER_NUMBER_ALPHABET.length)],
-  ).join("");
-}
-
 export async function placeOrder(
   request: CheckoutRequest,
   { userId }: { userId: string | null },
@@ -179,8 +168,8 @@ export async function placeOrder(
       .rpc("place_order", {
         payload: {
           ...payloadBase,
-          public_token: randomBytes(24).toString("base64url"),
-          order_number: orderNumber(),
+          public_token: privateToken(),
+          order_number: shortReference(),
         },
       })
       .single<{ order_id: string; public_token: string; order_number: string; created: boolean }>();
