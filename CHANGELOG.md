@@ -4,6 +4,29 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [0.7.0] - Phase 6: Admin panel
+
+### Added
+
+- Admin panel at `/admin`:
+  - Overview: revenue by day, top dishes, order type and payment split, by branch, for any date range.
+  - Orders across branches with filters and CSV export.
+  - Bookings calendar.
+  - Menu: dishes with translations, photos, choices and per-branch prices and availability, plus categories.
+  - Branches: details, map pin, delivery fees, opening hours, Telegram alerts and photo.
+  - Holidays and promo codes.
+  - Payments: refunds owed and flagged PayHere notifications.
+  - Staff: add, invite, change roles and branches, reset two-step sign-in.
+  - Settings: name, contact, colours with contrast checks, features, charges, booking and event rules.
+  - Audit log.
+- Two-step sign-in (authenticator app) for managers and admins, at `/dashboard/security`; optional for staff.
+- Audit log of every admin and staff change.
+- Image storage bucket for menu and branch photos.
+
+### Changed
+
+- Manager and admin rights need two-step sign-in in the session; without it they're treated as signed in, not as staff.
+
 ## [0.6.0] - Phase 5: Reservations and events
 
 ### Added
