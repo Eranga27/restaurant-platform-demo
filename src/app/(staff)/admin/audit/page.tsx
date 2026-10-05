@@ -30,6 +30,7 @@ const ENTITIES: Record<string, string> = {
   reservations: "Bookings",
   event_inquiries: "Event enquiries",
   payments: "Refunds",
+  reviews: "Reviews",
 };
 
 /** Short display of a changed value. */

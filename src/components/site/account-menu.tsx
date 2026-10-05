@@ -61,12 +61,13 @@ export function AccountMenu({ className }: { className?: string }) {
           </NextLink>
         </Button>
       )}
-      <span
-        className="max-w-32 truncate text-sm text-muted-foreground"
-        title={me.email ?? undefined}
+      <Link
+        href="/account"
+        className="max-w-32 truncate text-sm text-muted-foreground hover:text-foreground"
+        title={t("myAccount")}
       >
         {me.name ?? me.email}
-      </span>
+      </Link>
       <Button
         type="submit"
         variant="ghost"

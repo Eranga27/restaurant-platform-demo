@@ -10,7 +10,8 @@ import type { Locale } from "@/i18n/routing";
 import { getBrand } from "@/lib/data/brand";
 import { getBranches } from "@/lib/data/catalogue";
 import { getDistricts } from "@/lib/data/places";
-import { orderingEnabled } from "@/lib/orders/service";
+import { getSavedAddresses } from "@/lib/account/addresses";
+import { loyaltyBalance, orderingEnabled } from "@/lib/orders/service";
 import { onlinePaymentsEnabled } from "@/lib/payments/service";
 import { createClient, getCurrentUser } from "@/lib/supabase/server";
 
@@ -46,6 +47,11 @@ export default async function CheckoutPage({ params }: PageProps<"/[locale]/chec
     getCurrentUser(),
     headers().then((h) => h.get("x-nonce") ?? undefined),
   ]);
+
+  // Saved addresses and points, for signed-in customers.
+  const [addresses, points] = user
+    ? await Promise.all([getSavedAddresses(), loyaltyBalance(user.id)])
+    : [[], 0];
 
   // Prefill from the signed-in customer's profile.
   let phone = "";
@@ -84,6 +90,18 @@ export default async function CheckoutPage({ params }: PageProps<"/[locale]/chec
         }}
         initialContact={{ name: user?.name ?? "", phone, email: user?.email ?? "" }}
         signedIn={user !== null}
+        account={{
+          addresses,
+          loyalty:
+            user && brand.features.loyalty
+              ? {
+                  balance: points,
+                  pointValueCents: brand.loyalty.pointValueCents,
+                  pointPerCents: brand.loyalty.pointPerCents,
+                  maxRedeemBps: brand.loyalty.maxRedeemBps,
+                }
+              : null,
+        }}
         nonce={nonce}
       />
     </div>

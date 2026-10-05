@@ -5,8 +5,9 @@ import { applyBasisPoints, assertCents } from "@/lib/money";
  *
  *   subtotal          sum of line totals
  *   − discount        promo code, never more than the subtotal
- *   + service charge  on (subtotal − discount)
- *   + VAT             on (subtotal − discount + service charge)
+ *   − loyalty         points spent (B2), at most a share of what's left
+ *   + service charge  on (subtotal − discounts)
+ *   + VAT             on (subtotal − discounts + service charge)
  *   + delivery fee    no VAT
  *
  * All amounts are integer cents; each computed amount rounds half up.
@@ -35,6 +36,9 @@ export type DeliveryFeeRules = {
 export type OrderTotals = {
   subtotalCents: number;
   discountCents: number;
+  /** Points spent and what they took off. 0 when none. */
+  loyaltyPoints: number;
+  loyaltyDiscountCents: number;
   serviceChargeCents: number;
   vatCents: number;
   deliveryFeeCents: number;
@@ -72,28 +76,55 @@ export function deliveryFeeCents(
   return rules.baseFeeCents + extraKm * rules.perKmCents;
 }
 
+export type LoyaltyRedemption = {
+  /** Points the customer wants to spend (at most their balance). */
+  points: number;
+  pointValueCents: number;
+  /** The most the points may take off the food total after the promo, in basis points. */
+  maxShareBps: number;
+};
+
+/** Points actually spent and their value: whole points, within the cap. */
+export function loyaltyDiscount(
+  redemption: LoyaltyRedemption,
+  afterPromoCents: number,
+): { points: number; cents: number } {
+  assertCents(afterPromoCents);
+  if (redemption.points <= 0 || redemption.pointValueCents <= 0) return { points: 0, cents: 0 };
+  const cap = applyBasisPoints(afterPromoCents, redemption.maxShareBps);
+  const points = Math.min(redemption.points, Math.floor(cap / redemption.pointValueCents));
+  return { points, cents: points * redemption.pointValueCents };
+}
+
 export function priceOrder({
   lineTotalsCents,
   charges,
   promo,
   delivery,
+  loyalty = null,
 }: {
   lineTotalsCents: number[];
   charges: Charges;
   promo: PromoRule | null;
   /** Null for pickup. */
   delivery: { rules: DeliveryFeeRules; distanceKm: number } | null;
+  loyalty?: LoyaltyRedemption | null;
 }): OrderTotals {
   lineTotalsCents.forEach(assertCents);
   const subtotalCents = lineTotalsCents.reduce((sum, n) => sum + n, 0);
   const discountCents = promo ? promoDiscountCents(promo, subtotalCents) : 0;
-  const afterDiscount = subtotalCents - discountCents;
+  const spent = loyalty
+    ? loyaltyDiscount(loyalty, subtotalCents - discountCents)
+    : { points: 0, cents: 0 };
+  const afterDiscount = subtotalCents - discountCents - spent.cents;
   const serviceChargeCents = applyBasisPoints(afterDiscount, charges.serviceChargeBps);
   const vatCents = applyBasisPoints(afterDiscount + serviceChargeCents, charges.vatBps);
   const fee = delivery ? deliveryFeeCents(delivery.rules, delivery.distanceKm, afterDiscount) : 0;
   return {
     subtotalCents,
     discountCents,
+    loyaltyPoints: spent.points,
+    loyaltyDiscountCents: spent.cents,
     serviceChargeCents,
     vatCents,
     deliveryFeeCents: fee,

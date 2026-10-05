@@ -178,3 +178,50 @@ test.describe("security headers", () => {
     expect(first).not.toBe(second);
   });
 });
+
+test.describe("installable app", () => {
+  test("the manifest names the brand and its icons exist", async ({ request }) => {
+    const manifest = await (await request.get("/manifest.webmanifest")).json();
+    expect(manifest).toMatchObject({ display: "standalone", start_url: "/" });
+    expect(manifest.name).toBeTruthy();
+    for (const icon of manifest.icons as { src: string }[]) {
+      expect((await request.get(icon.src)).ok()).toBe(true);
+    }
+  });
+
+  test("offline pages are self-contained and locked down", async ({ request }) => {
+    const { name } = await (await request.get("/manifest.webmanifest")).json();
+    const response = await request.get("/offline/si.html");
+    expect(response.ok()).toBe(true);
+    expect(response.headers()["content-security-policy"]).toContain("default-src 'none'");
+    const html = await response.text();
+    expect(html).toContain('<html lang="si">');
+    expect(html).toContain((name as string).replaceAll("&", "&amp;"));
+    expect(html).not.toContain("<script");
+    expect((await request.get("/offline/fr.html")).status()).toBe(404);
+  });
+
+  test("an installed visitor who goes offline sees the offline page in their language", async ({
+    page,
+    context,
+  }) => {
+    await page.goto("/ta");
+    // Wait until the service worker controls the page.
+    await page.evaluate(async () => {
+      await navigator.serviceWorker.ready;
+      if (!navigator.serviceWorker.controller) {
+        await new Promise((resolve) =>
+          navigator.serviceWorker.addEventListener("controllerchange", resolve, { once: true }),
+        );
+      }
+    });
+    await context.setOffline(true);
+    try {
+      await page.goto("/ta/menu");
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText("நீங்கள் இணைப்பில் இல்லை");
+      await expect(page.getByRole("link", { name: "மீண்டும் முயலுங்கள்" })).toBeVisible();
+    } finally {
+      await context.setOffline(false);
+    }
+  });
+});

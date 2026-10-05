@@ -16,6 +16,7 @@ import {
 import { rateLimit } from "@/lib/security/rate-limit";
 import { clientIp } from "@/lib/security/request";
 import { verifyTurnstile } from "@/lib/security/turnstile";
+import { saveAddress } from "@/lib/account/addresses";
 import { getCurrentUser } from "@/lib/supabase/server";
 
 /**
@@ -60,7 +61,12 @@ export async function quoteAction(input: unknown, lang: unknown): Promise<QuoteR
   const limit = await rateLimit("quote", (await clientIp()) ?? "unknown");
   if (!limit.ok) return { ok: false, error: "rate-limited" };
 
-  return { ok: true, quote: toView(await getQuote(parsed.data), parsedLocale.data) };
+  // Points need the signed-in customer; only look them up when asked to spend some.
+  const user = (parsed.data.loyaltyPoints ?? 0) > 0 ? await getCurrentUser() : null;
+  return {
+    ok: true,
+    quote: toView(await getQuote(parsed.data, { userId: user?.id ?? null }), parsedLocale.data),
+  };
 }
 
 export type PlaceOrderResponse =
@@ -74,6 +80,7 @@ export type PlaceOrderResponse =
         | "rate-limited"
         | "bot-check"
         | "promo-exhausted"
+        | "loyalty-changed"
         | "payment-unavailable"
         | "unavailable"
         | "unknown";
@@ -103,6 +110,14 @@ export async function placeOrderAction(input: unknown): Promise<PlaceOrderRespon
 
   const user = await getCurrentUser();
   const result = await placeOrder(request, { userId: user?.id ?? null });
+
+  if (result.ok && user && request.saveAddressAs && request.address && request.location) {
+    await saveAddress({
+      label: request.saveAddressAs,
+      ...request.address,
+      ...request.location,
+    }).catch((e) => console.error("[checkout] saving the address failed", e));
+  }
 
   if (result.ok) {
     if (request.paymentMethod === "cod") {

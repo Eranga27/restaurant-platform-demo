@@ -3,6 +3,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { notFound } from "next/navigation";
 
 import { Document } from "@/components/document";
+import { OfflineSupport } from "@/components/site/offline-support";
 import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import { brandColorVariables, getBrand } from "@/lib/data/brand";
@@ -47,6 +48,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
       <NextIntlClientProvider>
         {children}
         <Toaster position="top-center" />
+        <OfflineSupport />
       </NextIntlClientProvider>
     </Document>
   );

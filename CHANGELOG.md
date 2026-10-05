@@ -4,6 +4,32 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [0.8.0] - Phase 7: Extras
+
+### Added
+
+- Customer accounts at `/account`:
+  - Overview: loyalty points with their history, and the customer's name and mobile number, which fill in checkout and bookings.
+  - Orders: past orders, a link to each one's tracking page, and "Order again", which puts the same dishes and choices back in the cart at today's prices.
+  - Bookings: table bookings and event enquiries.
+  - Addresses: up to 10 saved addresses with a map pin.
+- Saved addresses at checkout: pick one, or tick "Save this address" when ordering.
+- Loyalty points: a point for every Rs 100 of food, earned when an order is completed, and spent at checkout (a point takes Rs 1 off, up to 20% of the food). Points used on a rejected or cancelled order come back. The rates are in Admin → Settings.
+- Reviews: after an order is completed, its tracking page asks "How was it?". Reviews appear on the site once an admin approves them in Admin → Reviews.
+- Installable app: a web app manifest and app icons, and an offline page in English, Sinhala or Tamil when the connection drops.
+- Sinhala and Tamil translations for every customer-facing page and email.
+- "My account" in the header for signed-in customers.
+- Tests for addresses, points, reviews, reorder, translations, the offline page, and a customer account journey in CI.
+
+### Changed
+
+- The public API no longer returns which account wrote a review.
+- `scripts/check-translations.mjs` checks a batch of translations (placeholders, tags, message syntax) and merges it.
+
+### Fixed
+
+- The Sinhala and Tamil home page heading now uses the brand's own tagline instead of a fixed one.
+
 ## [0.7.0] - Phase 6: Admin panel
 
 ### Added

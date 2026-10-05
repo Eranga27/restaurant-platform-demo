@@ -78,6 +78,8 @@ describe("quoteOrder", () => {
     expect(quote.totals).toEqual({
       subtotalCents: 4900_00,
       discountCents: 0,
+      loyaltyPoints: 0,
+      loyaltyDiscountCents: 0,
       serviceChargeCents: 490_00,
       vatCents: 970_20, // 18% of 5,390.00
       deliveryFeeCents: 250_00,
@@ -246,6 +248,23 @@ describe("quoteOrder", () => {
     expect(codes(quoteOrder(request(), context({ rows: paused })).issues)).toContain(
       "branch-unavailable",
     );
+  });
+});
+
+describe("quoteOrder with loyalty points", () => {
+  const loyalty = { pointValueCents: 1_00, maxShareBps: 2000 };
+
+  it("spends at most the customer's balance", () => {
+    const quote = quoteOrder(
+      request({ loyaltyPoints: 300 }),
+      context({ loyalty: { ...loyalty, balance: 120 } }),
+    );
+    expect(quote.totals).toMatchObject({ loyaltyPoints: 120, loyaltyDiscountCents: 120_00 });
+  });
+
+  it("ignores points for guests", () => {
+    const quote = quoteOrder(request({ loyaltyPoints: 300 }), context({ loyalty: null }));
+    expect(quote.totals.loyaltyDiscountCents).toBe(0);
   });
 });
 

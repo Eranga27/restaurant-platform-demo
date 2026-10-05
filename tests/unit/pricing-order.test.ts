@@ -9,6 +9,7 @@ import {
 } from "@/lib/pricing/order";
 
 const charges = { serviceChargeBps: 1000, vatBps: 1800 };
+const applyVat = (cents: number) => Math.round((cents * 1800) / 10_000);
 const colombo: DeliveryFeeRules = {
   baseFeeCents: 250_00,
   includedKm: 3,
@@ -35,6 +36,8 @@ describe("priceOrder", () => {
     ).toEqual({
       subtotalCents: 2370_00,
       discountCents: 0,
+      loyaltyPoints: 0,
+      loyaltyDiscountCents: 0,
       serviceChargeCents: 237_00,
       vatCents: 469_26, // 18% of 2,607.00
       deliveryFeeCents: 250_00,
@@ -55,6 +58,33 @@ describe("priceOrder", () => {
     expect(totals.totalCents).toBe(2700_00 + 270_00 + 534_60);
   });
 
+  it("takes loyalty points off after the promo, capped at a share of the food total", () => {
+    const loyalty = { pointValueCents: 1_00, maxShareBps: 2000 };
+    const few = priceOrder({
+      lineTotalsCents: [3000_00],
+      charges,
+      promo: welcome10,
+      delivery: null,
+      loyalty: { ...loyalty, points: 150 },
+    });
+    expect(few).toMatchObject({
+      discountCents: 300_00,
+      loyaltyPoints: 150,
+      loyaltyDiscountCents: 150_00,
+    });
+    expect(few.serviceChargeCents).toBe(255_00); // 10% of 2,550
+    expect(few.totalCents).toBe(2550_00 + 255_00 + applyVat(2550_00 + 255_00));
+
+    const many = priceOrder({
+      lineTotalsCents: [3000_00],
+      charges,
+      promo: welcome10,
+      delivery: null,
+      loyalty: { ...loyalty, points: 5000 },
+    });
+    expect(many).toMatchObject({ loyaltyPoints: 540, loyaltyDiscountCents: 540_00 }); // 20% of 2,700
+  });
+
   it("totals always add up", () => {
     for (const lines of [[1], [99, 101], [123_45, 67_89, 1_00], [7500_00]]) {
       const t = priceOrder({
@@ -64,7 +94,12 @@ describe("priceOrder", () => {
         delivery: { rules: colombo, distanceKm: 5.5 },
       });
       expect(t.totalCents).toBe(
-        t.subtotalCents - t.discountCents + t.serviceChargeCents + t.vatCents + t.deliveryFeeCents,
+        t.subtotalCents -
+          t.discountCents -
+          t.loyaltyDiscountCents +
+          t.serviceChargeCents +
+          t.vatCents +
+          t.deliveryFeeCents,
       );
     }
   });

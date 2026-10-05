@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Banknote, Bike, CreditCard, LocateFixed, MapPin, Store } from "lucide-react";
+import { Banknote, Bike, CreditCard, Gift, LocateFixed, MapPin, Store } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -13,9 +13,11 @@ import { submitPaymentForm } from "@/components/payments/submit-payment-form";
 import { OpenStatus } from "@/components/site/open-status";
 import { Turnstile } from "@/components/security/turnstile";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Switch } from "@/components/ui/switch";
 import {
   Select,
   SelectContent,
@@ -32,6 +34,7 @@ import { byDistance, type LatLng } from "@/lib/geo";
 import type { OpeningHours } from "@/lib/hours";
 import type { QuoteRequest } from "@/lib/orders/schema";
 import { slotToIso } from "@/lib/orders/slots";
+import { formatLKR } from "@/lib/money";
 import { normalizeSriLankanPhone } from "@/lib/phone";
 import { cn } from "@/lib/utils";
 
@@ -39,6 +42,17 @@ import { DeliveryMap } from "./delivery-map-loader";
 import { OrderSummary } from "./order-summary";
 import { SchedulePicker, type Schedule } from "./schedule-picker";
 import { useQuote } from "./use-quote";
+
+export type SavedAddressView = {
+  id: string;
+  label: string;
+  district: string;
+  city: string;
+  line: string;
+  landmark: string | null;
+  lat: number;
+  lng: number;
+};
 
 export type CheckoutBranch = {
   id: string;
@@ -61,6 +75,16 @@ type CheckoutFormProps = {
   charges: { serviceChargePercent: number; vatPercent: number; minimumOrderCents: number };
   initialContact: { name: string; phone: string; email: string };
   signedIn: boolean;
+  /** Signed-in customers' saved addresses and points (null points: loyalty off or signed out). */
+  account: {
+    addresses: SavedAddressView[];
+    loyalty: {
+      balance: number;
+      pointValueCents: number;
+      pointPerCents: number;
+      maxRedeemBps: number;
+    } | null;
+  };
   nonce?: string;
 };
 
@@ -85,13 +109,23 @@ type SubmitError =
   | "rate-limited"
   | "bot-check"
   | "promo-exhausted"
+  | "loyalty-changed"
   | "payment-unavailable"
   | "unavailable"
   | "unknown";
 
 export function CheckoutForm(props: CheckoutFormProps) {
-  const { branches, districts, features, payments, charges, initialContact, signedIn, nonce } =
-    props;
+  const {
+    branches,
+    districts,
+    features,
+    payments,
+    charges,
+    initialContact,
+    signedIn,
+    account,
+    nonce,
+  } = props;
   const t = useTranslations("Checkout");
   const locale = useLocale();
   const router = useRouter();
@@ -108,6 +142,8 @@ export function CheckoutForm(props: CheckoutFormProps) {
   const [paymentMethod, setPaymentMethod] = useState<"cod" | "payhere">(
     payments.online ? "payhere" : "cod",
   );
+  const [usePoints, setUsePoints] = useState(false);
+  const [saveAddressAs, setSaveAddressAs] = useState<string | null>(null);
   // One key per checkout: a retried submit can never create a second order.
   const [idempotencyKey] = useState(() => crypto.randomUUID());
 
@@ -116,6 +152,7 @@ export function CheckoutForm(props: CheckoutFormProps) {
     control,
     handleSubmit,
     setError,
+    setValue,
     formState: { errors },
   } = useForm<Fields>({
     resolver: zodResolver(fieldsSchema),
@@ -175,6 +212,7 @@ export function CheckoutForm(props: CheckoutFormProps) {
           promoCode: cart.promoCode,
           location: type === "delivery" ? location : null,
           scheduledFor: schedule.mode === "later" ? slotToIso(schedule.date, schedule.time) : null,
+          loyaltyPoints: usePoints && account.loyalty ? account.loyalty.balance : 0,
         }
       : null;
   const { quote, setQuote, loading } = useQuote(request, locale);
@@ -220,6 +258,7 @@ export function CheckoutForm(props: CheckoutFormProps) {
           : null,
       notes: values.notes.trim() || null,
       paymentMethod,
+      saveAddressAs: type === "delivery" && saveAddressAs?.trim() ? saveAddressAs.trim() : null,
       idempotencyKey,
       turnstileToken,
       locale,
@@ -315,6 +354,31 @@ export function CheckoutForm(props: CheckoutFormProps) {
 
         {type === "delivery" ? (
           <Section title={t("whereTitle")}>
+            {account.addresses.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-sm font-medium">{t("savedAddresses")}</p>
+                <div className="flex flex-wrap gap-2">
+                  {account.addresses.map((a) => (
+                    <Button
+                      key={a.id}
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setValue("district", a.district);
+                        setValue("city", a.city);
+                        setValue("line", a.line);
+                        setValue("landmark", a.landmark ?? "");
+                        pickLocation({ lat: a.lat, lng: a.lng });
+                      }}
+                    >
+                      <MapPin data-icon="inline-start" aria-hidden />
+                      {a.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            )}
             <p className="text-sm text-muted-foreground">{t("mapHelp")}</p>
             <div className="h-72 overflow-hidden rounded-xl border sm:h-80">
               <DeliveryMap
@@ -431,6 +495,26 @@ export function CheckoutForm(props: CheckoutFormProps) {
                 />
               </div>
             </div>
+            {signedIn && account.addresses.length < 10 && (
+              <div className="flex flex-wrap items-center gap-3 text-sm">
+                <label className="flex items-center gap-2">
+                  <Checkbox
+                    checked={saveAddressAs !== null}
+                    onCheckedChange={(checked) => setSaveAddressAs(checked ? t("homeLabel") : null)}
+                  />
+                  {t("saveAddress")}
+                </label>
+                {saveAddressAs !== null && (
+                  <Input
+                    aria-label={t("addressLabel")}
+                    value={saveAddressAs}
+                    maxLength={40}
+                    onChange={(e) => setSaveAddressAs(e.target.value)}
+                    className="h-9 w-40"
+                  />
+                )}
+              </div>
+            )}
           </Section>
         ) : (
           <Section title={t("pickupFrom")}>
@@ -533,6 +617,44 @@ export function CheckoutForm(props: CheckoutFormProps) {
             </div>
           </div>
         </Section>
+
+        {account.loyalty && (account.loyalty.balance > 0 || quote) && (
+          <Section title={t("pointsTitle")}>
+            {account.loyalty.balance > 0 && (
+              <label className="flex items-start gap-3 text-sm">
+                <Switch
+                  checked={usePoints}
+                  onCheckedChange={setUsePoints}
+                  aria-describedby="points-help"
+                />
+                <span>
+                  <span className="flex items-center gap-2 font-semibold">
+                    <Gift aria-hidden className="size-4 text-primary" />
+                    {t("usePoints", { points: account.loyalty.balance })}
+                  </span>
+                  <span id="points-help" className="block text-muted-foreground">
+                    {t("pointsHelp", {
+                      value: formatLKR(account.loyalty.balance * account.loyalty.pointValueCents),
+                      share: account.loyalty.maxRedeemBps / 100,
+                    })}
+                  </span>
+                </span>
+              </label>
+            )}
+            {quote && (
+              <p className="text-sm text-muted-foreground">
+                {t("pointsEarn", {
+                  points: Math.floor(
+                    (quote.totals.subtotalCents -
+                      quote.totals.discountCents -
+                      quote.totals.loyaltyDiscountCents) /
+                      account.loyalty.pointPerCents,
+                  ),
+                })}
+              </p>
+            )}
+          </Section>
+        )}
 
         <Section title={t("paymentTitle")}>
           {payments.online || payments.cash ? (

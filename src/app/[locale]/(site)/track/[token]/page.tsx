@@ -5,6 +5,7 @@ import { getFormatter, getTranslations } from "next-intl/server";
 
 import { ContactLink } from "@/components/site/contact-link";
 import { OrderStatus } from "@/components/track/order-status";
+import { ReviewForm } from "@/components/track/review-form";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -13,6 +14,7 @@ import { localize } from "@/lib/data/catalogue";
 import { formatLKR } from "@/lib/money";
 import { getOrderByToken } from "@/lib/orders/service";
 import { formatPhone } from "@/lib/phone";
+import { getReviewForOrder } from "@/lib/reviews/service";
 
 // Always fresh, never cached, never indexed: the URL is the key to the order.
 export const dynamic = "force-dynamic";
@@ -155,6 +157,12 @@ export default async function TrackPage({
                 <dd>{formatLKR(-order.discount_cents)}</dd>
               </div>
             )}
+            {order.loyalty_discount_cents > 0 && (
+              <div className="flex justify-between text-success">
+                <dt>{tc("loyaltyDiscount", { points: order.loyalty_points_used })}</dt>
+                <dd>{formatLKR(-order.loyalty_discount_cents)}</dd>
+              </div>
+            )}
             <div className="flex justify-between">
               <dt>{tc("serviceCharge", { percent: brand.charges.serviceChargeBps / 100 })}</dt>
               <dd>{formatLKR(order.service_charge_cents)}</dd>
@@ -180,6 +188,14 @@ export default async function TrackPage({
           </dl>
         </div>
       </section>
+
+      {order.status === "completed" && (
+        <ReviewForm
+          token={order.public_token}
+          defaultName={order.customer_name}
+          existing={await getReviewForOrder(order.id)}
+        />
+      )}
 
       <Button asChild variant="outline">
         <Link href="/menu">{t("orderAgain")}</Link>
