@@ -84,15 +84,21 @@ where id = (select id from auth.users where email = 'you@example.com');
 
 On the next visit to `/admin` you'll be asked to set up two-step sign-in with an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password…). Managers need it too. After that, add other staff from the Staff page.
 
+### Customer accounts
+
+Signed-in customers get `/account`: points, past orders with "Order again", bookings and saved addresses. Loyalty rates (spend per point, what a point is worth, how much of the food points can pay for) are in Admin → Settings; turn the programme off under Features. Customers review completed orders from the tracking page, and reviews appear on the home page once approved in Admin → Reviews.
+
+The site can be installed from the browser ("Add to Home screen"). Its service worker only steps in when a page can't load, to show an offline page; menus and prices always come from the network.
+
 ### Testing orders
 
-The order, payment, dashboard, booking and admin journeys in `tests/e2e/order.spec.ts`, `payment.spec.ts`, `dashboard.spec.ts`, `reservation.spec.ts` and `admin.spec.ts` need a database and are skipped by default. CI runs them against a local Supabase (`supabase start`, which needs Docker). To run them yourself against the database in `.env.local`, build first, then:
+The order, payment, dashboard, booking, admin and account journeys in `tests/e2e/order.spec.ts`, `payment.spec.ts`, `dashboard.spec.ts`, `reservation.spec.ts`, `admin.spec.ts` and `account.spec.ts` need a database and are skipped by default. CI runs them against a local Supabase (`supabase start`, which needs Docker). To run them yourself against the database in `.env.local`, build first, then:
 
 ```bash
 E2E_DATABASE=1 npx playwright test tests/e2e/order.spec.ts --project=mobile
 ```
 
-The payment journeys also need `PAYHERE_MERCHANT_ID` and `PAYHERE_MERCHANT_SECRET` set to made-up values: they stand in for PayHere and sign its notifications themselves. The dashboard and admin journeys and the manager's part of the events journey create staff accounts, so they only run against a local Supabase. Each run places real test orders in that database.
+The payment journeys also need `PAYHERE_MERCHANT_ID` and `PAYHERE_MERCHANT_SECRET` set to made-up values: they stand in for PayHere and sign its notifications themselves. The dashboard, admin and account journeys and the manager's part of the events journey create accounts, so they only run against a local Supabase. Each run places real test orders in that database.
 
 ## Scripts
 
@@ -117,17 +123,17 @@ All variables are documented in [.env.example](.env.example). Public values (`NE
 ```
 src/
   app/            Routes: [locale]/(site) for the public site, (staff) for the branch dashboard and admin panel, (internal) for the styleguide
-  components/     ui/ (design system, shadcn/ui based), site/, home/, menu/, branches/, cart/, checkout/, track/, auth/, payments/, dashboard/, reservations/, events/, admin/
+  components/     ui/ (design system, shadcn/ui based), site/, home/, menu/, branches/, cart/, checkout/, track/, auth/, payments/, dashboard/, reservations/, events/, admin/, account/
   config/         Brand defaults, fonts and photos: the main rebranding surface
   content/        Policy text
   data/seed.ts    Demo content (source of supabase/seed.sql and the no-database fallback)
   emails/         Email templates (React Email)
   i18n/           Locale routing and message loading
-  lib/            Data access, cart, orders, payments, reservations, events, dashboard, pricing, money, hours, phone numbers, auth, email, alerts, security, Supabase clients, env
+  lib/            Data access, cart, orders, payments, reservations, events, dashboard, accounts, reviews, pricing, money, hours, phone numbers, auth, email, alerts, security, Supabase clients, env
   messages/       UI text in English, Sinhala and Tamil
   proxy.ts        Locale routing, per-request CSP and session refresh
 supabase/         Migrations and generated seed data
-scripts/          Seed generator
+scripts/          Seed, favicon and app icon generators, translation checker
 tests/            unit/ (Vitest, including database tests on PGlite) and e2e/ (Playwright)
 docs/             Plan, decisions, security, credits, rebranding
 ```

@@ -74,6 +74,16 @@ Defined in `supabase/migrations/`. Tested on every `npm test` run against an in-
 - **CSV export** is admin-only, capped at 5,000 rows, and escapes cells a spreadsheet would run as formulas (CSV injection).
 - **Settings** are validated in full, including colour contrast, before saving.
 
+## Customer accounts (Phase 7)
+
+- **Account pages** (`/account`) check the session on the server and read only through the customer's own session, so RLS returns only their orders, bookings, points and addresses. They're never indexed.
+- **Saved addresses:** customers read and change only their own (RLS on every operation), up to 10 each.
+- **Loyalty points:** an append-only ledger nobody can write through the API. Points are spent inside `place_order()` under a per-customer lock with a balance check, so two orders at once can't spend the same points; earning and returning happen in a database trigger, at most once per order. The quote caps how many points an order can use, and the database checks the totals add up.
+- **Reorder** reads the past order through the customer's session (RLS) and rebuilds the cart from today's menu; checkout re-prices it on the server like any other cart.
+- **Reviews:** submitted only by the server (`submit_review()`, secret key) from a completed order's private tracking link, rate limited (20 per 10 minutes per IP), one per order. Nothing shows until an admin with two-step sign-in approves it; moderation is audited. The public API returns only what the site shows (column privileges), never the author's account ID.
+- **Service worker:** network-first for pages, with an offline page as the only cached content, so it can't serve stale prices or someone else's page. The offline page has no scripts and its own `default-src 'none'` CSP.
+- **Translations** go through a checker and a unit test that reject a missing or changed placeholder or tag, so a translation can't break a page or add a link.
+
 ## Headers
 
 Set for every response in `next.config.ts`, with the CSP set per request in `src/proxy.ts`.
@@ -95,6 +105,7 @@ Two levels (docs/DECISIONS.md D4, D5):
 
 - **Strict routes** (`/account`, `/admin`, `/checkout`, `/dashboard`, `/login`, `/signup`, `/track`, in any locale): `script-src 'self' 'nonce-…' 'strict-dynamic'`. A fresh nonce per request; Next.js applies it to its own scripts. These pages render dynamically.
 - **Public pages** (home, menu, branches, static pages): `script-src 'self' 'unsafe-inline'` so they can be static or ISR. They render no user-supplied content.
+- **Offline pages** (`/offline/<locale>.html`, shown by the service worker): `default-src 'none'; style-src 'unsafe-inline'`, set by the route itself.
 - **Both:** `style-src 'self' 'unsafe-inline'` (React style attributes, animation libraries and Leaflet need it); `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`, `upgrade-insecure-requests`; Supabase allowed only for the configured project origin (HTTPS and WSS).
 
 Unit tests in `tests/unit/csp.test.ts` pin these rules. The smoke tests check the headers on a production build.
