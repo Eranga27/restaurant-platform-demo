@@ -154,9 +154,11 @@ export function CartButton() {
     >
       <ShoppingBag aria-hidden />
       {count > 0 && (
+        // Keyed by the count, so it pops each time something is added.
         <span
+          key={count}
           aria-hidden
-          className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-highlight px-1 text-xs font-bold text-highlight-foreground tabular-nums"
+          className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 animate-bump items-center justify-center rounded-full bg-highlight px-1 text-xs font-bold text-highlight-foreground tabular-nums"
         >
           {count}
         </span>

@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 import { InquiryForm } from "@/components/events/inquiry-form";
+import { Ornament } from "@/components/site/ornament";
 import { UnavailableNotice } from "@/components/site/unavailable-notice";
 import type { Locale } from "@/i18n/routing";
 import { contactPrefill } from "@/lib/auth/prefill";
@@ -51,6 +52,7 @@ export default async function EventsPage({ params }: PageProps<"/[locale]/events
   return (
     <div className="mx-auto w-full max-w-5xl space-y-10 px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
       <header className="max-w-3xl space-y-3">
+        <Ornament />
         <h1 className="text-display-xl text-primary">{t("title")}</h1>
         <p className="text-lg text-muted-foreground">{t("intro")}</p>
       </header>
@@ -61,7 +63,11 @@ export default async function EventsPage({ params }: PageProps<"/[locale]/events
         </h2>
         <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {packages.map((p) => (
-            <li key={p.id} className="space-y-2 rounded-2xl border bg-card p-5 shadow-soft">
+            <li
+              key={p.id}
+              data-reveal
+              className="space-y-2 rounded-2xl border bg-card p-5 shadow-soft"
+            >
               <h3 className="font-display text-lg">{p.name}</h3>
               <p className="text-sm text-muted-foreground">{p.description}</p>
               <p className="text-sm font-semibold text-secondary">{p.price}</p>

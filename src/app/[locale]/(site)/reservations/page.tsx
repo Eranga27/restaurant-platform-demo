@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 import { BookingForm } from "@/components/reservations/booking-form";
+import { Ornament } from "@/components/site/ornament";
 import { UnavailableNotice } from "@/components/site/unavailable-notice";
 import type { Locale } from "@/i18n/routing";
 import { contactPrefill } from "@/lib/auth/prefill";
@@ -51,6 +52,7 @@ export default async function ReservationsPage({
   return (
     <div className="mx-auto w-full max-w-4xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
       <header className="mb-8 space-y-2">
+        <Ornament />
         <h1 className="text-display-xl text-primary">{t("title")}</h1>
         <p className="text-lg text-muted-foreground">{t("intro")}</p>
       </header>

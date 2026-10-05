@@ -26,6 +26,7 @@ export async function SiteFooter({ brand, branches }: { brand: Brand; branches: 
 
   return (
     <footer className="mt-auto bg-primary text-primary-foreground">
+      <div aria-hidden className="lotus-border opacity-80" />
       <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-4">
           <div className="inline-flex rounded-xl bg-background px-3 py-2">

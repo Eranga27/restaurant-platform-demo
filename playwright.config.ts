@@ -12,6 +12,9 @@ export default defineConfig({
   use: {
     baseURL,
     trace: "on-first-retry",
+    // No splash screen or scroll reveals by default: journeys test behaviour,
+    // and tests/e2e/smoke.spec.ts turns motion on to check it.
+    contextOptions: { reducedMotion: "reduce" },
   },
   projects: [
     // Mobile first: most customers order on phones.

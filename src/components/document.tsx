@@ -13,7 +13,8 @@ export function Document({
   children: ReactNode;
 }) {
   return (
-    <html lang={lang} className={fontVariables} style={style}>
+    // suppressHydrationWarning: the splash script may set data-splash before hydration.
+    <html lang={lang} className={fontVariables} style={style} suppressHydrationWarning>
       <body className="flex min-h-dvh flex-col">{children}</body>
     </html>
   );

@@ -1,6 +1,8 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { DemoRibbon } from "@/components/site/demo-ribbon";
+import { MotionObserver } from "@/components/site/motion-observer";
+import { PageTransition } from "@/components/site/page-transition";
 import { PoyaBanner } from "@/components/site/poya-banner";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
@@ -33,9 +35,10 @@ export default async function SiteLayout({ children }: LayoutProps<"/[locale]">)
       <PoyaBanner holiday={holiday} />
       <SiteHeader brand={brand} branches={branches.map((b) => ({ id: b.id, name: b.name }))} />
       <main id="main" tabIndex={-1} className="flex flex-1 flex-col outline-none">
-        {children}
+        <PageTransition>{children}</PageTransition>
       </main>
       <SiteFooter brand={brand} branches={branches} />
+      <MotionObserver />
     </>
   );
 }

@@ -4,6 +4,7 @@ import { Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Suspense, useDeferredValue, useMemo, useState } from "react";
 
+import { Ornament } from "@/components/site/ornament";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -190,7 +191,8 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
               aria-labelledby={`${category.slug}-title`}
               className="scroll-mt-36"
             >
-              <div className="mb-4 space-y-1">
+              <div data-reveal className="mb-4 space-y-1">
+                <Ornament className="w-20" />
                 <h2 id={`${category.slug}-title`} className="text-display-md text-primary">
                   {category.name}
                 </h2>
@@ -200,7 +202,7 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
               </div>
               <ul className="grid gap-4 md:grid-cols-2">
                 {category.items.map((item) => (
-                  <li key={item.id}>
+                  <li key={item.id} data-reveal>
                     <MenuItemCard
                       item={item}
                       priceCents={fromPriceCents(item, overrides[item.id]?.priceCents)}

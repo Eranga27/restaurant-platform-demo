@@ -1,5 +1,6 @@
 /**
- * Structured data for search engines. The only place the app writes raw HTML:
+ * Structured data for search engines. One of two places the app writes raw
+ * HTML (the other is the splash screen's fixed one-line script):
  * the payload is built by our own code from catalogue data, and `<` is escaped
  * so no value can close the script tag.
  */
