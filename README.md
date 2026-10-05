@@ -5,6 +5,8 @@ A white-label restaurant website and ordering platform, built as a sales demo fo
 - **Plan:** [docs/PLAN.md](docs/PLAN.md). Changes to the plan: [docs/DECISIONS.md](docs/DECISIONS.md)
 - **Security:** [docs/SECURITY.md](docs/SECURITY.md)
 - **Rebranding for a new client:** [docs/REBRANDING.md](docs/REBRANDING.md)
+- **Taking a client live:** [docs/LAUNCH.md](docs/LAUNCH.md)
+- **Demo tour for client meetings:** `/demo` on any demo deployment
 - **Changelog:** [CHANGELOG.md](CHANGELOG.md)
 
 ## Stack

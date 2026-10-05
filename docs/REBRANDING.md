@@ -1,6 +1,17 @@
 # Rebranding for a new client
 
-Goal: re-skin the demo for a prospect in minutes. This guide grows with each phase; the full version lands in Phase 8.
+Goal: re-skin the demo for a prospect in minutes, and set up a real client in a day or two. Taking a client live (accounts, keys, domain) is in [LAUNCH.md](LAUNCH.md).
+
+## 0. What to collect from the client
+
+- Name, short name (12 characters, for the phone home screen), tagline and a one-line description
+- Logo as SVG: a square mark, and a wordmark if they have one
+- Brand colours (or a photo of their signage to match)
+- Photos of their dishes, rooms and team
+- The menu with prices, choices (portions, add-ons) and dietary information
+- Each branch: address, map pin, phone, WhatsApp, email, opening hours, seats, delivery radius and fees
+- Service charge, minimum delivery order, delivery fees, which features they want (delivery, pickup, cash, bookings, events, loyalty, alcohol)
+- Their privacy, terms and refund wording, or approval of ours after their lawyer's review
 
 ## 1. Brand defaults: `src/config/brand.ts`
 
@@ -43,6 +54,14 @@ Fonts are bundled at build time, so this one needs a deploy. Swap the `next/font
 | Fine dining             | Cormorant Garamond  | Manrope |
 | Street food, bold       | Bricolage Grotesque | Figtree |
 
-## 7. Check it
+## 7. Settings that need no deploy
 
-Open `/styleguide` to see every colour, type style and component in the new brand, then click through `/`, `/menu` and `/branches` in each language.
+Once the site runs on Supabase, Admin → Settings changes the name, contact details, colours (contrast-checked), features, charges, loyalty rates, booking and event rules. Admin → Menu, Branches, Holidays and Promo codes cover the rest. Changes appear within a few minutes.
+
+## 8. Policies
+
+`src/content/legal` holds the privacy, terms and refund text. It's a template for a fictional restaurant: the client's lawyer must review it (Sri Lanka's Personal Data Protection Act, PayHere's requirements) before launch.
+
+## 9. Check it
+
+Open `/styleguide` to see every colour, type style and component in the new brand, then click through `/`, `/menu` and `/branches` in each language. `npm test` fails if a colour pair misses WCAG AA contrast or a translation loses a placeholder; `npm run test:e2e` runs the accessibility checks (axe) on the main pages.
