@@ -3,6 +3,8 @@ import { randomBytes } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
 
+import { setUpTwoStep } from "./helpers/two-step";
+
 /**
  * Booking and event journeys against a real database (E2E_DATABASE=1). The
  * manager's quote needs a staff account, so that part runs only against a
@@ -95,6 +97,8 @@ test("a guest asks about an event; the manager quotes and the guest accepts", as
   await manager.getByLabel("Email").fill(email);
   await manager.getByLabel("Password").fill(password);
   await manager.getByRole("button", { name: "Sign in" }).click();
+  // Managers set up two-step sign-in before their first dashboard visit (D49).
+  await setUpTwoStep(manager);
   await expect(manager).toHaveURL(/\/dashboard\/events$/, { timeout: 15_000 });
   const card = manager.getByRole("article", { name: `Enquiry ${reference}` });
   await card.getByRole("button", { name: "Send quote" }).click();

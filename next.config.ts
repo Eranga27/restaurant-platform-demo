@@ -37,6 +37,8 @@ const nextConfig: NextConfig = {
   experimental: {
     // One 404 for URLs outside every root layout (the site and staff areas each have their own).
     globalNotFound: true,
+    // Admin photo uploads (up to 3 MB, checked in src/lib/admin/images.ts).
+    serverActions: { bodySizeLimit: "4mb" },
   },
   images: {
     formats: ["image/avif", "image/webp"],

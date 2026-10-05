@@ -1,11 +1,11 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { after } from "next/server";
 import { z } from "zod";
 
 import { canActForBranch, getStaff } from "@/lib/auth/staff";
 import { sendEventEmail } from "@/lib/events/service";
+import { refreshPublicSite } from "@/lib/revalidate";
 import { sendReservationEmail } from "@/lib/reservations/service";
 import { createClient } from "@/lib/supabase/server";
 
@@ -87,7 +87,7 @@ export async function setAvailabilityAction(input: unknown): Promise<ActionResul
   });
   if (error) return fail(error.message);
   // The public menu is cached for a few minutes; show the change now.
-  revalidatePath("/", "layout");
+  refreshPublicSite();
   return { ok: true };
 }
 
@@ -106,7 +106,7 @@ export async function setAcceptingOrdersAction(input: unknown): Promise<ActionRe
     accepting: parsed.data.accepting,
   });
   if (error) return fail(error.message);
-  revalidatePath("/", "layout");
+  refreshPublicSite();
   return { ok: true };
 }
 

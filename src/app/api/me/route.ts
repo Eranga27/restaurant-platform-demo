@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getStaff } from "@/lib/auth/staff";
+import { getStaffAccount } from "@/lib/auth/staff";
 import { getCurrentUser } from "@/lib/supabase/server";
 
 /**
@@ -9,7 +9,7 @@ import { getCurrentUser } from "@/lib/supabase/server";
  */
 export async function GET() {
   const user = await getCurrentUser();
-  const staff = user ? await getStaff() : null;
+  const staff = user ? await getStaffAccount() : null;
   return NextResponse.json(
     user
       ? { signedIn: true, name: user.name, email: user.email, staff: staff !== null }

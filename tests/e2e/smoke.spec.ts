@@ -113,6 +113,13 @@ test.describe("public site", () => {
     await expect(page).toHaveURL(/\/login\?next=%2Fdashboard$/);
     await page.goto("/dashboard/menu");
     await expect(page).toHaveURL(/\/login\?next=%2Fdashboard%2Fmenu$/);
+    await page.goto("/admin/settings");
+    await expect(page).toHaveURL(/\/login\?next=%2Fadmin%2Fsettings$/);
+  });
+
+  test("the admin's CSV export refuses anyone not signed in as an admin", async ({ request }) => {
+    const response = await request.get("/admin/orders/export");
+    expect(response.status()).toBe(403);
   });
 });
 

@@ -26,12 +26,23 @@ const SUPABASE_STUB = `
     select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid
   $$;
 
+  -- The session's claims. "aal" is the MFA level: aal2 once a TOTP code was
+  -- verified. Tests get aal2 unless they set request.jwt.claim.aal to aal1.
+  create or replace function auth.jwt() returns jsonb
+  language sql stable as $$
+    select jsonb_build_object(
+      'sub', nullif(current_setting('request.jwt.claim.sub', true), ''),
+      'aal', coalesce(nullif(current_setting('request.jwt.claim.aal', true), ''), 'aal2')
+    )
+  $$;
+
   create role anon nologin;
   create role authenticated nologin;
   create role service_role nologin bypassrls;
 
   grant usage on schema public, auth to anon, authenticated, service_role;
   grant execute on function auth.uid() to anon, authenticated, service_role;
+  grant execute on function auth.jwt() to anon, authenticated, service_role;
 
   -- Supabase gives service_role (the secret key) full access to new tables.
   alter default privileges in schema public grant all on tables to service_role;
@@ -80,12 +91,14 @@ export async function asRole<T>(
   role: Role,
   userId: string | null,
   fn: (tx: Transaction) => Promise<T>,
+  { aal = "aal2" }: { aal?: "aal1" | "aal2" } = {},
 ): Promise<T> {
   let result: T | undefined;
   let failure: unknown;
   await db
     .transaction(async (tx) => {
       await tx.query("select set_config('request.jwt.claim.sub', $1, true)", [userId ?? ""]);
+      await tx.query("select set_config('request.jwt.claim.aal', $1, true)", [aal]);
       await tx.exec(`set local role ${role}`);
       try {
         result = await fn(tx);

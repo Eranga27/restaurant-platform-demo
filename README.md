@@ -73,15 +73,26 @@ Alerts on staff phones and computers (Web Push) need VAPID keys: run `npx web-pu
 
 Table bookings (`/reservations`) and event enquiries (`/events`) need Supabase, like ordering. Their rules (seat share, how long tables are held, party sizes, notice, menus and deposit) are in `settings.brand.reservations` and `settings.brand.events`. Managers and admins quote events from the dashboard's Events tab; staff can see enquiries but not price them.
 
+### Admin panel
+
+Admins manage the menu, branches, promo codes, staff and settings at `/admin`. To make the first admin, sign up on the site, then run in the Supabase SQL editor:
+
+```sql
+update public.profiles set role = 'admin'
+where id = (select id from auth.users where email = 'you@example.com');
+```
+
+On the next visit to `/admin` you'll be asked to set up two-step sign-in with an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password…). Managers need it too. After that, add other staff from the Staff page.
+
 ### Testing orders
 
-The order, payment, dashboard and booking journeys in `tests/e2e/order.spec.ts`, `payment.spec.ts`, `dashboard.spec.ts` and `reservation.spec.ts` need a database and are skipped by default. CI runs them against a local Supabase (`supabase start`, which needs Docker). To run them yourself against the database in `.env.local`, build first, then:
+The order, payment, dashboard, booking and admin journeys in `tests/e2e/order.spec.ts`, `payment.spec.ts`, `dashboard.spec.ts`, `reservation.spec.ts` and `admin.spec.ts` need a database and are skipped by default. CI runs them against a local Supabase (`supabase start`, which needs Docker). To run them yourself against the database in `.env.local`, build first, then:
 
 ```bash
 E2E_DATABASE=1 npx playwright test tests/e2e/order.spec.ts --project=mobile
 ```
 
-The payment journeys also need `PAYHERE_MERCHANT_ID` and `PAYHERE_MERCHANT_SECRET` set to made-up values: they stand in for PayHere and sign its notifications themselves. The dashboard journey and the manager's part of the events journey create staff accounts, so they only run against a local Supabase. Each run places real test orders in that database.
+The payment journeys also need `PAYHERE_MERCHANT_ID` and `PAYHERE_MERCHANT_SECRET` set to made-up values: they stand in for PayHere and sign its notifications themselves. The dashboard and admin journeys and the manager's part of the events journey create staff accounts, so they only run against a local Supabase. Each run places real test orders in that database.
 
 ## Scripts
 
@@ -105,8 +116,8 @@ All variables are documented in [.env.example](.env.example). Public values (`NE
 
 ```
 src/
-  app/            Routes: [locale]/(site) for the public site, (staff) for the branch dashboard, (internal) for the styleguide
-  components/     ui/ (design system, shadcn/ui based), site/, home/, menu/, branches/, cart/, checkout/, track/, auth/, payments/, dashboard/, reservations/, events/
+  app/            Routes: [locale]/(site) for the public site, (staff) for the branch dashboard and admin panel, (internal) for the styleguide
+  components/     ui/ (design system, shadcn/ui based), site/, home/, menu/, branches/, cart/, checkout/, track/, auth/, payments/, dashboard/, reservations/, events/, admin/
   config/         Brand defaults, fonts and photos: the main rebranding surface
   content/        Policy text
   data/seed.ts    Demo content (source of supabase/seed.sql and the no-database fallback)

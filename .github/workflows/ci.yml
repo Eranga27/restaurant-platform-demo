@@ -101,8 +101,19 @@ jobs:
 
       # Database, auth, REST API and Realtime: what ordering and live tracking
       # need. Applies supabase/migrations and seed.sql on start.
+      # Retried: image registries sometimes rate-limit shared CI runners, and a
+      # half-started stack has to be stopped before trying again.
       - name: Start Supabase
-        run: supabase start -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,supavisor,storage-api,postgres-meta
+        run: |
+          for attempt in 1 2 3; do
+            if supabase start -x studio,imgproxy,mailpit,edge-runtime,logflare,vector,supavisor,storage-api,postgres-meta; then
+              exit 0
+            fi
+            echo "::warning::supabase start failed (attempt $attempt of 3), retrying"
+            supabase stop --no-backup || true
+            sleep $((attempt * 20))
+          done
+          exit 1
 
       - name: Lint schema
         run: supabase db lint --local --level warning --fail-on error
@@ -154,7 +165,7 @@ jobs:
       - name: Order journeys
         env:
           E2E_DATABASE: "1"
-        run: npm run test:e2e -- tests/e2e/order.spec.ts tests/e2e/payment.spec.ts tests/e2e/dashboard.spec.ts tests/e2e/reservation.spec.ts --project=mobile
+        run: npm run test:e2e -- tests/e2e/order.spec.ts tests/e2e/payment.spec.ts tests/e2e/dashboard.spec.ts tests/e2e/reservation.spec.ts tests/e2e/admin.spec.ts --project=mobile
 
       # Kept on success too: the journeys attach screenshots of the staff screens.
       - name: Upload Playwright report
