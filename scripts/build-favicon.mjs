@@ -1,6 +1,7 @@
 // npm run brand:favicon. Renders public/brand/mark.svg to 16, 32 and 48 px PNGs and
 // packs them into src/app/favicon.ico (ICO files may embed PNG images directly).
-import { readFileSync, statSync, writeFileSync } from "node:fs";
+// Also writes the app icons: public/icons/ (web app manifest) and src/app/apple-icon.png.
+import { mkdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 
 import sharp from "sharp";
 
@@ -31,3 +32,26 @@ const entries = SIZES.map((size, i) => {
 const target = "src/app/favicon.ico";
 writeFileSync(target, Buffer.concat([header, ...entries, ...pngs]));
 console.log(`Wrote ${target} (${statSync(target).size} bytes)`);
+
+// App icons. "Maskable" icons keep the mark inside the middle 80% safe zone,
+// on the brand background, so Android can crop them to any shape.
+const BACKGROUND = "#fbf6ee";
+mkdirSync("public/icons", { recursive: true });
+const render = (size) => sharp(svg, { density: 384 }).resize(size, size).png().toBuffer();
+async function padded(size, markShare) {
+  const mark = await render(Math.round(size * markShare));
+  return sharp({ create: { width: size, height: size, channels: 4, background: BACKGROUND } })
+    .composite([{ input: mark, gravity: "center" }])
+    .png()
+    .toBuffer();
+}
+const icons = [
+  ["public/icons/icon-192.png", await render(192)],
+  ["public/icons/icon-512.png", await render(512)],
+  ["public/icons/maskable-512.png", await padded(512, 0.6)],
+  ["src/app/apple-icon.png", await padded(180, 0.78)],
+];
+for (const [file, png] of icons) {
+  writeFileSync(file, png);
+  console.log(`Wrote ${file} (${statSync(file).size} bytes)`);
+}
