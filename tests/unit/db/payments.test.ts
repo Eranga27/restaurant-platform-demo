@@ -95,9 +95,10 @@ async function startPayment(token: string) {
 
 type Applied = {
   outcome: string;
-  order_token: string | null;
+  kind: "order" | "deposit" | null;
+  token: string | null;
   payment_status: string | null;
-  order_status: string | null;
+  status: string | null;
 };
 
 async function notify(
@@ -185,9 +186,10 @@ describe("apply_payhere_notification()", () => {
 
     expect(await notify(reference, 2)).toEqual({
       outcome: "applied",
-      order_token: order.token,
+      kind: "order",
+      token: order.token,
       payment_status: "paid",
-      order_status: "received",
+      status: "received",
     });
     const { rows: payments } = await db.query<{ status: string; verified: boolean }>(
       "select status, verified from public.payments where reference = $1",
