@@ -4,6 +4,26 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [0.9.0] - Phase 8: UI/UX polish
+
+### Added
+
+- A branded splash screen on the first visit in a tab: the brand mark opens like a lotus, with "Welcome · ආයුබෝවන් · வணக்கம்". Only on the public pages, never on checkout, tracking, payments or account pages.
+- Page transitions: the old page fades out and the new one rises in, with the header held still.
+- Scroll animations: headings, dish cards, offers, branches, reviews and photos rise in as they come into view, a few at a time.
+- The home hero enters line by line, its photo drifts gently as you scroll, and photo bands move with a slight parallax.
+- A lotus ornament above section headings, a lotus border along the footer, and quote marks on reviews.
+- The header gains a soft shadow once the page scrolls; desktop menu links get a turmeric underline.
+- On phones, a "View order" bar at the bottom of the menu once something is in the order, and the cart badge pops when a dish is added.
+- Loading screens for checkout and account pages, and a friendly error page with "Try again" in all three languages.
+- Ornament and motion sections in the styleguide.
+
+### Changed
+
+- Dishes without a photo show a lotus placeholder.
+- Browser tests run with reduced motion; new smoke tests check the splash, the reveals and reduced-motion behaviour.
+- Everything that moves is switched off for visitors who ask for reduced motion.
+
 ## [0.8.0] - Phase 7: Extras
 
 ### Added

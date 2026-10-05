@@ -26,6 +26,8 @@ The home hero, story, events and branches photos. Use the client's own photograp
 
 The home page hero, story and About page are written for Kithul & Co. Edit the `Home` and `About` sections and their Sinhala and Tamil versions (reviewed by a native speaker). `npm test` fails if a Sinhala or Tamil message is missing or loses a placeholder; `node scripts/check-translations.mjs <si|ta> <batch.json>` checks and merges a batch of flat `"Namespace.key": "text"` translations.
 
+The splash screen's welcome is `Splash.greeting` in each language file. The lotus ornament, footer border and splash petals take the brand's `accent` (turmeric by default), `primary` and `secondary` colours, so they follow a new palette with no extra work.
+
 ## 5. Menu, branches and offers
 
 With a database, change these in the admin panel (`/admin`). The starting data lives in `src/data/seed.ts`: branches, categories, dishes, options, prices, photos, offers, reviews and holidays. Edit it, then run `npm run db:seed` to regenerate `supabase/seed.sql`. Without a database, the site reads `seed.ts` directly.

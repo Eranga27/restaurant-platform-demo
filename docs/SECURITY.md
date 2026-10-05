@@ -104,7 +104,7 @@ Set for every response in `next.config.ts`, with the CSP set per request in `src
 Two levels (docs/DECISIONS.md D4, D5):
 
 - **Strict routes** (`/account`, `/admin`, `/checkout`, `/dashboard`, `/login`, `/signup`, `/track`, in any locale): `script-src 'self' 'nonce-…' 'strict-dynamic'`. A fresh nonce per request; Next.js applies it to its own scripts. These pages render dynamically.
-- **Public pages** (home, menu, branches, static pages): `script-src 'self' 'unsafe-inline'` so they can be static or ISR. They render no user-supplied content.
+- **Public pages** (home, menu, branches, static pages): `script-src 'self' 'unsafe-inline'` so they can be static or ISR. They render no user-supplied content. Their only inline script of our own is the splash screen's fixed one-line `sessionStorage` check (D63); strict pages never show the splash.
 - **Offline pages** (`/offline/<locale>.html`, shown by the service worker): `default-src 'none'; style-src 'unsafe-inline'`, set by the route itself.
 - **Both:** `style-src 'self' 'unsafe-inline'` (React style attributes, animation libraries and Leaflet need it); `object-src 'none'`, `base-uri 'self'`, `form-action 'self'`, `frame-ancestors 'none'`, `upgrade-insecure-requests`; Supabase allowed only for the configured project origin (HTTPS and WSS).
 
