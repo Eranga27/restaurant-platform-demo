@@ -4,6 +4,24 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [0.6.0] - Phase 5: Reservations and events
+
+### Added
+
+- Table booking at `/reservations`: choose a branch, day, number of guests and a free time, plus seating and occasion. Confirmed straight away, with an email and a private link to view or cancel.
+- Capacity rules: a share of each branch's seats is bookable online, tables are held 90 or 120 minutes, and the database stops double-booking.
+- Events and catering at `/events`: menus to start from, and an enquiry form for birthdays, office events, almsgivings, weddings and homecomings, at a branch or at the guest's venue.
+- A private enquiry page where guests see the quote, accept or decline it, and pay the deposit through PayHere (when it's set up).
+- Dashboard tabs: Reservations (a day's bookings with seat, finish, no-show and cancel) and Events (the New, Quoted, Confirmed and Closed pipeline, with the quote form for managers and admins).
+- Emails for bookings (confirmed, cancelled) and events (received, quoted, confirmed, declined), and branch alerts for new enquiries.
+- "Book a table" and "Events" in the header and footer; the home page buttons now lead there.
+- Tests for slot and capacity rules and the booking and event database rules, plus booking and enquiry journeys.
+
+### Changed
+
+- Database tests run one file at a time, so the in-memory databases don't run out of memory.
+- PayHere notifications now cover event deposits as well as orders.
+
 ## [0.5.0] - Phase 4: Branch dashboard
 
 ### Added
