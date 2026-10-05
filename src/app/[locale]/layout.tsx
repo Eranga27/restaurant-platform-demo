@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 
 import { Document } from "@/components/document";
 import { OfflineSupport } from "@/components/site/offline-support";
-import { Toaster } from "@/components/ui/sonner";
+import { LazyToaster } from "@/components/ui/lazy-toaster";
 import { routing } from "@/i18n/routing";
 import { brandColorVariables, getBrand } from "@/lib/data/brand";
 import { publicEnv } from "@/lib/public-env";
@@ -47,7 +47,7 @@ export default async function LocaleLayout({ children, params }: LayoutProps<"/[
     <Document lang={locale} style={brandColorVariables(brand)}>
       <NextIntlClientProvider>
         {children}
-        <Toaster position="top-center" />
+        <LazyToaster position="top-center" />
         <OfflineSupport />
       </NextIntlClientProvider>
     </Document>

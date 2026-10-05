@@ -1,20 +1,17 @@
 "use client";
 
-import { Languages } from "lucide-react";
+import { ChevronDown, Languages } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useTransition } from "react";
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { LOCALE_NAMES, LOCALE_SHORT, routing, type Locale } from "@/i18n/routing";
 import { cn } from "@/lib/utils";
 
+/**
+ * The language menu: a native <select> laid over the short label, so phones
+ * show their own picker and no dropdown library loads with every page.
+ */
 export function LanguageSwitcher({ className }: { className?: string }) {
   const t = useTranslations("Nav");
   const locale = useLocale();
@@ -31,24 +28,32 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   }
 
   return (
-    <Select value={locale} onValueChange={change} disabled={isPending}>
-      <SelectTrigger
-        size="sm"
+    <div
+      className={cn(
+        "relative inline-flex h-8 items-center gap-1.5 rounded-lg border border-input bg-card px-2.5 text-sm",
+        "transition-colors hover:bg-muted has-[select:focus-visible]:ring-2 has-[select:focus-visible]:ring-ring",
+        isPending && "opacity-60",
+        className,
+      )}
+    >
+      <Languages aria-hidden className="size-4 text-muted-foreground" />
+      <span aria-hidden lang={locale}>
+        {LOCALE_SHORT[locale]}
+      </span>
+      <ChevronDown aria-hidden className="size-4 text-muted-foreground" />
+      <select
         aria-label={t("changeLanguage")}
-        className={cn("w-auto gap-1.5 bg-card", className)}
+        value={locale}
+        disabled={isPending}
+        onChange={(e) => change(e.target.value)}
+        className="absolute inset-0 cursor-pointer appearance-none opacity-0"
       >
-        <Languages aria-hidden className="size-4 text-muted-foreground" />
-        <SelectValue>
-          <span lang={locale}>{LOCALE_SHORT[locale]}</span>
-        </SelectValue>
-      </SelectTrigger>
-      <SelectContent align="end" position="popper">
         {routing.locales.map((l) => (
-          <SelectItem key={l} value={l} lang={l}>
+          <option key={l} value={l} lang={l}>
             {LOCALE_NAMES[l]}
-          </SelectItem>
+          </option>
         ))}
-      </SelectContent>
-    </Select>
+      </select>
+    </div>
   );
 }

@@ -11,7 +11,8 @@ import { Link } from "@/i18n/navigation";
 /** Order in the hero's entrance (globals.css, .intro). */
 const intro = (i: number) => ({ "--i": i }) as CSSProperties;
 
-export async function Hero({ brand, branchCount }: { brand: Brand; branchCount: number }) {
+export async function Hero({ brand, branchNames }: { brand: Brand; branchNames: string[] }) {
+  const branchCount = branchNames.length;
   const t = await getTranslations("Home");
   const nav = await getTranslations("Nav");
 
@@ -31,6 +32,8 @@ export async function Hero({ brand, branchCount }: { brand: Brand; branchCount: 
           fill
           priority
           fetchPriority="high"
+          // Under a dark gradient, so lighter compression doesn't show.
+          quality={60}
           sizes="100vw"
           className="animate-hero-settle object-cover"
         />
@@ -46,7 +49,7 @@ export async function Hero({ brand, branchCount }: { brand: Brand; branchCount: 
             className="intro mb-4 text-xs font-medium tracking-[0.2em] text-highlight uppercase sm:text-sm"
             style={intro(0)}
           >
-            {t("heroEyebrow", { tagline: brand.tagline })}
+            {t("heroEyebrow", { tagline: brand.tagline, places: branchNames.join(" · ") })}
           </p>
           <h1 className="intro text-display-2xl text-balance text-white" style={intro(1)}>
             {t("heroTitle")}

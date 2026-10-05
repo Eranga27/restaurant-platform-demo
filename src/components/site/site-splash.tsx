@@ -87,7 +87,9 @@ export function SiteSplash({
         </div>
         <div className="words space-y-2">
           <p className="font-display text-3xl text-primary">{name}</p>
-          <p className="text-sm tracking-[0.18em] text-muted-foreground">{greeting}</p>
+          {/* The phone's own Sinhala and Tamil fonts: the site's web fonts for
+              those scripts load only on pages in those languages. */}
+          <p className="font-system text-sm tracking-[0.18em] text-muted-foreground">{greeting}</p>
         </div>
       </div>
     </div>
