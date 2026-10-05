@@ -14,6 +14,7 @@ export const ADMIN_SECTIONS = [
   { key: "branches", label: "Branches", href: "/admin/branches" },
   { key: "holidays", label: "Holidays", href: "/admin/holidays" },
   { key: "promo-codes", label: "Promo codes", href: "/admin/promo-codes" },
+  { key: "reviews", label: "Reviews", href: "/admin/reviews" },
   { key: "payments", label: "Payments", href: "/admin/payments" },
   { key: "staff", label: "Staff", href: "/admin/staff" },
   { key: "settings", label: "Settings", href: "/admin/settings" },

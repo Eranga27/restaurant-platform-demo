@@ -206,6 +206,13 @@ export function OrderSummary(props: OrderSummaryProps) {
             highlight
           />
         )}
+        {totals && totals.loyaltyDiscountCents > 0 && (
+          <Row
+            label={t("loyaltyDiscount", { points: totals.loyaltyPoints })}
+            value={formatLKR(-totals.loyaltyDiscountCents)}
+            highlight
+          />
+        )}
         <Row
           label={t("serviceCharge", { percent: charges.serviceChargePercent })}
           value={totals ? formatLKR(totals.serviceChargeCents) : "…"}

@@ -38,6 +38,8 @@ export const quoteRequestSchema = z.object({
   location: locationSchema.nullable(),
   /** ISO timestamp with offset, or null for "as soon as possible". */
   scheduledFor: z.iso.datetime({ offset: true }).nullable(),
+  /** Loyalty points to spend; signed-in customers only, checked on the server. */
+  loyaltyPoints: z.number().int().min(0).max(1_000_000).optional(),
 });
 
 export const contactSchema = z.object({
@@ -69,6 +71,8 @@ export const checkoutSchema = quoteRequestSchema
     address: addressSchema.nullable(),
     notes: z.string().trim().max(500).nullable(),
     paymentMethod: z.enum(["cod", "payhere"]),
+    /** Signed-in customers can keep a delivery address for next time, under this name. */
+    saveAddressAs: z.string().trim().min(1).max(40).nullable().optional(),
     idempotencyKey: z.uuid(),
     turnstileToken: z.string().max(2048).nullable(),
     locale: z.enum(["en", "si", "ta"]),

@@ -44,7 +44,8 @@
     "account": "Account",
     "signOut": "Sign out",
     "dashboard": "Branch dashboard",
-    "events": "Events"
+    "events": "Events",
+    "myAccount": "My account"
   },
   "Footer": {
     "about": "Sri Lankan home cooking from three kitchens across the island.",
@@ -377,9 +378,19 @@
       "bot-check": "We couldn't confirm you're human. Please try again.",
       "unavailable": "Online ordering isn't available right now. Please call the branch.",
       "unknown": "Something went wrong placing your order. Nothing was charged. Please try again.",
-      "payment-unavailable": "That payment method isn't available right now. Please choose another."
+      "payment-unavailable": "That payment method isn't available right now. Please choose another.",
+      "loyalty-changed": "Your points balance changed. Please check your order and try again."
     },
-    "noPaymentMethod": "Online ordering is paused. Please call the branch to order."
+    "noPaymentMethod": "Online ordering is paused. Please call the branch to order.",
+    "savedAddresses": "Your saved addresses",
+    "saveAddress": "Save this address for next time as",
+    "addressLabel": "Name for this address",
+    "homeLabel": "Home",
+    "pointsTitle": "Loyalty points",
+    "usePoints": "Use my {points, plural, one {# point} other {# points}}",
+    "pointsHelp": "Worth up to {value}. Points can pay for up to {share}% of your food.",
+    "pointsEarn": "This order earns {points, plural, =0 {no points} one {# point} other {# points}} once it's completed.",
+    "loyaltyDiscount": "Points ({points})"
   },
   "Track": {
     "metaTitle": "Order {number}",
@@ -743,5 +754,103 @@
       "reason": "Reason: {reason}",
       "button": "View your enquiry"
     }
+  },
+  "Account": {
+    "eyebrow": "Your account",
+    "title": "My account",
+    "hello": "Hello, {name}",
+    "tabs": {
+      "overview": "Overview",
+      "orders": "Orders",
+      "bookings": "Bookings",
+      "addresses": "Addresses"
+    },
+    "pointsTitle": "Loyalty points",
+    "pointsRule": "Earn a point for every {spend} you spend. Each point is worth {value} on a future order, for up to {share}% of the food.",
+    "pointsWorth": "worth {value}",
+    "pointsReason": {
+      "earned": "Earned on order {order}",
+      "redeemed": "Spent on order {order}",
+      "returned": "Returned from order {order}",
+      "adjusted": "Adjusted by the restaurant"
+    },
+    "pointsNone": "No points yet. You'll earn some with your first completed order.",
+    "profileTitle": "Your details",
+    "profileHelp": "Signed in as {email}. These fill in checkout and bookings for you.",
+    "name": "Name",
+    "phone": "Mobile number",
+    "save": "Save",
+    "saved": "Saved.",
+    "errors": {
+      "not-signed-in": "Please sign in again.",
+      "invalid": "Please check what you entered.",
+      "too-many": "You can save up to 10 addresses. Delete one first.",
+      "unknown": "Something went wrong. Please try again."
+    },
+    "noOrders": "No orders yet.",
+    "browseMenu": "Browse the menu",
+    "orderSummary": "Order {number} · {items, plural, one {# item} other {# items}}",
+    "status": {
+      "rejected": "Declined",
+      "cancelled": "Cancelled"
+    },
+    "viewOrder": "View",
+    "reorder": "Order again",
+    "reorderFailed": "We couldn't add that order to your cart.",
+    "reorderSkipped": "{count, plural, one {# dish isn't} other {# dishes aren't}} on the menu any more, so we left {count, plural, one {it} other {them}} out.",
+    "noBookings": "No bookings yet.",
+    "bookTable": "Book a table",
+    "planEvent": "Plan an event",
+    "tables": "Tables",
+    "events": "Events and catering",
+    "guests": "{count, plural, one {# guest} other {# guests}}",
+    "bookingStatus": {
+      "confirmed": "Booked",
+      "seated": "Seated",
+      "completed": "Finished",
+      "no_show": "Missed",
+      "cancelled": "Cancelled"
+    },
+    "eventStatus": {
+      "new": "Waiting for a quote",
+      "quoted": "Quote ready",
+      "confirmed": "Confirmed",
+      "done": "Done",
+      "declined": "Declined",
+      "cancelled": "Closed"
+    },
+    "view": "View",
+    "noAddresses": "No saved addresses. Add one here, or tick “Save this address” at checkout.",
+    "deleteAddress": "Delete {label}",
+    "addressName": "Name (Home, Office…)",
+    "saveAddress": "Save address",
+    "cancel": "Cancel",
+    "addAddress": "Add an address",
+    "addressSaved": "Address saved."
+  },
+  "Review": {
+    "title": "How was it?",
+    "rating": "Your rating",
+    "stars": "{count, plural, one {# star} other {# stars}}",
+    "body": "Tell us about it",
+    "bodyPlaceholder": "What did you enjoy? Anything we could do better?",
+    "name": "Name shown with your review",
+    "submit": "Send review",
+    "thanks": "Thank you for your review!",
+    "thanksBody": "It will appear on the site once our team has read it.",
+    "errors": {
+      "invalid": "Please choose a rating and write at least a few words.",
+      "rate-limited": "Too many attempts. Please wait a few minutes.",
+      "not-reviewable": "This order can't be reviewed.",
+      "already-reviewed": "This order has already been reviewed.",
+      "too-late": "Reviews close 60 days after an order.",
+      "unknown": "Something went wrong. Please try again."
+    }
+  },
+  "Offline": {
+    "title": "You're offline",
+    "body": "Check your internet connection and try again. Anything in your order is still saved on this device.",
+    "retry": "Try again",
+    "call": "Need to order now? Call {phone}."
   }
 }

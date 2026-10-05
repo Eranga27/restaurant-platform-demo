@@ -91,6 +91,15 @@ export const brandSchema = z.object({
     /** Orders not accepted within this many minutes are rejected automatically. 0 turns it off. */
     autoRejectMinutes: z.number().int().min(0).max(120),
   }),
+  /** Loyalty points (docs/DECISIONS.md B2, D58). */
+  loyalty: z.object({
+    /** Food spend (after discounts) for one point. */
+    pointPerCents: z.number().int().min(100),
+    /** What one point takes off a bill. */
+    pointValueCents: z.number().int().min(1),
+    /** The most points may take off, as a share of the food total after a promo code. */
+    maxRedeemBps: z.number().int().min(0).max(10_000),
+  }),
   /** Online table bookings (docs/DECISIONS.md D42). */
   reservations: z.object({
     slotMinutes: z.number().int().min(15).max(60),
@@ -196,6 +205,7 @@ export const defaultBrand = brandSchema.parse({
     minimumOrderCents: 1500_00,
   },
   orders: { autoRejectMinutes: 10 },
+  loyalty: { pointPerCents: 100_00, pointValueCents: 1_00, maxRedeemBps: 2000 },
   reservations: {
     slotMinutes: 30,
     seatingMinutes: 90,

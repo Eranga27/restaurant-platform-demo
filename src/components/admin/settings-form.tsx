@@ -250,6 +250,17 @@ export function SettingsForm({ brand: initial }: { brand: Brand }) {
         </div>
       </Panel>
 
+      <Panel
+        title="Loyalty points"
+        description="Customers with an account earn points when an order is completed and spend them at checkout. Switch the programme on or off under Features."
+      >
+        <div className="grid gap-4 sm:grid-cols-3">
+          {number(["loyalty", "pointPerCents"], "One point for every (Rs. of food)", 100)}
+          {number(["loyalty", "pointValueCents"], "A point takes off (Rs.)", 100)}
+          {number(["loyalty", "maxRedeemBps"], "Points pay up to (% of the food)", 100)}
+        </div>
+      </Panel>
+
       <Panel title="Table bookings">
         <div className="grid gap-4 sm:grid-cols-4">
           {number(["reservations", "onlineShareBps"], "Seats bookable online (%)", 100)}

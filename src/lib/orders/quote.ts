@@ -51,7 +51,13 @@ export type QuoteIssue =
   | { code: "promo-expired" }
   | { code: "promo-min-spend"; minSubtotalCents: number };
 
-export type OptionSnapshot = { option: I18nText; value: I18nText; priceDeltaCents: number };
+export type OptionSnapshot = {
+  optionId: string;
+  valueId: string;
+  option: I18nText;
+  value: I18nText;
+  priceDeltaCents: number;
+};
 
 export type QuotedLine = {
   lineIndex: number;
@@ -80,6 +86,8 @@ export type QuoteContext = {
   alcoholServed: boolean;
   /** Looked up by the caller (codes aren't readable through the public API). */
   promo: PromoRecord | null;
+  /** The signed-in customer's points and the rules, or null (signed out, or loyalty off). */
+  loyalty?: { balance: number; pointValueCents: number; maxShareBps: number } | null;
   now: Date;
 };
 
@@ -174,6 +182,9 @@ export function quoteOrder(request: QuoteRequest, ctx: QuoteContext): Quote {
         rows.values
           .filter((v) => v.option_id === o.id && chosen.has(v.id))
           .map((v) => ({
+            // IDs let the customer reorder the same choices later.
+            optionId: o.id,
+            valueId: v.id,
             option: o.name_i18n,
             value: v.name_i18n,
             priceDeltaCents: v.price_delta_cents,
@@ -235,6 +246,15 @@ export function quoteOrder(request: QuoteRequest, ctx: QuoteContext): Quote {
     lineTotalsCents,
     charges: ctx.charges,
     promo,
+    // Never more points than the customer has; nothing for guests.
+    loyalty:
+      ctx.loyalty && (request.loyaltyPoints ?? 0) > 0
+        ? {
+            points: Math.min(request.loyaltyPoints ?? 0, ctx.loyalty.balance),
+            pointValueCents: ctx.loyalty.pointValueCents,
+            maxShareBps: ctx.loyalty.maxShareBps,
+          }
+        : null,
     delivery:
       request.type === "delivery" && branch && distance !== null
         ? { rules: branch.delivery_fee_rules, distanceKm: distance }

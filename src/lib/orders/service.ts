@@ -35,20 +35,42 @@ export function orderingEnabled(): boolean {
 // Quotes
 // ---------------------------------------------------------------------------
 
-export async function getQuote(request: QuoteRequest, now = new Date()): Promise<Quote> {
+export async function getQuote(
+  request: QuoteRequest,
+  { userId = null, now = new Date() }: { userId?: string | null; now?: Date } = {},
+): Promise<Quote> {
   const [rows, brand, promo] = await Promise.all([
     getPublicRows(),
     getBrand(),
     request.promoCode ? findPromo(request.promoCode) : Promise.resolve(null),
   ]);
+  const wantsPoints = (request.loyaltyPoints ?? 0) > 0 && userId !== null && brand.features.loyalty;
   return quoteOrder(request, {
     rows,
     charges: { serviceChargeBps: brand.charges.serviceChargeBps, vatBps: brand.charges.vatBps },
     minimumOrderCents: brand.charges.minimumOrderCents,
     alcoholServed: brand.features.alcohol,
     promo,
+    loyalty: wantsPoints
+      ? {
+          balance: await loyaltyBalance(userId),
+          pointValueCents: brand.loyalty.pointValueCents,
+          maxShareBps: brand.loyalty.maxRedeemBps,
+        }
+      : null,
     now,
   });
+}
+
+/** A customer's loyalty points, read with the secret key (the ledger has no write access). */
+export async function loyaltyBalance(userId: string): Promise<number> {
+  if (!orderingEnabled()) return 0;
+  const { data, error } = await createAdminClient().rpc("loyalty_balance", { account: userId });
+  if (error) {
+    console.error("[loyalty] balance failed", error.message);
+    return 0;
+  }
+  return typeof data === "number" ? data : 0;
 }
 
 const promoRow = z.object({
@@ -111,7 +133,7 @@ async function findPromo(code: string): Promise<PromoRecord | null> {
 export type PlaceOrderResult =
   | { ok: true; publicToken: string; orderNumber: string }
   | { ok: false; reason: "issues"; issues: QuoteIssue[]; quote: Quote }
-  | { ok: false; reason: "promo-exhausted" | "unavailable" | "unknown" };
+  | { ok: false; reason: "promo-exhausted" | "loyalty-changed" | "unavailable" | "unknown" };
 
 export async function placeOrder(
   request: CheckoutRequest,
@@ -119,7 +141,7 @@ export async function placeOrder(
 ): Promise<PlaceOrderResult> {
   if (!orderingEnabled()) return { ok: false, reason: "unavailable" };
 
-  const quote = await getQuote(request);
+  const quote = await getQuote(request, { userId });
   if (quote.issues.length > 0) return { ok: false, reason: "issues", issues: quote.issues, quote };
 
   const payloadBase = {
@@ -140,6 +162,8 @@ export async function placeOrder(
     notes: request.notes,
     subtotal_cents: quote.totals.subtotalCents,
     discount_cents: quote.totals.discountCents,
+    loyalty_points_used: quote.totals.loyaltyPoints,
+    loyalty_discount_cents: quote.totals.loyaltyDiscountCents,
     service_charge_cents: quote.totals.serviceChargeCents,
     vat_cents: quote.totals.vatCents,
     delivery_fee_cents: quote.totals.deliveryFeeCents,
@@ -193,6 +217,9 @@ export async function placeOrder(
     ) {
       return { ok: false, reason: "promo-exhausted" };
     }
+    // Points spent elsewhere in the meantime: the customer re-checks the quote.
+    if (error?.message.includes("loyalty_insufficient"))
+      return { ok: false, reason: "loyalty-changed" };
     if (error?.code === "23505" && error.message.includes("order_number")) continue;
     console.error("[order] place_order failed", error?.code, error?.message);
     return { ok: false, reason: "unknown" };
@@ -229,6 +256,8 @@ const orderRow = z.object({
   delivery_landmark: z.string().nullable(),
   subtotal_cents: z.number().int(),
   discount_cents: z.number().int(),
+  loyalty_points_used: z.number().int(),
+  loyalty_discount_cents: z.number().int(),
   service_charge_cents: z.number().int(),
   vat_cents: z.number().int(),
   delivery_fee_cents: z.number().int(),
@@ -280,7 +309,7 @@ export async function getOrderByToken(token: string): Promise<TrackedOrder | nul
     .from("orders")
     .select(
       `id, public_token, order_number, branch_id, customer_name, customer_email, type, status, scheduled_for,
-       delivery_city, delivery_address, delivery_landmark, subtotal_cents, discount_cents, service_charge_cents,
+       delivery_city, delivery_address, delivery_landmark, subtotal_cents, discount_cents, loyalty_points_used, loyalty_discount_cents, service_charge_cents,
        vat_cents, delivery_fee_cents, total_cents, payment_method, payment_status, locale, rejection_reason, created_at,
        promo_codes (code),
        branches (name_i18n, address_line, city, phone),
@@ -335,6 +364,14 @@ export async function sendOrderConfirmation(token: string): Promise<void> {
           {
             label: tc("discount", { code: order.promo_codes?.code ?? "" }),
             value: formatLKR(-order.discount_cents),
+          },
+        ]
+      : []),
+    ...(order.loyalty_discount_cents > 0
+      ? [
+          {
+            label: tc("loyaltyDiscount", { points: order.loyalty_points_used }),
+            value: formatLKR(-order.loyalty_discount_cents),
           },
         ]
       : []),
