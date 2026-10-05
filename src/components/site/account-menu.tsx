@@ -1,6 +1,7 @@
 "use client";
 
-import { CircleUser, LogOut } from "lucide-react";
+import { CircleUser, LayoutDashboard, LogOut } from "lucide-react";
+import NextLink from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
@@ -9,7 +10,9 @@ import { Link } from "@/i18n/navigation";
 import { signOutAction } from "@/lib/auth/actions";
 import { cn } from "@/lib/utils";
 
-type Me = { signedIn: false } | { signedIn: true; name: string | null; email: string | null };
+type Me =
+  | { signedIn: false }
+  | { signedIn: true; name: string | null; email: string | null; staff?: boolean };
 
 /** Sign-in link or the signed-in user's name, fetched after load (cookies are HttpOnly). */
 export function AccountMenu({ className }: { className?: string }) {
@@ -44,6 +47,20 @@ export function AccountMenu({ className }: { className?: string }) {
   return (
     <form action={signOutAction} className={cn("items-center gap-1", className)}>
       <input type="hidden" name="locale" value={locale} />
+      {me.staff && (
+        // Staff screens sit outside locale routing: not the localized Link.
+        <Button
+          asChild
+          variant="ghost"
+          size="icon-sm"
+          aria-label={t("dashboard")}
+          title={t("dashboard")}
+        >
+          <NextLink href="/dashboard">
+            <LayoutDashboard aria-hidden />
+          </NextLink>
+        </Button>
+      )}
       <span
         className="max-w-32 truncate text-sm text-muted-foreground"
         title={me.email ?? undefined}

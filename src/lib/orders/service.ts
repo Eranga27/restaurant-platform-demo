@@ -16,6 +16,7 @@ import { getPublicRows } from "@/lib/data/source";
 import { sendEmail } from "@/lib/email/send";
 import { env } from "@/lib/env";
 import { formatLKR } from "@/lib/money";
+import { alertBranchOfNewOrder } from "@/lib/notifications/new-order";
 import { formatPhone } from "@/lib/phone";
 import { publicEnv } from "@/lib/public-env";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -187,10 +188,12 @@ export async function placeOrder(
     if (!error && data) {
       // Online-payment orders are confirmed once PayHere reports the payment.
       if (data.created && request.paymentMethod === "cod") {
+        const token = data.public_token;
         after(() =>
-          sendOrderConfirmation(data.public_token).catch((e) =>
-            console.error("[order] email failed", e),
-          ),
+          Promise.all([
+            sendOrderConfirmation(token).catch((e) => console.error("[order] email failed", e)),
+            alertBranchOfNewOrder(token).catch((e) => console.error("[order] alert failed", e)),
+          ]),
         );
       }
       return { ok: true, publicToken: data.public_token, orderNumber: data.order_number };

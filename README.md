@@ -55,15 +55,29 @@ Without PayHere keys, customers pay in cash. To take payments online (sandbox, n
 
 PayHere only accepts payments started from the registered domain and must be able to reach `/api/payments/payhere/notify`, so online payment works on production, not on previews or localhost (docs/DECISIONS.md D32). Sandbox test card: `4916 2175 0161 1292`, any future expiry, any name and CVV. `4024 0071 9434 9121` is declined.
 
+### Branch dashboard
+
+Staff use `/dashboard` (sign in on the normal sign-in page). To make someone staff, have them sign up on the site, then in the Supabase SQL editor:
+
+```sql
+update public.profiles
+set role = 'staff', branch_id = (select id from public.branches where slug = 'colombo-07')
+where id = (select id from auth.users where email = 'person@example.com');
+```
+
+Roles: `staff` and `manager` (one branch), `admin` (every branch). Orders not accepted within 10 minutes are rejected automatically; change or turn this off (0) with `settings.brand.orders.autoRejectMinutes`.
+
+Alerts on staff phones and computers (Web Push) need VAPID keys: run `npx web-push generate-vapid-keys` and set `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` (sensitive) and `VAPID_SUBJECT` (`mailto:` address) in Vercel. For Telegram alerts, create a bot with @BotFather, set `TELEGRAM_BOT_TOKEN`, add the bot to the branch's group and store the group's chat ID in `branch_secrets.telegram_chat_id`.
+
 ### Testing orders
 
-The order and payment journeys in `tests/e2e/order.spec.ts` and `payment.spec.ts` need a database and are skipped by default. CI runs them against a local Supabase (`supabase start`, which needs Docker). To run them yourself against the database in `.env.local`, build first, then:
+The order, payment and dashboard journeys in `tests/e2e/order.spec.ts`, `payment.spec.ts` and `dashboard.spec.ts` need a database and are skipped by default. CI runs them against a local Supabase (`supabase start`, which needs Docker). To run them yourself against the database in `.env.local`, build first, then:
 
 ```bash
 E2E_DATABASE=1 npx playwright test tests/e2e/order.spec.ts --project=mobile
 ```
 
-The payment journeys also need `PAYHERE_MERCHANT_ID` and `PAYHERE_MERCHANT_SECRET` set to made-up values: they stand in for PayHere and sign its notifications themselves. Each run places real test orders in that database.
+The payment journeys also need `PAYHERE_MERCHANT_ID` and `PAYHERE_MERCHANT_SECRET` set to made-up values: they stand in for PayHere and sign its notifications themselves. The dashboard journey creates a staff account, so it only runs against a local Supabase. Each run places real test orders in that database.
 
 ## Scripts
 
@@ -87,8 +101,8 @@ All variables are documented in [.env.example](.env.example). Public values (`NE
 
 ```
 src/
-  app/            Routes: [locale]/(site) for the public site, (internal) for the styleguide
-  components/     ui/ (design system, shadcn/ui based), site/, home/, menu/, branches/, cart/, checkout/, track/, auth/
+  app/            Routes: [locale]/(site) for the public site, (staff) for the branch dashboard, (internal) for the styleguide
+  components/     ui/ (design system, shadcn/ui based), site/, home/, menu/, branches/, cart/, checkout/, track/, auth/, payments/, dashboard/
   config/         Brand defaults, fonts and photos: the main rebranding surface
   content/        Policy text
   data/seed.ts    Demo content (source of supabase/seed.sql and the no-database fallback)

@@ -4,6 +4,28 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [0.5.0] - Phase 4: Branch dashboard
+
+### Added
+
+- Branch dashboard at `/dashboard` for staff, managers and admins: a live order board with New, Accepted, Preparing, Ready / on the way and Done columns.
+- Accept, reject with a reason, start preparing, ready or out for delivery, and complete, with only the allowed next steps offered. Customers see each change live on their tracking page.
+- Alerts for new orders: a chime that repeats while an order waits (after "Start shift"), Web Push on staff devices, and optional Telegram messages.
+- Auto-reject for orders not accepted in time (10 minutes by default, configurable in settings), with a countdown on the card.
+- Menu availability page to mark dishes sold out, and a switch to pause online orders for the branch.
+- Kitchen tickets and customer receipts sized for 80 mm thermal printers.
+- A dashboard link in the site header for signed-in staff.
+- Tests for the dashboard database rules, and a staff journey in CI (sign in, accept an order, print a ticket).
+
+### Changed
+
+- Staff can no longer write menu overrides directly (which would have let them change prices); availability goes through a checked function.
+- Rejected and cancelled orders give their promo code back.
+
+### Fixed
+
+- Signing in from a link to the dashboard now lands on the dashboard instead of a localized 404.
+
 ## [0.4.0] - Phase 3: Online payments
 
 ### Added

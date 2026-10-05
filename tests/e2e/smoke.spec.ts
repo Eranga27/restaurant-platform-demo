@@ -97,6 +97,13 @@ test.describe("public site", () => {
     await page.goto("/styleguide");
     await expect(page.getByRole("heading", { level: 2, name: "Colour" })).toBeVisible();
   });
+
+  test("the branch dashboard sends signed-out visitors to sign in", async ({ page }) => {
+    await page.goto("/dashboard");
+    await expect(page).toHaveURL(/\/login\?next=%2Fdashboard$/);
+    await page.goto("/dashboard/menu");
+    await expect(page).toHaveURL(/\/login\?next=%2Fdashboard%2Fmenu$/);
+  });
 });
 
 test.describe("SEO", () => {
@@ -143,7 +150,6 @@ test.describe("security headers", () => {
   });
 
   test("sensitive routes get a fresh nonce on every request", async ({ request }) => {
-    // The route doesn't exist yet; the proxy still sets the header on the 404.
     const first = (await request.get("/checkout")).headers()["content-security-policy"];
     const second = (await request.get("/si/checkout")).headers()["content-security-policy"];
 

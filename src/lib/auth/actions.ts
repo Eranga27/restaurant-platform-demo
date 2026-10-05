@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect as unlocalizedRedirect } from "next/navigation";
 import { z } from "zod";
 
 import { redirect } from "@/i18n/navigation";
@@ -29,6 +30,16 @@ function safeNext(value: FormDataEntryValue | null): string {
   return /^\/(?!\/)[\w\-./?=&%]*$/.test(next) ? next : "/";
 }
 
+/** Staff areas sit outside locale routing (docs/DECISIONS.md D17). */
+const UNLOCALIZED = /^\/(dashboard|admin)(\/|\?|$)/;
+
+function redirectAfterAuth(form: FormData): never {
+  const next = safeNext(form.get("next"));
+  if (UNLOCALIZED.test(next)) unlocalizedRedirect(next);
+  redirect({ href: next, locale: formLocale(form) });
+  throw new Error("unreachable");
+}
+
 const credentials = z.object({
   email: z.email().max(254),
   password: z.string().min(1).max(200),
@@ -52,8 +63,7 @@ export async function signInAction(_prev: AuthState, form: FormData): Promise<Au
     if (error.code === "over_request_rate_limit") return { error: "rate-limited" };
     return { error: "invalid" };
   }
-  redirect({ href: safeNext(form.get("next")), locale: formLocale(form) });
-  return {};
+  return redirectAfterAuth(form);
 }
 
 const signUp = credentials.extend({
@@ -99,8 +109,7 @@ export async function signUpAction(_prev: AuthState, form: FormData): Promise<Au
   // With email confirmation on, there's no session until the link is clicked.
   if (!data.session) return { notice: "check-email" };
 
-  redirect({ href: safeNext(form.get("next")), locale: formLocale(form) });
-  return {};
+  return redirectAfterAuth(form);
 }
 
 export async function signOutAction(form: FormData): Promise<void> {
