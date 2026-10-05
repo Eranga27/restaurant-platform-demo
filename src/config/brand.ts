@@ -11,6 +11,11 @@ import { z } from "zod";
 
 const e164 = z.string().regex(/^\+94[0-9]{9}$/, "Expected a Sri Lankan number in E.164 format");
 const hex = z.string().regex(/^#[0-9a-fA-F]{6}$/, "Expected a #RRGGBB colour");
+const localized = z.object({
+  en: z.string(),
+  si: z.string().optional(),
+  ta: z.string().optional(),
+});
 
 /** Percentages are stored as basis points so all money maths stays integer. 1000 = 10%. */
 const basisPoints = z.number().int().min(0).max(10_000);
@@ -86,6 +91,42 @@ export const brandSchema = z.object({
     /** Orders not accepted within this many minutes are rejected automatically. 0 turns it off. */
     autoRejectMinutes: z.number().int().min(0).max(120),
   }),
+  /** Online table bookings (docs/DECISIONS.md D42). */
+  reservations: z.object({
+    slotMinutes: z.number().int().min(15).max(60),
+    /** How long a table is held. Parties of `largePartySize` or more get `largePartyMinutes`. */
+    seatingMinutes: z.number().int().min(30).max(240),
+    largePartySize: z.number().int().min(2),
+    largePartyMinutes: z.number().int().min(30).max(300),
+    /** Share of a branch's seats bookable online (basis points); the rest is for walk-ins. */
+    onlineShareBps: z.number().int().min(0).max(10_000),
+    maxPartySize: z.number().int().min(1).max(50),
+    minNoticeMinutes: z.number().int().min(0),
+    maxDaysAhead: z.number().int().min(1).max(365),
+    /** No new seatings this close to closing time. */
+    lastSeatingMinutes: z.number().int().min(0),
+    /** Guests can cancel online until this long before their time. */
+    cancelUntilMinutes: z.number().int().min(0),
+  }),
+  /** Events and catering enquiries (D45). */
+  events: z.object({
+    minGuests: z.number().int().min(1),
+    maxGuests: z.number().int().min(1),
+    minNoticeDays: z.number().int().min(0),
+    /** Suggested deposit when quoting, in basis points of the quote. */
+    defaultDepositBps: z.number().int().min(0).max(10_000),
+    packages: z
+      .array(
+        z.object({
+          id: z.string().regex(/^[a-z0-9-]+$/),
+          name: localized,
+          description: localized,
+          /** Guide price per guest; the quote is the real price. */
+          fromPerGuestCents: z.number().int().min(0),
+        }),
+      )
+      .min(1),
+  }),
   currency: z.literal("LKR"),
   timeZone: z.string(),
 });
@@ -155,6 +196,56 @@ export const defaultBrand = brandSchema.parse({
     minimumOrderCents: 1500_00,
   },
   orders: { autoRejectMinutes: 10 },
+  reservations: {
+    slotMinutes: 30,
+    seatingMinutes: 90,
+    largePartySize: 7,
+    largePartyMinutes: 120,
+    onlineShareBps: 6000,
+    maxPartySize: 12,
+    minNoticeMinutes: 120,
+    maxDaysAhead: 30,
+    lastSeatingMinutes: 60,
+    cancelUntilMinutes: 120,
+  },
+  events: {
+    minGuests: 10,
+    maxGuests: 1000,
+    minNoticeDays: 3,
+    defaultDepositBps: 2500,
+    packages: [
+      {
+        id: "rice-and-curry",
+        name: { en: "Rice and curry buffet" },
+        description: {
+          en: "Red or yellow rice with chicken or fish curry, dhal, three vegetable curries, mallum, papadam and wattalappan.",
+        },
+        fromPerGuestCents: 2400_00,
+      },
+      {
+        id: "kottu-night",
+        name: { en: "Kottu and devilled night" },
+        description: {
+          en: "Live kottu station, devilled chicken and prawns, hot butter cuttlefish, string hopper biryani and fresh juices.",
+        },
+        fromPerGuestCents: 3200_00,
+      },
+      {
+        id: "dana",
+        name: { en: "Dana (almsgiving)" },
+        description: {
+          en: "A traditional vegetarian dana for the Sangha and guests: rice, seven curries, kiribath and sweets, served or delivered.",
+        },
+        fromPerGuestCents: 1800_00,
+      },
+      {
+        id: "custom",
+        name: { en: "Something else" },
+        description: { en: "Tell us what you have in mind and we'll put a menu together." },
+        fromPerGuestCents: 0,
+      },
+    ],
+  },
   currency: "LKR",
   timeZone: "Asia/Colombo",
 } satisfies Brand);

@@ -71,12 +71,24 @@ export async function alertBranchOfNewOrder(token: string): Promise<void> {
     when,
   ].join(" · ");
 
+  await alertBranch(order.branch_id, {
+    title,
+    body,
+    url: "/dashboard",
+    tag: order.order_number,
+    branchName: localize(order.branches.name_i18n, "en"),
+  });
+}
+
+/** Push and Telegram to a branch's team. The text must not contain customer details. */
+export async function alertBranch(
+  branchId: string,
+  message: { title: string; body: string; url: string; tag: string; branchName: string },
+): Promise<void> {
+  const { branchName, ...push } = message;
   await Promise.allSettled([
-    sendPush(order.branch_id, { title, body, url: "/dashboard", tag: order.order_number }),
-    sendTelegram(
-      order.branch_id,
-      `${title} at ${localize(order.branches.name_i18n, "en")}\n${body}`,
-    ),
+    sendPush(branchId, push),
+    sendTelegram(branchId, `${message.title} at ${branchName}\n${message.body}`),
   ]);
 }
 

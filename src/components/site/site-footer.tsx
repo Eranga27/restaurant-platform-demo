@@ -79,6 +79,8 @@ export async function SiteFooter({ brand, branches }: { brand: Brand; branches: 
               [
                 ["/menu", nav("menu")],
                 ["/branches", nav("branches")],
+                ["/reservations", nav("bookTable")],
+                ["/events", nav("events")],
                 ["/about", nav("about")],
                 ["/contact", nav("contact")],
                 ["/faq", nav("faq")],

@@ -11,7 +11,17 @@ import { env } from "@/lib/env";
  * production.
  */
 
-type LimitName = "checkout" | "quote" | "payment" | "login" | "signup" | "contact" | "booking";
+type LimitName =
+  | "checkout"
+  | "quote"
+  | "payment"
+  | "login"
+  | "signup"
+  | "contact"
+  | "booking"
+  | "availability"
+  | "event"
+  | "guest";
 
 const LIMITS: Record<LimitName, { requests: number; window: `${number} ${"s" | "m" | "h"}` }> = {
   checkout: { requests: 5, window: "10 m" },
@@ -21,6 +31,10 @@ const LIMITS: Record<LimitName, { requests: number; window: `${number} ${"s" | "
   signup: { requests: 5, window: "1 h" },
   contact: { requests: 5, window: "1 h" },
   booking: { requests: 10, window: "1 h" },
+  availability: { requests: 120, window: "10 m" },
+  event: { requests: 5, window: "1 h" },
+  // Accepting a quote, cancelling a booking: actions on a private link.
+  guest: { requests: 20, window: "10 m" },
 };
 
 let limiters: Map<LimitName, Ratelimit> | null | undefined;
