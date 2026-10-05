@@ -109,16 +109,22 @@ export function DashboardShell({
 }
 
 /** Shown to signed-in people without a staff role, and staff without a branch. */
-export function NoAccess({ reason }: { reason: "not-staff" | "no-branch" }) {
+export function NoAccess({ reason }: { reason: "not-staff" | "no-branch" | "not-admin" }) {
   return (
     <main id="main" className="mx-auto w-full max-w-md flex-1 space-y-4 px-4 py-20 text-center">
       <h1 className="text-display-md text-primary">
-        {reason === "not-staff" ? "This area is for branch staff" : "No branch assigned"}
+        {reason === "not-staff"
+          ? "This area is for branch staff"
+          : reason === "not-admin"
+            ? "This area is for admins"
+            : "No branch assigned"}
       </h1>
       <p className="text-muted-foreground">
         {reason === "not-staff"
           ? "Your account doesn't have access to the dashboard. Ask an admin to add you as staff."
-          : "Your account isn't linked to a branch yet. Ask an admin to assign one."}
+          : reason === "not-admin"
+            ? "Your account can use the branch dashboard, but not the admin panel."
+            : "Your account isn't linked to a branch yet. Ask an admin to assign one."}
       </p>
       <form action={signOutAction}>
         <input type="hidden" name="locale" value="en" />
