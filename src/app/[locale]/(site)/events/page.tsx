@@ -90,6 +90,7 @@ export default async function EventsPage({ params }: PageProps<"/[locale]/events
         </section>
       ) : (
         <UnavailableNotice
+          embedded
           title={t("unavailableTitle")}
           body={t("unavailableBody")}
           linkLabel={nav("branches")}
