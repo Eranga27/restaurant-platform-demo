@@ -1,11 +1,15 @@
 import { Banknote, CalendarDays, Clock, ShoppingBag, Store } from "lucide-react";
 import Image from "next/image";
+import type { CSSProperties } from "react";
 import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
 import type { Brand } from "@/config/brand";
 import { siteMedia } from "@/config/media";
 import { Link } from "@/i18n/navigation";
+
+/** Order in the hero's entrance (globals.css, .intro). */
+const intro = (i: number) => ({ "--i": i }) as CSSProperties;
 
 export async function Hero({ brand, branchCount }: { brand: Brand; branchCount: number }) {
   const t = await getTranslations("Home");
@@ -20,15 +24,17 @@ export async function Hero({ brand, branchCount }: { brand: Brand; branchCount: 
 
   return (
     <section className="relative isolate flex min-h-[min(88svh,760px)] items-end overflow-hidden">
-      <Image
-        src={siteMedia.hero}
-        alt={t("heroImageAlt")}
-        fill
-        priority
-        fetchPriority="high"
-        sizes="100vw"
-        className="-z-10 animate-hero-settle object-cover"
-      />
+      <div className="hero-drift absolute inset-0 -z-10">
+        <Image
+          src={siteMedia.hero}
+          alt={t("heroImageAlt")}
+          fill
+          priority
+          fetchPriority="high"
+          sizes="100vw"
+          className="animate-hero-settle object-cover"
+        />
+      </div>
       <div
         aria-hidden
         className="absolute inset-0 -z-10 bg-gradient-to-t from-foreground/95 via-foreground/70 to-foreground/25"
@@ -36,13 +42,20 @@ export async function Hero({ brand, branchCount }: { brand: Brand; branchCount: 
 
       <div className="mx-auto w-full max-w-6xl px-4 pt-32 pb-12 sm:px-6 sm:pb-16 lg:pb-20">
         <div className="max-w-2xl text-white">
-          <p className="mb-4 animate-in text-xs font-medium tracking-[0.2em] text-highlight uppercase duration-700 slide-in-from-bottom-2 sm:text-sm">
+          <p
+            className="intro mb-4 text-xs font-medium tracking-[0.2em] text-highlight uppercase sm:text-sm"
+            style={intro(0)}
+          >
             {t("heroEyebrow", { tagline: brand.tagline })}
           </p>
-          <h1 className="text-display-2xl text-balance text-white">{t("heroTitle")}</h1>
-          <p className="mt-5 max-w-xl text-lg text-pretty text-white/85">{t("heroSubtitle")}</p>
+          <h1 className="intro text-display-2xl text-balance text-white" style={intro(1)}>
+            {t("heroTitle")}
+          </h1>
+          <p className="intro mt-5 max-w-xl text-lg text-pretty text-white/85" style={intro(2)}>
+            {t("heroSubtitle")}
+          </p>
 
-          <div className="mt-8 flex animate-in flex-wrap gap-3 duration-700 slide-in-from-bottom-3">
+          <div className="intro mt-8 flex flex-wrap gap-3" style={intro(3)}>
             <Button
               asChild
               size="lg"
@@ -66,7 +79,10 @@ export async function Hero({ brand, branchCount }: { brand: Brand; branchCount: 
             </Button>
           </div>
 
-          <ul className="mt-10 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/80">
+          <ul
+            className="intro mt-10 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/80"
+            style={intro(4)}
+          >
             {highlights.map(({ icon: Icon, label }) => (
               <li key={label} className="flex items-center gap-2">
                 {Icon ? (

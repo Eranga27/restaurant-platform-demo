@@ -1,7 +1,8 @@
-import { UtensilsCrossed } from "lucide-react";
 import Image from "next/image";
 
 import { cn } from "@/lib/utils";
+
+import { Ornament } from "./ornament";
 
 /**
  * A dish photo, or a branded placeholder when there isn't one. Fills its
@@ -30,7 +31,7 @@ export function DishImage({
           className,
         )}
       >
-        <UtensilsCrossed aria-hidden className="size-8 text-primary/35" />
+        <Ornament className="w-28 text-primary/30" />
       </div>
     );
   }

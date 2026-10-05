@@ -4,6 +4,8 @@ import { getTranslations } from "next-intl/server";
 
 import { ContactLink } from "@/components/site/contact-link";
 import { OpenStatus } from "@/components/site/open-status";
+import { Ornament } from "@/components/site/ornament";
+import { Splash } from "@/components/site/splash";
 import type { Locale } from "@/i18n/routing";
 import { getBrand } from "@/lib/data/brand";
 import { getBranches } from "@/lib/data/catalogue";
@@ -36,87 +38,91 @@ export default async function ContactPage({ params }: PageProps<"/[locale]/conta
   ]);
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
-      <header className="mb-10 max-w-2xl space-y-3">
-        <h1 className="text-display-xl text-primary">{t("title")}</h1>
-        <p className="text-pretty text-muted-foreground">{t("subtitle")}</p>
-      </header>
+    <>
+      <Splash />
+      <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
+        <header className="mb-10 max-w-2xl space-y-3">
+          <Ornament />
+          <h1 className="text-display-xl text-primary">{t("title")}</h1>
+          <p className="text-pretty text-muted-foreground">{t("subtitle")}</p>
+        </header>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <section
-          aria-labelledby="general"
-          className="space-y-4 rounded-2xl border bg-card p-6 shadow-soft"
-        >
-          <h2 id="general" className="font-display text-2xl text-primary">
-            {t("general")}
-          </h2>
-          <ul className="space-y-3">
-            <li>
-              <ContactLink kind="tel" value={brand.contact.phone} className={linkClass}>
-                <Phone aria-hidden className="size-4" />
-                {formatPhone(brand.contact.phone)}
-              </ContactLink>
-            </li>
-            {brand.contact.whatsapp && (
+        <div className="grid gap-6 lg:grid-cols-3">
+          <section
+            aria-labelledby="general"
+            className="space-y-4 rounded-2xl border bg-card p-6 shadow-soft"
+          >
+            <h2 id="general" className="font-display text-2xl text-primary">
+              {t("general")}
+            </h2>
+            <ul className="space-y-3">
               <li>
-                <ContactLink kind="whatsapp" value={brand.contact.whatsapp} className={linkClass}>
-                  <MessageCircle aria-hidden className="size-4" />
-                  {footer("whatsapp")}
-                </ContactLink>
-              </li>
-            )}
-            <li>
-              <ContactLink kind="email" value={brand.contact.email} className={linkClass}>
-                <Mail aria-hidden className="size-4" />
-                {brand.contact.email}
-              </ContactLink>
-            </li>
-          </ul>
-          <p className="text-sm text-muted-foreground">{brand.hoursSummary}</p>
-        </section>
-
-        <section
-          aria-labelledby="branch-contacts"
-          className="space-y-4 rounded-2xl border bg-card p-6 shadow-soft"
-        >
-          <h2 id="branch-contacts" className="font-display text-2xl text-primary">
-            {t("branchContacts")}
-          </h2>
-          <ul className="space-y-5">
-            {branches.map((b) => (
-              <li key={b.id} className="space-y-1">
-                <p className="font-semibold">{b.name}</p>
-                <OpenStatus hours={b.openingHours} />
-                <ContactLink kind="tel" value={b.phone} className={linkClass}>
+                <ContactLink kind="tel" value={brand.contact.phone} className={linkClass}>
                   <Phone aria-hidden className="size-4" />
-                  {formatPhone(b.phone)}
+                  {formatPhone(brand.contact.phone)}
                 </ContactLink>
               </li>
-            ))}
-          </ul>
-        </section>
+              {brand.contact.whatsapp && (
+                <li>
+                  <ContactLink kind="whatsapp" value={brand.contact.whatsapp} className={linkClass}>
+                    <MessageCircle aria-hidden className="size-4" />
+                    {footer("whatsapp")}
+                  </ContactLink>
+                </li>
+              )}
+              <li>
+                <ContactLink kind="email" value={brand.contact.email} className={linkClass}>
+                  <Mail aria-hidden className="size-4" />
+                  {brand.contact.email}
+                </ContactLink>
+              </li>
+            </ul>
+            <p className="text-sm text-muted-foreground">{brand.hoursSummary}</p>
+          </section>
 
-        <section
-          aria-labelledby="events"
-          className="space-y-4 rounded-2xl bg-secondary p-6 text-secondary-foreground shadow-soft"
-        >
-          <PartyPopper aria-hidden className="size-7 text-highlight" />
-          <h2 id="events" className="font-display text-2xl">
-            {t("eventsTitle")}
-          </h2>
-          <p className="text-pretty text-secondary-foreground/90">{t("eventsBody")}</p>
-          {brand.contact.whatsapp && (
-            <ContactLink
-              kind="whatsapp"
-              value={brand.contact.whatsapp}
-              className="inline-flex h-10 items-center gap-2 rounded-lg bg-highlight px-4 font-medium text-highlight-foreground"
-            >
-              <MessageCircle aria-hidden className="size-4" />
-              {footer("whatsapp")}
-            </ContactLink>
-          )}
-        </section>
+          <section
+            aria-labelledby="branch-contacts"
+            className="space-y-4 rounded-2xl border bg-card p-6 shadow-soft"
+          >
+            <h2 id="branch-contacts" className="font-display text-2xl text-primary">
+              {t("branchContacts")}
+            </h2>
+            <ul className="space-y-5">
+              {branches.map((b) => (
+                <li key={b.id} className="space-y-1">
+                  <p className="font-semibold">{b.name}</p>
+                  <OpenStatus hours={b.openingHours} />
+                  <ContactLink kind="tel" value={b.phone} className={linkClass}>
+                    <Phone aria-hidden className="size-4" />
+                    {formatPhone(b.phone)}
+                  </ContactLink>
+                </li>
+              ))}
+            </ul>
+          </section>
+
+          <section
+            aria-labelledby="events"
+            className="space-y-4 rounded-2xl bg-secondary p-6 text-secondary-foreground shadow-soft"
+          >
+            <PartyPopper aria-hidden className="size-7 text-highlight" />
+            <h2 id="events" className="font-display text-2xl">
+              {t("eventsTitle")}
+            </h2>
+            <p className="text-pretty text-secondary-foreground/90">{t("eventsBody")}</p>
+            {brand.contact.whatsapp && (
+              <ContactLink
+                kind="whatsapp"
+                value={brand.contact.whatsapp}
+                className="inline-flex h-10 items-center gap-2 rounded-lg bg-highlight px-4 font-medium text-highlight-foreground"
+              >
+                <MessageCircle aria-hidden className="size-4" />
+                {footer("whatsapp")}
+              </ContactLink>
+            )}
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 }

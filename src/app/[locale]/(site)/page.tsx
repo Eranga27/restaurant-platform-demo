@@ -8,6 +8,8 @@ import { Hero } from "@/components/home/hero";
 import { SectionHeading } from "@/components/home/section-heading";
 import { DishCard } from "@/components/site/dish-card";
 import { JsonLd } from "@/components/site/json-ld";
+import { Ornament } from "@/components/site/ornament";
+import { Splash } from "@/components/site/splash";
 import { StarRating } from "@/components/site/star-rating";
 import { Button } from "@/components/ui/button";
 import { siteMedia } from "@/config/media";
@@ -52,6 +54,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
 
   return (
     <>
+      <Splash />
       <JsonLd data={restaurantJsonLd(brand, branches, getPathname({ locale, href: "/menu" }))} />
       <Hero brand={brand} branchCount={branches.length} />
 
@@ -74,7 +77,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         />
         <ul className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 sm:pb-0 lg:grid-cols-3">
           {signatures.map((item) => (
-            <li key={item.id} className="w-[78%] shrink-0 snap-start sm:w-auto">
+            <li key={item.id} data-reveal className="w-[78%] shrink-0 snap-start sm:w-auto">
               <DishCard item={item} />
             </li>
           ))}
@@ -89,6 +92,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               {promotions.slice(0, 3).map((promo, i) => (
                 <li
                   key={promo.id}
+                  data-reveal
                   className={cn(
                     "flex flex-col gap-3 rounded-2xl p-6 shadow-soft",
                     OFFER_TONES[i % OFFER_TONES.length],
@@ -130,30 +134,41 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             </Link>
           }
         />
-        <BranchFinder
-          branches={branches.map((b) => ({
-            id: b.id,
-            name: b.name,
-            addressLine: b.addressLine,
-            city: b.city,
-            lat: b.lat,
-            lng: b.lng,
-            phone: b.phone,
-            openingHours: b.openingHours,
-          }))}
-        />
+        <div data-reveal>
+          <BranchFinder
+            branches={branches.map((b) => ({
+              id: b.id,
+              name: b.name,
+              addressLine: b.addressLine,
+              city: b.city,
+              lat: b.lat,
+              lng: b.lng,
+              phone: b.phone,
+              openingHours: b.openingHours,
+            }))}
+          />
+        </div>
       </section>
 
       {reviews.length > 0 && (
         <section aria-labelledby="reviews" className="bg-secondary text-secondary-foreground">
           <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:py-20">
-            <h2 id="reviews" className="mb-8 text-display-lg">
-              {t("reviewsTitle")}
-            </h2>
+            <div data-reveal className="mb-8 space-y-2">
+              <Ornament />
+              <h2 id="reviews" className="text-display-lg">
+                {t("reviewsTitle")}
+              </h2>
+            </div>
             <ul className="grid gap-4 md:grid-cols-3">
               {reviews.slice(0, 3).map((review) => (
-                <li key={review.id}>
-                  <figure className="flex h-full flex-col gap-4 rounded-2xl bg-card p-6 text-card-foreground shadow-soft">
+                <li key={review.id} data-reveal>
+                  <figure className="relative flex h-full flex-col gap-4 overflow-hidden rounded-2xl bg-card p-6 text-card-foreground shadow-soft">
+                    <span
+                      aria-hidden
+                      className="pointer-events-none absolute top-2 right-5 font-display text-[5.5rem] leading-[0.8] text-highlight/30"
+                    >
+                      “
+                    </span>
                     <StarRating
                       rating={review.rating}
                       label={tc("rating", { rating: review.rating })}
@@ -175,16 +190,22 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         aria-labelledby="story"
         className="mx-auto grid w-full max-w-6xl items-center gap-10 px-4 py-16 sm:px-6 md:grid-cols-2 lg:py-24"
       >
-        <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-lifted md:order-2">
-          <Image
-            src={siteMedia.story}
-            alt=""
-            fill
-            sizes="(min-width: 768px) 50vw, 100vw"
-            className="object-cover"
-          />
+        <div
+          data-reveal="zoom"
+          className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-muted shadow-lifted md:order-2"
+        >
+          <div className="parallax absolute inset-x-0 -inset-y-[8%]">
+            <Image
+              src={siteMedia.story}
+              alt=""
+              fill
+              sizes="(min-width: 768px) 50vw, 100vw"
+              className="object-cover"
+            />
+          </div>
         </div>
-        <div className="space-y-5">
+        <div data-reveal className="space-y-5">
+          <Ornament />
           <h2 id="story" className="text-display-lg text-balance text-primary">
             {t("storyTitle")}
           </h2>
@@ -199,9 +220,14 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       </section>
 
       <section aria-labelledby="events" className="relative isolate overflow-hidden">
-        <Image src={siteMedia.events} alt="" fill sizes="100vw" className="-z-10 object-cover" />
+        <div className="parallax absolute inset-x-0 -inset-y-[12%] -z-10">
+          <Image src={siteMedia.events} alt="" fill sizes="100vw" className="object-cover" />
+        </div>
         <div aria-hidden className="absolute inset-0 -z-10 bg-primary/85" />
-        <div className="mx-auto flex w-full max-w-6xl flex-col items-start gap-5 px-4 py-16 text-primary-foreground sm:px-6 lg:py-24">
+        <div
+          data-reveal
+          className="mx-auto flex w-full max-w-6xl flex-col items-start gap-5 px-4 py-16 text-primary-foreground sm:px-6 lg:py-24"
+        >
           <PartyPopper aria-hidden className="size-8 text-highlight" />
           <h2 id="events" className="max-w-2xl text-display-lg text-balance">
             {t("eventsTitle")}

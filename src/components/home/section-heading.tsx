@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { Ornament } from "@/components/site/ornament";
 import { cn } from "@/lib/utils";
 
 export function SectionHeading({
@@ -16,8 +17,12 @@ export function SectionHeading({
   className?: string;
 }) {
   return (
-    <div className={cn("mb-8 flex flex-wrap items-end justify-between gap-4", className)}>
+    <div
+      data-reveal
+      className={cn("mb-8 flex flex-wrap items-end justify-between gap-4", className)}
+    >
       <div className="max-w-2xl space-y-2">
+        <Ornament />
         <h2 id={id} className="text-display-lg text-primary">
           {title}
         </h2>

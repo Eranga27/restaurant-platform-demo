@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ArrowRight, ShoppingBag } from "lucide-react";
 
 import { DIETARY_TAGS, DietaryBadge } from "@/components/site/dietary-badge";
+import { Ornament } from "@/components/site/ornament";
 import { Price } from "@/components/site/price";
 import { SPICE_LEVELS, SpiceLevelIndicator } from "@/components/site/spice-level";
 import { Badge } from "@/components/ui/badge";
@@ -276,6 +277,42 @@ export default function StyleguidePage() {
           <dt className="border-t pt-2 font-semibold">Total</dt>
           <dd className="border-t pt-2 text-right font-semibold">{formatLKR(3326_26)}</dd>
         </dl>
+      </Section>
+
+      <Section title="Ornament">
+        <p className="max-w-2xl text-muted-foreground">
+          A lotus divider in the spirit of palapethi borders: above section headings, as the dish
+          photo placeholder, and as a repeating border along the footer.
+        </p>
+        <div className="flex flex-wrap items-center gap-8">
+          <Ornament />
+          <Ornament className="w-20 text-primary" />
+          <div className="w-64 rounded-xl bg-primary py-3">
+            <div aria-hidden className="lotus-border opacity-80" />
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Motion">
+        <ul className="max-w-2xl list-disc space-y-2 pl-5 text-muted-foreground">
+          <li>
+            Splash: once per tab on the public pages, timed in CSS (1.15 s, then a 0.45 s fade).
+          </li>
+          <li>
+            Scroll reveals: add <code>data-reveal</code> (rise),{" "}
+            <code>data-reveal=&quot;fade&quot;</code> or <code>data-reveal=&quot;zoom&quot;</code>{" "}
+            to a block; items entering together are staggered by 90 ms.
+          </li>
+          <li>
+            Page changes fade the old page out (150 ms) and raise the new one in (360 ms); the
+            header stays still.
+          </li>
+          <li>
+            <code>.parallax</code> and <code>.hero-drift</code> move photos with the scroll, where
+            the browser supports scroll-driven animations.
+          </li>
+          <li>Everything is switched off for visitors who ask for reduced motion.</li>
+        </ul>
       </Section>
     </main>
   );

@@ -134,7 +134,10 @@ test("a declined payment can be retried or paid in cash instead", async ({ page,
   // PayHere sends the customer back to the pay page.
   await page.goto(pathOf(fields.cancel_url!));
   await expect(page.getByRole("heading", { name: "Complete your payment" })).toBeVisible();
-  await expect(page.getByRole("alert")).toContainText("You cancelled the payment");
+  // Filtered: Next.js's route announcer is an (empty) alert region too.
+  await expect(
+    page.getByRole("alert").filter({ hasText: "You cancelled the payment" }),
+  ).toBeVisible();
 
   // Retrying opens a second attempt.
   await page.getByRole("button", { name: "Pay securely with PayHere" }).click();

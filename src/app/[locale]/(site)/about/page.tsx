@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
+import { Ornament } from "@/components/site/ornament";
+import { Splash } from "@/components/site/splash";
 import { Button } from "@/components/ui/button";
 import { siteMedia } from "@/config/media";
 import { Link } from "@/i18n/navigation";
@@ -32,44 +34,55 @@ export default async function AboutPage() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
-      <div className="grid items-start gap-10 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="space-y-6">
-          <h1 className="text-display-xl text-primary">{t("title")}</h1>
-          <p className="font-display text-2xl text-pretty text-foreground">{t("lead")}</p>
-          <p className="text-lg text-pretty text-foreground/85">{t("p1")}</p>
-          <p className="text-lg text-pretty text-foreground/85">{t("p2")}</p>
-          <p className="text-lg text-pretty text-foreground/85">{t("p3")}</p>
-          <Button asChild size="lg">
-            <Link href="/menu">{nav("orderNow")}</Link>
-          </Button>
+    <>
+      <Splash />
+      <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
+        <div className="grid items-start gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="space-y-6">
+            <Ornament />
+            <h1 className="text-display-xl text-primary">{t("title")}</h1>
+            <p className="font-display text-2xl text-pretty text-foreground">{t("lead")}</p>
+            <p className="text-lg text-pretty text-foreground/85">{t("p1")}</p>
+            <p className="text-lg text-pretty text-foreground/85">{t("p2")}</p>
+            <p className="text-lg text-pretty text-foreground/85">{t("p3")}</p>
+            <Button asChild size="lg">
+              <Link href="/menu">{nav("orderNow")}</Link>
+            </Button>
+          </div>
+          <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-muted shadow-lifted">
+            <Image
+              src={siteMedia.story}
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 1024px) 45vw, 100vw"
+              className="object-cover"
+            />
+          </div>
         </div>
-        <div className="relative aspect-[4/5] overflow-hidden rounded-3xl shadow-lifted">
-          <Image
-            src={siteMedia.story}
-            alt=""
-            fill
-            priority
-            sizes="(min-width: 1024px) 45vw, 100vw"
-            className="object-cover"
-          />
-        </div>
-      </div>
 
-      <section aria-labelledby="values" className="mt-20">
-        <h2 id="values" className="mb-8 text-display-lg text-primary">
-          {t("valuesTitle")}
-        </h2>
-        <ul className="grid gap-4 md:grid-cols-3">
-          {values.map(({ icon: Icon, title, body }) => (
-            <li key={title} className="space-y-3 rounded-2xl border bg-card p-6 shadow-soft">
-              <Icon aria-hidden className="size-6 text-secondary" />
-              <h3 className="font-display text-xl">{title}</h3>
-              <p className="text-pretty text-muted-foreground">{body}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-    </div>
+        <section aria-labelledby="values" className="mt-20">
+          <div data-reveal className="mb-8 space-y-2">
+            <Ornament />
+            <h2 id="values" className="text-display-lg text-primary">
+              {t("valuesTitle")}
+            </h2>
+          </div>
+          <ul className="grid gap-4 md:grid-cols-3">
+            {values.map(({ icon: Icon, title, body }) => (
+              <li
+                key={title}
+                data-reveal
+                className="space-y-3 rounded-2xl border bg-card p-6 shadow-soft"
+              >
+                <Icon aria-hidden className="size-6 text-secondary" />
+                <h3 className="font-display text-xl">{title}</h3>
+                <p className="text-pretty text-muted-foreground">{body}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      </div>
+    </>
   );
 }

@@ -225,3 +225,46 @@ test.describe("installable app", () => {
     }
   });
 });
+
+test.describe("motion", () => {
+  test.use({ contextOptions: { reducedMotion: "no-preference" } });
+
+  test("the splash plays once per tab and leaves by itself", async ({ page }) => {
+    const errors = trackErrors(page);
+    await page.goto("/");
+    const splash = page.locator(".site-splash");
+    await expect(splash).toBeVisible();
+    await expect(splash).toHaveCount(0, { timeout: 6_000 });
+    await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-splash", "seen");
+    await expect(splash).toBeHidden();
+    expect(errors).toEqual([]);
+  });
+
+  test("pages people reach from emails or payments never wait for the splash", async ({ page }) => {
+    await page.goto("/login");
+    await expect(page.locator(".site-splash")).toHaveCount(0);
+  });
+
+  test("sections below the fold rise in as they scroll into view", async ({ page }) => {
+    const errors = trackErrors(page);
+    await page.goto("/about");
+    const values = page.locator("li[data-reveal]").first();
+    await expect(values).toHaveAttribute("data-reveal-state", "hidden");
+    await values.scrollIntoViewIfNeeded();
+    await expect(values).toHaveAttribute("data-reveal-state", /shown|done/);
+    await expect(values).toBeVisible();
+    expect(errors).toEqual([]);
+  });
+});
+
+test.describe("reduced motion", () => {
+  test("shows everything straight away, with no splash", async ({ page }) => {
+    await page.goto("/about");
+    await expect(page.locator(".site-splash")).toBeHidden();
+    // Nothing waits for scrolling.
+    await expect(page.locator("[data-reveal-state='hidden']")).toHaveCount(0);
+  });
+});

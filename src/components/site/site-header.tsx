@@ -36,14 +36,18 @@ export async function SiteHeader({
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75">
+    // Named for page transitions: the header stays still while pages change.
+    <header
+      style={{ viewTransitionName: "site-header" }}
+      className="site-header sticky top-0 z-40 border-b border-border/70 bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75"
+    >
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4 sm:px-6 lg:gap-6">
         <Logo brand={brand} />
         <nav aria-label={t("mainNavigation")} className="hidden md:block">
           <NavLinks
             items={items}
             className="flex items-center gap-6 text-sm"
-            linkClassName="py-2"
+            linkClassName="relative py-2 after:absolute after:inset-x-0 after:bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-highlight after:transition-transform after:duration-300 after:ease-out-soft hover:after:scale-x-100 aria-[current=page]:after:scale-x-100"
           />
         </nav>
         <div className="ml-auto flex items-center gap-1.5 sm:gap-2">

@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 import { CheckoutForm } from "@/components/checkout/checkout-form";
+import { Ornament } from "@/components/site/ornament";
 import { Button } from "@/components/ui/button";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -67,6 +68,7 @@ export default async function CheckoutPage({ params }: PageProps<"/[locale]/chec
 
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
+      <Ornament className="mb-3" />
       <h1 className="mb-8 text-display-xl text-primary">{t("title")}</h1>
       <CheckoutForm
         branches={branches.map((b) => ({

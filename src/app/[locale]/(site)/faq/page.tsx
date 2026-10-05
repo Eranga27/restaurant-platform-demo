@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { JsonLd } from "@/components/site/json-ld";
+import { Ornament } from "@/components/site/ornament";
+import { Splash } from "@/components/site/splash";
 import {
   Accordion,
   AccordionContent,
@@ -45,31 +47,39 @@ export default async function FaqPage() {
   }));
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
-      <JsonLd
-        data={{
-          "@context": "https://schema.org",
-          "@type": "FAQPage",
-          mainEntity: items.map(({ q, a }) => ({
-            "@type": "Question",
-            name: q,
-            acceptedAnswer: { "@type": "Answer", text: a },
-          })),
-        }}
-      />
-      <h1 className="mb-8 text-display-xl text-primary">{t("title")}</h1>
-      <Accordion type="single" collapsible className="rounded-2xl border bg-card px-5 shadow-soft">
-        {items.map(({ key, q, a }) => (
-          <AccordionItem key={key} value={key}>
-            <AccordionTrigger className="py-5 text-left text-base font-semibold">
-              {q}
-            </AccordionTrigger>
-            <AccordionContent className="pb-5 text-base text-pretty text-muted-foreground">
-              {a}
-            </AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </div>
+    <>
+      <Splash />
+      <div className="mx-auto w-full max-w-3xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: items.map(({ q, a }) => ({
+              "@type": "Question",
+              name: q,
+              acceptedAnswer: { "@type": "Answer", text: a },
+            })),
+          }}
+        />
+        <Ornament className="mb-3" />
+        <h1 className="mb-8 text-display-xl text-primary">{t("title")}</h1>
+        <Accordion
+          type="single"
+          collapsible
+          className="rounded-2xl border bg-card px-5 shadow-soft"
+        >
+          {items.map(({ key, q, a }) => (
+            <AccordionItem key={key} value={key}>
+              <AccordionTrigger className="py-5 text-left text-base font-semibold">
+                {q}
+              </AccordionTrigger>
+              <AccordionContent className="pb-5 text-base text-pretty text-muted-foreground">
+                {a}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
+    </>
   );
 }

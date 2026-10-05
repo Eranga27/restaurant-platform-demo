@@ -156,9 +156,18 @@
   --shadow-lifted: 0 2px 4px rgb(66 38 18 / 0.06), 0 12px 32px rgb(66 38 18 / 0.12);
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
 
   /* Slow settle on the home hero image. Disabled by prefers-reduced-motion below. */
   --animate-hero-settle: hero-settle 14s var(--ease-out-soft) both;
+  /* A quick pop, e.g. the cart badge when something is added. */
+  --animate-bump: bump 450ms var(--ease-out-soft);
+
+  @keyframes bump {
+    30% {
+      scale: 1.35;
+    }
+  }
 
   @keyframes hero-settle {
     from {
@@ -205,6 +214,219 @@
 
   ::selection {
     background-color: color-mix(in srgb, var(--highlight) 45%, transparent);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Motion (docs/DECISIONS.md D63 to D66). Durations are short and movement is
+ * small; everything here is off for visitors who ask for reduced motion.
+ * ------------------------------------------------------------------------- */
+
+:root {
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-reveal: 700ms;
+  /* When the splash screen is up, the hero's entrance waits for it. */
+  --splash-hold: 1150ms;
+  --splash-fade: 450ms;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/*
+ * Scroll reveals. Elements marked data-reveal stay visible until
+ * src/components/site/motion-observer.tsx hides the ones below the fold
+ * after hydration, so nothing is hidden without JavaScript.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  [data-reveal-state="hidden"] {
+    opacity: 0;
+    translate: 0 1.5rem;
+  }
+  [data-reveal="fade"][data-reveal-state="hidden"] {
+    translate: none;
+  }
+  [data-reveal="zoom"][data-reveal-state="hidden"] {
+    translate: none;
+    scale: 0.96;
+  }
+  [data-reveal-state="shown"] {
+    transition:
+      opacity var(--duration-reveal) var(--ease-out-soft) var(--reveal-delay, 0ms),
+      translate var(--duration-reveal) var(--ease-out-soft) var(--reveal-delay, 0ms),
+      scale var(--duration-reveal) var(--ease-out-soft) var(--reveal-delay, 0ms);
+  }
+
+  /* The home hero's entrance, line by line; after the splash on a first visit. */
+  .intro {
+    animation: intro-rise 900ms var(--ease-out-soft) both;
+    animation-delay: calc(var(--intro-start, 0ms) + var(--i, 0) * 110ms);
+  }
+  :root:not([data-splash="seen"]):has(.site-splash) .intro {
+    --intro-start: calc(var(--splash-hold) + 150ms);
+  }
+}
+
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    translate: 0 1.25rem;
+    filter: blur(6px);
+  }
+}
+
+/*
+ * Scroll-linked depth, where the browser supports scroll-driven animations
+ * (others show the page as it is): the hero photo drifts, photo bands move
+ * a little slower than the page, and the header gains a shadow once the
+ * page scrolls.
+ */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .hero-drift {
+      animation: hero-drift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100svh;
+    }
+    .parallax {
+      animation: parallax linear both;
+      animation-timeline: view();
+    }
+  }
+
+  .site-header {
+    animation: header-settle linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 6rem;
+  }
+}
+
+@keyframes hero-drift {
+  to {
+    translate: 0 14%;
+  }
+}
+
+@keyframes parallax {
+  from {
+    translate: 0 -7%;
+  }
+  to {
+    translate: 0 7%;
+  }
+}
+
+@keyframes header-settle {
+  to {
+    border-color: transparent;
+    box-shadow: var(--shadow-soft);
+  }
+}
+
+/*
+ * Page transitions (React <ViewTransition>, src/components/site/page-transition.tsx):
+ * the old page fades out quickly, the new one rises in. The header stays put.
+ */
+::view-transition {
+  pointer-events: none;
+}
+::view-transition-old(.page) {
+  animation: var(--duration-fast) ease-in both vt-fade-out;
+}
+::view-transition-new(.page) {
+  animation: 360ms var(--ease-out-soft) 90ms both vt-rise-in;
+}
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+@keyframes vt-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes vt-rise-in {
+  from {
+    opacity: 0;
+    translate: 0 0.75rem;
+  }
+}
+
+/*
+ * Splash screen on a full page load (src/components/site/site-splash.tsx).
+ * Timed in CSS, so it leaves even if JavaScript never runs.
+ */
+.site-splash {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: var(--background);
+  animation: splash-out var(--splash-fade) var(--ease-in-out-soft) var(--splash-hold) forwards;
+}
+.site-splash .petal {
+  transform-box: view-box;
+  transform-origin: 60px 60px;
+  animation: petal-bloom 700ms var(--ease-out-soft) both;
+  animation-delay: calc(var(--i) * 55ms);
+}
+.site-splash .mark {
+  animation: splash-mark 650ms var(--ease-out-soft) 120ms both;
+}
+.site-splash .words {
+  animation: intro-rise 700ms var(--ease-out-soft) 380ms both;
+}
+[data-splash="seen"] .site-splash {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-splash {
+    display: none;
+  }
+}
+
+@keyframes splash-out {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+@keyframes petal-bloom {
+  from {
+    opacity: 0;
+    scale: 0.2;
+  }
+}
+@keyframes splash-mark {
+  from {
+    opacity: 0;
+    scale: 0.6;
+  }
+}
+
+/* A repeating lotus border (palapethi), e.g. along the top of the footer. Takes the turmeric colour. */
+.lotus-border {
+  height: 0.875rem;
+  background-color: var(--highlight);
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 14'%3E%3Cpath d='M24 1.5c2.6 2.3 3.1 6.4 0 10.5-3.1-4.1-2.6-8.2 0-10.5Z'/%3E%3Ccircle cx='6' cy='7' r='1.4'/%3E%3Ccircle cx='42' cy='7' r='1.4'/%3E%3Cpath d='M10 7h8M30 7h8' stroke='%23000' stroke-width='1'/%3E%3C/svg%3E")
+    repeat-x center / 3rem 0.875rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
 
