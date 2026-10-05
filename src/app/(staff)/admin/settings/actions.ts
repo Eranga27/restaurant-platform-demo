@@ -1,9 +1,8 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
-
 import { adminError, getAdmin } from "@/lib/admin/guard";
 import { checkBrand, overridesFor } from "@/lib/admin/settings";
+import { refreshPublicSite } from "@/lib/revalidate";
 import { createAuditedClient } from "@/lib/supabase/server";
 
 /** Saves the brand settings (admins with MFA). Validated in full, stored as overrides. */
@@ -19,6 +18,6 @@ export async function saveSettingsAction(
     .update({ brand: overridesFor(checked.brand) })
     .eq("id", 1);
   if (error) return adminError(error.message);
-  revalidatePath("/", "layout");
+  refreshPublicSite();
   return { ok: true };
 }

@@ -1,11 +1,11 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { adminError, getAdmin } from "@/lib/admin/guard";
 import { deleteImage, uploadImage } from "@/lib/admin/images";
 import { normalizeSriLankanPhone } from "@/lib/phone";
+import { refreshPublicSite } from "@/lib/revalidate";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createAuditedClient } from "@/lib/supabase/server";
 
@@ -113,7 +113,7 @@ export async function saveBranchAction(input: unknown): Promise<Result> {
     .eq("branch_id", id);
   if (secretError) return adminError(secretError.message);
 
-  revalidatePath("/", "layout");
+  refreshPublicSite();
   return { ok: true, id };
 }
 
@@ -139,7 +139,7 @@ export async function uploadBranchImageAction(form: FormData): Promise<Result> {
     return adminError(error.message);
   }
   await deleteImage((current as { image_path: string | null }).image_path);
-  revalidatePath("/", "layout");
+  refreshPublicSite();
   return { ok: true };
 }
 
@@ -171,7 +171,7 @@ export async function addHolidayAction(input: unknown): Promise<Result> {
     is_alcohol_free: v.isAlcoholFree,
   });
   if (error) return adminError(error.message);
-  revalidatePath("/", "layout");
+  refreshPublicSite();
   return { ok: true };
 }
 
@@ -182,6 +182,6 @@ export async function deleteHolidayAction(id: unknown): Promise<Result> {
   const supabase = await createAuditedClient();
   const { error } = await supabase.from("holidays").delete().eq("id", parsed.data);
   if (error) return adminError(error.message);
-  revalidatePath("/", "layout");
+  refreshPublicSite();
   return { ok: true };
 }

@@ -1,10 +1,10 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
 
 import { adminError, getAdmin } from "@/lib/admin/guard";
 import { deleteImage, uploadImage } from "@/lib/admin/images";
+import { refreshPublicSite } from "@/lib/revalidate";
 import { createAuditedClient } from "@/lib/supabase/server";
 
 /**
@@ -35,7 +35,7 @@ function compact(value: Record<string, string>): Record<string, string> {
 }
 
 function refreshSite() {
-  revalidatePath("/", "layout");
+  refreshPublicSite();
 }
 
 // ---------------------------------------------------------------------------

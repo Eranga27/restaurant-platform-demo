@@ -27,6 +27,10 @@ All notable changes to this project are documented here. The format is based on 
 
 - Manager and admin rights need two-step sign-in in the session; without it they're treated as signed in, not as staff.
 
+### Fixed
+
+- Marking a dish sold out (or any admin change) no longer takes the public pages down on self-hosted servers: on-demand page refreshes now use the locale route pattern, and the locale layout accepts on-demand rendering.
+
 ## [0.6.0] - Phase 5: Reservations and events
 
 ### Added

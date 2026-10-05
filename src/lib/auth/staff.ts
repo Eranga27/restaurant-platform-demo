@@ -43,14 +43,15 @@ export const getStaffAccount = cache(async (): Promise<StaffAccount | null> => {
   const user = await getCurrentUser();
   if (!user) return null;
   const supabase = await createClient();
-  const [{ data, error }, { data: aal }] = await Promise.all([
+  // The MFA level comes from the session's verified token claims ("aal").
+  const [{ data, error }, { data: claims }] = await Promise.all([
     supabase.from("profiles").select("role, branch_id, full_name").eq("id", user.id).maybeSingle(),
-    supabase.auth.mfa.getAuthenticatorAssuranceLevel(),
+    supabase.auth.getClaims(),
   ]);
   if (error || !data) return null;
   const profile = profileRow.parse(data);
   if (profile.role === "customer") return null;
-  const mfaVerified = aal?.currentLevel === "aal2";
+  const mfaVerified = claims?.claims.aal === "aal2";
   return {
     userId: user.id,
     name: profile.full_name ?? user.name,

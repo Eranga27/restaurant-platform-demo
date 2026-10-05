@@ -11,7 +11,9 @@ import { robotsMetadata } from "@/lib/seo";
 
 import "../globals.css";
 
-export const dynamicParams = false;
+// Unknown locales are refused below (hasLocale → notFound). Not with
+// `dynamicParams = false`: in `next start`, that makes every page 404 once
+// it has been revalidated on demand (docs/DECISIONS.md D56).
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
