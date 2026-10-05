@@ -75,6 +75,17 @@ export function DashboardShell({
             ))}
           </nav>
           <div className="ml-auto flex flex-wrap items-center gap-4">
+            {staff.role === "admin" && (
+              <Link href="/admin" className="text-sm font-medium text-primary hover:underline">
+                Admin
+              </Link>
+            )}
+            <Link
+              href="/dashboard/security"
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Security
+            </Link>
             <AcceptingToggle
               key={`${branch.id}-${branch.isAcceptingOrders}`}
               branchId={branch.id}
