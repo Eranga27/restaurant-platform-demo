@@ -66,7 +66,8 @@
   "Demo": {
     "ribbon": "Demo site",
     "ribbonDetail": "A fictional restaurant. Orders, payments and bookings are not real.",
-    "contactDisabled": "Calls and messages are turned off on the demo site."
+    "contactDisabled": "Calls and messages are turned off on the demo site.",
+    "tour": "Take the tour"
   },
   "Poya": {
     "banner": "Today is {name}. As on every Poya day, we don't serve alcohol."
@@ -79,7 +80,7 @@
     "kmAway": "{km} km away"
   },
   "Home": {
-    "heroEyebrow": "{tagline} · Colombo · Nugegoda · Kandy",
+    "heroEyebrow": "{tagline} · {places}",
     "heroTitle": "Sri Lankan home cooking, done properly.",
     "heroSubtitle": "Kottu off the griddle, hoppers off the pan and curries slow-cooked the way our grandmothers made them. Delivered hot, or waiting for you at the table.",
     "heroImageAlt": "A spread of Sri Lankan rice and curry dishes",
