@@ -1,5 +1,7 @@
 import "server-only";
 
+import { createHash } from "node:crypto";
+
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 
@@ -16,6 +18,7 @@ type LimitName =
   | "quote"
   | "payment"
   | "login"
+  | "login-account"
   | "signup"
   | "contact"
   | "booking"
@@ -28,6 +31,9 @@ const LIMITS: Record<LimitName, { requests: number; window: `${number} ${"s" | "
   quote: { requests: 120, window: "10 m" },
   payment: { requests: 10, window: "10 m" },
   login: { requests: 10, window: "15 m" },
+  // Per account, whatever the IP: slows guessing one password from many
+  // addresses, without letting a stranger lock someone out for long.
+  "login-account": { requests: 30, window: "1 h" },
   signup: { requests: 5, window: "1 h" },
   contact: { requests: 5, window: "1 h" },
   booking: { requests: 10, window: "1 h" },
@@ -63,6 +69,11 @@ function getLimiters(): Map<LimitName, Ratelimit> | null {
 
 export type RateLimitResult = { ok: true } | { ok: false; retryAfterSeconds: number };
 
+/** Keys (IPs, emails) are hashed, so no personal data is stored at Upstash. */
+function hashKey(key: string): string {
+  return createHash("sha256").update(key).digest("base64url").slice(0, 32);
+}
+
 export async function rateLimit(name: LimitName, key: string): Promise<RateLimitResult> {
   const limiter = getLimiters()?.get(name);
   if (!limiter) {
@@ -75,7 +86,7 @@ export async function rateLimit(name: LimitName, key: string): Promise<RateLimit
     return { ok: true };
   }
   try {
-    const { success, reset } = await limiter.limit(key);
+    const { success, reset } = await limiter.limit(hashKey(key));
     return success
       ? { ok: true }
       : { ok: false, retryAfterSeconds: Math.max(1, Math.ceil((reset - Date.now()) / 1000)) };
