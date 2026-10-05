@@ -29,8 +29,11 @@ export async function generateMetadata({
   };
 }
 
-export default async function TrackPage({ params }: PageProps<"/[locale]/track/[token]">) {
-  const { token, locale: rawLocale } = await params;
+export default async function TrackPage({
+  params,
+  searchParams,
+}: PageProps<"/[locale]/track/[token]">) {
+  const [{ token, locale: rawLocale }, query] = await Promise.all([params, searchParams]);
   const locale = rawLocale as Locale;
   const order = await getOrderByToken(token);
   if (!order) notFound();
@@ -70,6 +73,9 @@ export default async function TrackPage({ params }: PageProps<"/[locale]/track/[
         initialStatus={order.status}
         branchName={branchName}
         rejectionReason={order.rejection_reason}
+        unpaidOnline={order.payment_method === "payhere" && order.payment_status !== "paid"}
+        paid={order.payment_status === "paid"}
+        returningFromPayment={query.payment === "return"}
       />
 
       <section
@@ -95,9 +101,13 @@ export default async function TrackPage({ params }: PageProps<"/[locale]/track/[
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">{t("payment")}</p>
           <p className="font-medium">
-            {order.type === "delivery"
-              ? t("cod", { amount: formatLKR(order.total_cents) })
-              : t("codPickup", { amount: formatLKR(order.total_cents) })}
+            {order.payment_status === "paid"
+              ? t("paidOnline", { amount: formatLKR(order.total_cents) })
+              : order.payment_method === "payhere"
+                ? t("paymentPending", { amount: formatLKR(order.total_cents) })
+                : order.type === "delivery"
+                  ? t("cod", { amount: formatLKR(order.total_cents) })
+                  : t("codPickup", { amount: formatLKR(order.total_cents) })}
           </p>
           <ContactLink
             kind="tel"

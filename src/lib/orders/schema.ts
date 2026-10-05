@@ -68,7 +68,7 @@ export const checkoutSchema = quoteRequestSchema
     contact: contactSchema,
     address: addressSchema.nullable(),
     notes: z.string().trim().max(500).nullable(),
-    paymentMethod: z.literal("cod"),
+    paymentMethod: z.enum(["cod", "payhere"]),
     idempotencyKey: z.uuid(),
     turnstileToken: z.string().max(2048).nullable(),
     locale: z.enum(["en", "si", "ta"]),

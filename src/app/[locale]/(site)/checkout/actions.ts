@@ -2,10 +2,17 @@
 
 import { z } from "zod";
 
+import { getBrand } from "@/lib/data/brand";
 import { localize } from "@/lib/data/catalogue";
 import type { Quote, QuoteIssue } from "@/lib/orders/quote";
 import { checkoutSchema, quoteRequestSchema } from "@/lib/orders/schema";
 import { getQuote, placeOrder, trackingPath } from "@/lib/orders/service";
+import {
+  onlinePaymentsEnabled,
+  payPath,
+  startPayment,
+  type PaymentForm,
+} from "@/lib/payments/service";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { clientIp } from "@/lib/security/request";
 import { verifyTurnstile } from "@/lib/security/turnstile";
@@ -57,12 +64,19 @@ export async function quoteAction(input: unknown, lang: unknown): Promise<QuoteR
 }
 
 export type PlaceOrderResponse =
-  | { ok: true; trackingPath: string }
+  /** `payment`: post this form to PayHere. Without it, go to `nextPath`. */
+  | { ok: true; nextPath: string; payment: PaymentForm | null }
   | { ok: false; error: "invalid"; fields: string[] }
   | { ok: false; error: "issues"; quote: QuoteView }
   | {
       ok: false;
-      error: "rate-limited" | "bot-check" | "promo-exhausted" | "unavailable" | "unknown";
+      error:
+        | "rate-limited"
+        | "bot-check"
+        | "promo-exhausted"
+        | "payment-unavailable"
+        | "unavailable"
+        | "unknown";
     };
 
 export async function placeOrderAction(input: unknown): Promise<PlaceOrderResponse> {
@@ -76,6 +90,11 @@ export async function placeOrderAction(input: unknown): Promise<PlaceOrderRespon
   }
   const request = parsed.data;
 
+  const brand = await getBrand();
+  const methodAvailable =
+    request.paymentMethod === "payhere" ? onlinePaymentsEnabled() : brand.features.cashOnDelivery;
+  if (!methodAvailable) return { ok: false, error: "payment-unavailable" };
+
   const ip = await clientIp();
   const limit = await rateLimit("checkout", ip ?? "unknown");
   if (!limit.ok) return { ok: false, error: "rate-limited" };
@@ -85,8 +104,22 @@ export async function placeOrderAction(input: unknown): Promise<PlaceOrderRespon
   const user = await getCurrentUser();
   const result = await placeOrder(request, { userId: user?.id ?? null });
 
-  if (result.ok)
-    return { ok: true, trackingPath: trackingPath(result.publicToken, request.locale) };
+  if (result.ok) {
+    if (request.paymentMethod === "cod") {
+      return {
+        ok: true,
+        nextPath: trackingPath(result.publicToken, request.locale),
+        payment: null,
+      };
+    }
+    // Straight on to PayHere. If that can't start, the pay page offers a retry.
+    const payment = await startPayment(result.publicToken);
+    return {
+      ok: true,
+      nextPath: payPath(result.publicToken, request.locale),
+      payment: payment.ok ? payment.form : null,
+    };
+  }
   if (result.reason === "issues")
     return { ok: false, error: "issues", quote: toView(result.quote, request.locale) };
   return { ok: false, error: result.reason };

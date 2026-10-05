@@ -23,6 +23,8 @@ export const featureFlagsSchema = z.object({
   reservations: z.boolean(),
   events: z.boolean(),
   loyalty: z.boolean(),
+  /** Cash on delivery or at pickup. Online payment appears whenever PayHere is configured. */
+  cashOnDelivery: z.boolean(),
   /** When on, alcohol items are hidden automatically on Poya days. */
   alcohol: z.boolean(),
 });
@@ -133,6 +135,7 @@ export const defaultBrand = brandSchema.parse({
     reservations: true,
     events: true,
     loyalty: true,
+    cashOnDelivery: true,
     alcohol: true,
   },
   charges: {

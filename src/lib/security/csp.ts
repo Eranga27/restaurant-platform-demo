@@ -15,13 +15,25 @@ export const STRICT_CSP_PREFIXES = [
   "/checkout",
   "/dashboard",
   "/login",
+  "/pay",
   "/signup",
   "/track",
 ] as const;
 
-export function needsStrictCsp(pathname: string): boolean {
+/** Pages that post the customer on to the payment gateway. */
+export const PAYMENT_FORM_PREFIXES = ["/checkout", "/pay"] as const;
+
+function matches(pathname: string, prefixes: readonly string[]): boolean {
   const path = pathname.replace(LOCALE_PREFIX, "") || "/";
-  return STRICT_CSP_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+  return prefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+}
+
+export function needsStrictCsp(pathname: string): boolean {
+  return matches(pathname, STRICT_CSP_PREFIXES);
+}
+
+export function postsPaymentForm(pathname: string): boolean {
+  return matches(pathname, PAYMENT_FORM_PREFIXES);
 }
 
 export type CspOptions = {
@@ -30,6 +42,8 @@ export type CspOptions = {
   isDev: boolean;
   /** Origin of the Supabase project, e.g. `https://abc.supabase.co`. */
   supabaseOrigin?: string;
+  /** Extra origins forms may post to: the payment gateway, on checkout and pay pages only. */
+  formTargets?: string[];
 };
 
 const TURNSTILE = "https://challenges.cloudflare.com";
@@ -40,7 +54,7 @@ const IMAGE_HOSTS = [
   "https://*.tile.openstreetmap.org",
 ];
 
-export function buildCsp({ nonce, isDev, supabaseOrigin }: CspOptions): string {
+export function buildCsp({ nonce, isDev, supabaseOrigin, formTargets = [] }: CspOptions): string {
   const supabase = supabaseOrigin ?? "https://*.supabase.co";
   // Realtime's websocket: wss:// for the hosted project, ws:// for a local Supabase.
   const supabaseWs = supabase.replace(/^http/, "ws");
@@ -64,7 +78,7 @@ export function buildCsp({ nonce, isDev, supabaseOrigin }: CspOptions): string {
     "manifest-src": ["'self'"],
     "object-src": ["'none'"],
     "base-uri": ["'self'"],
-    "form-action": ["'self'"],
+    "form-action": ["'self'", ...formTargets],
     "frame-ancestors": ["'none'"],
   };
 

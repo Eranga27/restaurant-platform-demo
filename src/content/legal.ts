@@ -167,7 +167,8 @@ export function refundPolicy(brand: Brand): LegalDocument {
       {
         heading: "Orders we decline",
         body: [
-          "If a branch declines your order or cannot deliver it, any online payment is refunded in full automatically.",
+          "If a branch declines your order or cannot deliver it, any online payment is refunded in full, without you having to ask.",
+          "An order you chose to pay online that isn't paid within 30 minutes is cancelled, and nothing is charged.",
         ],
       },
       {

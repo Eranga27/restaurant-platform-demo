@@ -11,11 +11,12 @@ import { env } from "@/lib/env";
  * production.
  */
 
-type LimitName = "checkout" | "quote" | "login" | "signup" | "contact" | "booking";
+type LimitName = "checkout" | "quote" | "payment" | "login" | "signup" | "contact" | "booking";
 
 const LIMITS: Record<LimitName, { requests: number; window: `${number} ${"s" | "m" | "h"}` }> = {
   checkout: { requests: 5, window: "10 m" },
   quote: { requests: 120, window: "10 m" },
+  payment: { requests: 10, window: "10 m" },
   login: { requests: 10, window: "15 m" },
   signup: { requests: 5, window: "1 h" },
   contact: { requests: 5, window: "1 h" },

@@ -4,6 +4,23 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [0.4.0] - Phase 3: Online payments
+
+### Added
+
+- Online payment through PayHere (cards and mobile wallets), next to cash on delivery. Checkout sends the customer to PayHere's secure page and back to the tracking page.
+- Pay page for retrying a declined or cancelled payment, or switching to cash on delivery or at the counter.
+- PayHere payment notifications: signature, merchant, amount and currency checks; repeats and out-of-order notifications are ignored; chargebacks and payments for cancelled orders are recorded for follow-up.
+- Orders paid online wait for payment before the branch sees them. Unpaid ones are cancelled after 30 minutes and give their promo code back.
+- Tracking page states for "waiting for payment" and "confirming payment", and the payment status in the order summary and confirmation email.
+- A `cashOnDelivery` feature flag in the brand settings.
+- Tests for PayHere signing, the payment database rules and the CSP, plus payment journeys in CI with PayHere stood in for.
+
+### Changed
+
+- The tracking page re-checks the order when it connects and every 20 seconds, so an update sent while connecting isn't missed.
+- Confirmation emails for online orders are sent once the payment is confirmed.
+
 ## [0.3.0] - Phase 2: Cart, checkout and order tracking
 
 ### Added
