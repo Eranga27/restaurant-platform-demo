@@ -1,7 +1,9 @@
-import { createHmac, randomBytes } from "node:crypto";
+import { randomBytes } from "node:crypto";
 
 import { createClient } from "@supabase/supabase-js";
 import { expect, test } from "@playwright/test";
+
+import { setUpTwoStep } from "./helpers/two-step";
 
 /**
  * Admin journey: sign in, set up two-step sign-in, edit a dish, see it in the
@@ -12,22 +14,6 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const local = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(supabaseUrl);
 test.skip(process.env.E2E_DATABASE !== "1" || !local, "Needs a local Supabase");
 test.skip(({ isMobile }) => !isMobile, "Runs on the mobile project only");
-
-/** RFC 6238 TOTP (SHA-1, 6 digits, 30 seconds), as an authenticator app computes it. */
-function totp(base32Secret: string, at = Date.now()): string {
-  const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-  let bits = "";
-  for (const char of base32Secret.replace(/=+$/, "").toUpperCase()) {
-    bits += alphabet.indexOf(char).toString(2).padStart(5, "0");
-  }
-  const key = Buffer.from(bits.match(/.{8}/g)!.map((b) => parseInt(b, 2)));
-  const counter = Buffer.alloc(8);
-  counter.writeBigUInt64BE(BigInt(Math.floor(at / 30_000)));
-  const hmac = createHmac("sha1", key).update(counter).digest();
-  const offset = hmac[hmac.length - 1]! & 0x0f;
-  const code = (hmac.readUInt32BE(offset) & 0x7fffffff) % 1_000_000;
-  return String(code).padStart(6, "0");
-}
 
 test("an admin sets up two-step sign-in, edits a dish and sees it audited", async ({
   page,
@@ -52,13 +38,7 @@ test("an admin sets up two-step sign-in, edits a dish and sees it audited", asyn
   await page.getByLabel("Password").fill(password);
   await page.getByRole("button", { name: "Sign in" }).click();
   await expect(page).toHaveURL(/\/dashboard\/security\?next=%2Fadmin/, { timeout: 15_000 });
-
-  await page.getByRole("button", { name: "Set up two-step sign-in" }).click();
-  await expect(page.getByAltText("QR code for your authenticator app")).toBeVisible();
-  await page.getByText("Can't scan it? Enter this key instead").click();
-  const secret = (await page.locator("details code").textContent())!.trim();
-  await page.getByLabel("6-digit code").fill(totp(secret));
-  await page.getByRole("button", { name: "Confirm" }).click();
+  await setUpTwoStep(page);
 
   await expect(page).toHaveURL(/\/admin$/, { timeout: 15_000 });
   await expect(page.getByRole("heading", { name: "Overview" })).toBeVisible();
