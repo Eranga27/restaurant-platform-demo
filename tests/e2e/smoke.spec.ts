@@ -87,6 +87,16 @@ test.describe("public site", () => {
     }
   });
 
+  test("booking and events pages render, with or without a database", async ({ page }) => {
+    await page.goto("/reservations");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      /^(Book a table|Online booking isn't available right now)$/,
+    );
+    await page.goto("/events");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Events and catering");
+    await expect(page.getByRole("heading", { name: "Dana (almsgiving)" })).toBeVisible();
+  });
+
   test("unknown pages return a localized 404", async ({ page }) => {
     const response = await page.goto("/no-such-page");
     expect(response?.status()).toBe(404);

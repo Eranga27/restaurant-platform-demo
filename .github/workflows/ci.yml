@@ -154,7 +154,7 @@ jobs:
       - name: Order journeys
         env:
           E2E_DATABASE: "1"
-        run: npm run test:e2e -- tests/e2e/order.spec.ts tests/e2e/payment.spec.ts tests/e2e/dashboard.spec.ts --project=mobile
+        run: npm run test:e2e -- tests/e2e/order.spec.ts tests/e2e/payment.spec.ts tests/e2e/dashboard.spec.ts tests/e2e/reservation.spec.ts --project=mobile
 
       # Kept on success too: the journeys attach screenshots of the staff screens.
       - name: Upload Playwright report
