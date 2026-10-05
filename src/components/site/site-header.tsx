@@ -2,7 +2,9 @@ import { UtensilsCrossed } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { CartHydrator } from "@/components/cart/cart-hydrator";
-import { CartButton, CartSheet, type CartSettings } from "@/components/cart/cart-sheet";
+import { CartButton } from "@/components/cart/cart-button";
+import type { CartSettings } from "@/components/cart/cart-sheet";
+import { LazyCartSheet } from "@/components/cart/lazy-cart-sheet";
 import { Button } from "@/components/ui/button";
 import type { Brand } from "@/config/brand";
 import { Link } from "@/i18n/navigation";
@@ -63,7 +65,7 @@ export async function SiteHeader({
           <MobileNav items={items} brandName={brand.name} />
         </div>
       </div>
-      <CartSheet settings={cartSettings} />
+      <LazyCartSheet settings={cartSettings} />
       <CartHydrator />
     </header>
   );

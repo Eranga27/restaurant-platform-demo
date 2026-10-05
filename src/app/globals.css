@@ -273,7 +273,6 @@ html {
   from {
     opacity: 0;
     translate: 0 1.25rem;
-    filter: blur(6px);
   }
 }
 
@@ -412,6 +411,11 @@ html {
     opacity: 0;
     scale: 0.6;
   }
+}
+
+/* System fonts only, e.g. for a line mixing scripts the page's language doesn't need. */
+.font-system {
+  font-family: ui-sans-serif, system-ui, sans-serif;
 }
 
 /* A repeating lotus border (palapethi), e.g. along the top of the footer. Takes the turmeric colour. */

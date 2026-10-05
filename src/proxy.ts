@@ -10,7 +10,7 @@ import { hardenCookie } from "@/lib/supabase/cookies";
 const handleI18nRouting = createIntlMiddleware(routing);
 
 /** Areas outside the localized site: English only, no locale prefix. */
-const UNLOCALIZED_PREFIXES = ["/styleguide", "/dashboard", "/admin"];
+const UNLOCALIZED_PREFIXES = ["/styleguide", "/demo", "/dashboard", "/admin"];
 
 /**
  * Runs before every page request: locale routing (next-intl), the CSP, and on

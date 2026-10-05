@@ -54,8 +54,12 @@ export async function signInAction(_prev: AuthState, form: FormData): Promise<Au
   if (!parsed.success) return { error: "invalid" };
 
   const ip = (await clientIp()) ?? "unknown";
-  const limit = await rateLimit("login", `${ip}:${parsed.data.email.toLowerCase()}`);
-  if (!limit.ok) return { error: "rate-limited" };
+  const email = parsed.data.email.toLowerCase();
+  const [perIp, perAccount] = await Promise.all([
+    rateLimit("login", `${ip}:${email}`),
+    rateLimit("login-account", email),
+  ]);
+  if (!perIp.ok || !perAccount.ok) return { error: "rate-limited" };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);

@@ -49,9 +49,6 @@ const serverSchema = z.object({
   VAPID_PRIVATE_KEY: optional,
   VAPID_SUBJECT: optional,
   TELEGRAM_BOT_TOKEN: optional,
-
-  // Shared secret for scheduled jobs calling our own endpoints
-  CRON_SECRET: optional,
 });
 
 export type ServerEnv = z.infer<typeof serverSchema>;

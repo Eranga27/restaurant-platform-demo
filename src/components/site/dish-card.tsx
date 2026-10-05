@@ -20,7 +20,7 @@ export async function DishCard({ item, priority }: { item: MenuItemView; priorit
         <DishImage
           src={item.imageUrl}
           alt={item.name}
-          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 78vw"
           priority={priority}
           className="transition-transform duration-500 ease-out-soft group-hover:scale-105"
         />

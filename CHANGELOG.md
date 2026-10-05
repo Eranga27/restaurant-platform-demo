@@ -4,6 +4,27 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [1.0.0] - Phase 9: Hardening and launch
+
+### Added
+
+- A demo tour at `/demo` for client meetings, linked from the demo ribbon: the demo script step by step, and what's included.
+- A launch checklist (docs/LAUNCH.md): accounts, environment variables, database, content, domain, final checks and quality results.
+- Database guard tests for the whole schema: RLS everywhere, what the public and signed-in roles can read, write and call, and fixed search paths.
+- Accessibility checks (axe, WCAG 2.2 AA) on 16 pages and the dish and cart windows, at phone and desktop sizes, in CI.
+- A per-account limit on sign-in attempts from any address.
+- The full rebranding guide: what to collect from a client, settings that need no deploy, policies.
+
+### Changed
+
+- Rate-limit keys are hashed, so no email or IP address is stored at Upstash.
+- Faster on phones: the cart drawer, phone menu and toasts load when first used; the language menu uses the phone's own picker; the heading font no longer competes with the hero photo; the splash's welcome no longer downloads the Sinhala and Tamil fonts on English pages.
+- The hero's line of places is built from the branch list.
+
+### Removed
+
+- The unused `CRON_SECRET` setting.
+
 ## [0.9.0] - Phase 8: UI/UX polish
 
 ### Added

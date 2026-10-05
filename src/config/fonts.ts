@@ -6,12 +6,17 @@ import { DM_Sans, Fraunces, Noto_Sans_Sinhala, Noto_Sans_Tamil } from "next/font
  * Keep the CSS variable names; the design tokens in globals.css use them.
  */
 
-/** Headings: a warm, soft serif. */
+/**
+ * Headings: a warm, soft serif. Not preloaded: at 118 KB it would compete with
+ * the hero photo on slow connections; headings show in a size-matched
+ * fallback for a moment (behind the splash on a first visit), then swap.
+ */
 export const displayFont = Fraunces({
   subsets: ["latin"],
   variable: "--font-display-latin",
   axes: ["SOFT", "opsz"],
   display: "swap",
+  preload: false,
 });
 
 /** Body and UI text. */

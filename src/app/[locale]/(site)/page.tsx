@@ -56,7 +56,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
     <>
       <Splash />
       <JsonLd data={restaurantJsonLd(brand, branches, getPathname({ locale, href: "/menu" }))} />
-      <Hero brand={brand} branchCount={branches.length} />
+      <Hero brand={brand} branchNames={branches.map((b) => b.name)} />
 
       <section
         aria-labelledby="signatures"

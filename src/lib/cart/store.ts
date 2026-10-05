@@ -33,6 +33,8 @@ type CartState = {
   lines: CartLine[];
   promoCode: string | null;
   isOpen: boolean;
+  /** Opened at least once in this visit: the drawer's code then stays loaded. */
+  wasOpened: boolean;
   add: (line: Omit<CartLine, "key">) => void;
   setQuantity: (key: string, quantity: number) => void;
   remove: (key: string) => void;
@@ -69,6 +71,7 @@ export const useCart = create<CartState>()(
       lines: [],
       promoCode: null,
       isOpen: false,
+      wasOpened: false,
       add: (line) =>
         set((state) => {
           const existing = state.lines.find((l) => sameConfiguration(l, line));
@@ -96,7 +99,7 @@ export const useCart = create<CartState>()(
       setBranch: (branchId) => set({ branchId }),
       setType: (type) => set({ type }),
       setPromoCode: (promoCode) => set({ promoCode }),
-      setOpen: (isOpen) => set({ isOpen }),
+      setOpen: (isOpen) => set((state) => ({ isOpen, wasOpened: state.wasOpened || isOpen })),
     }),
     {
       name: "kithul.cart",

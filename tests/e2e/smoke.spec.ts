@@ -268,3 +268,19 @@ test.describe("reduced motion", () => {
     await expect(page.locator("[data-reveal-state='hidden']")).toHaveCount(0);
   });
 });
+
+test.describe("demo tour", () => {
+  test("is linked from the demo ribbon and walks through the platform", async ({ page }) => {
+    const errors = trackErrors(page);
+    await page.goto("/");
+    await page.getByRole("link", { name: "Take the tour" }).click();
+    await expect(page).toHaveURL(/\/demo$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("A tour of the platform");
+    await expect(page.getByRole("link", { name: "Start with kottu" })).toHaveAttribute(
+      "href",
+      "/menu?item=chicken-kottu",
+    );
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+    expect(errors).toEqual([]);
+  });
+});
