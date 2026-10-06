@@ -456,12 +456,75 @@ html {
 ::view-transition {
   pointer-events: none;
 }
+/* The page itself animates (below); the rest just swaps, so nothing washes it out. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
 ::view-transition-old(.page) {
   animation: var(--duration-fast) ease-in both vt-fade-out;
 }
 ::view-transition-new(.page) {
   animation: 360ms var(--ease-out-soft) 90ms both vt-rise-in;
 }
+/*
+ * Typed page transitions (src/lib/transitions.ts):
+ * - lamp: the new page opens in a circle from the click (--vt-x, --vt-y,
+ *   set by nav-progress.tsx), echoing the splash, while the old one dims.
+ * - curtain: the new page rises over the old one with rounded shoulders, the
+ *   old one sinking back a little.
+ * - home: a soft fade-through, the home page settling as it arrives.
+ * Exits are quicker than entrances; all of it is off for reduced motion.
+ */
+::view-transition-new(.page-lamp) {
+  animation: vt-lamp 720ms cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+::view-transition-old(.page-lamp) {
+  animation: vt-recede 720ms ease-in both;
+}
+::view-transition-new(.page-curtain) {
+  animation: vt-curtain 640ms cubic-bezier(0.76, 0, 0.24, 1) both;
+}
+::view-transition-old(.page-curtain) {
+  animation: vt-recede 640ms ease-in both;
+}
+::view-transition-new(.page-home) {
+  animation: vt-settle 520ms var(--ease-out-soft) 120ms both;
+}
+::view-transition-old(.page-home) {
+  animation: 200ms ease-in both vt-fade-out;
+}
+
+@keyframes vt-lamp {
+  from {
+    clip-path: circle(0 at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+  to {
+    clip-path: circle(150vmax at var(--vt-x, 50%) var(--vt-y, 50%));
+  }
+}
+/* In screen heights: the page itself can be much taller than the screen. */
+@keyframes vt-curtain {
+  from {
+    clip-path: inset(100vh 0 0 0 round 2.5rem 2.5rem 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 0);
+  }
+}
+@keyframes vt-recede {
+  to {
+    scale: 0.96;
+    opacity: 0.35;
+  }
+}
+@keyframes vt-settle {
+  from {
+    opacity: 0;
+    scale: 1.03;
+  }
+}
+
 ::view-transition-group(site-header) {
   animation: none;
   z-index: 100;

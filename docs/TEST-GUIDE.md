@@ -24,6 +24,7 @@ A walk through everything the platform does, in plain steps. Use a phone and a l
 - [ ] **Branches:** a map of Sri Lanka with each branch pinned. Point at a branch in the list: its pin grows. "Use my location" adds you and sorts by distance.
 - [ ] **Guests:** a green section with the average rating and the number of reviews, and one large quote at a time.
 - [ ] **Order bar (phone):** scroll past the first screen: a dark bar with "Order now" and "Book a table" slides up from the bottom. It steps aside when you reach the footer.
+- [ ] **Page transitions (laptop or a recent phone browser):** click "Order now" or a dish: the menu opens in a growing circle from where you clicked. Click "Branches" or "Events" in the header: the new page rises up over the old one like a curtain. Click the logo: the home page fades in and settles. The browser's back button just fades.
 - [ ] **Loading line:** click "Menu" in the header: a thin saffron line runs along the very top until the menu appears. Buttons and cards press in slightly when tapped.
 - [ ] **Scrolling:** flick quickly to the bottom, then back up: every section is there, nothing is left blank. On a laptop, scrolling glides; on a phone it's the phone's normal scrolling.
 - [ ] **Explore menu:** tap "Explore" (top right). A full-screen menu with every page in large type, the branches' numbers and the time in Sri Lanka.

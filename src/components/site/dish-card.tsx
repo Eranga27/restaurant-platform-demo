@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { MenuItemView } from "@/lib/data/catalogue";
 import { formatLKR } from "@/lib/money";
+import { LAMP } from "@/lib/transitions";
 
 import { DietaryBadge } from "./dietary-badge";
 import { DishImage } from "./dish-image";
@@ -18,6 +19,7 @@ export async function DishCard({ item }: { item: MenuItemView }) {
   return (
     <Link
       href={{ pathname: "/menu", query: { item: item.slug } }}
+      transitionTypes={LAMP}
       className="group flex h-full flex-col overflow-hidden rounded-2xl bg-card shadow-soft ring-1 ring-border/70 transition-[translate,box-shadow] duration-500 ease-out-soft hover:-translate-y-1 hover:shadow-lifted"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
