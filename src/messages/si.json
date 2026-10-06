@@ -117,7 +117,7 @@
     "heroRating": "{rating} ★ · සමාලෝචන {count}ක්",
     "heroFreeDelivery": "{amount}ට වැඩි ඇණවුම්වලට නොමිලේ බෙදාහැරීම",
     "addDish": "එකතු කරන්න",
-    "bestsellersLabel": "වැඩියෙන්ම ඇණවුම් කරන",
+    "bestsellersLabel": "අපේ මුළුතැන්ගෙයින්",
     "whyLabel": "අමුත්තන් නැවත එන්නේ ඇයි",
     "whyTitle": "ගෙදර උයන <em>විදිහටම උයනවා.</em>",
     "whySpicesTitle": "හැම උදේම බදින තුනපහ",
@@ -130,7 +130,13 @@
     "branchesLabel": "අපේ මුළුතැන්ගෙවල්",
     "guestsLabel": "අමුත්තන්",
     "ratingCount": "සමාලෝචන {count}ක් අනුව",
-    "eventsLabel": "උත්සව සහ කේටරින්"
+    "eventsLabel": "උත්සව සහ කේටරින්",
+    "tabPopular": "වැඩියෙන්ම ඇණවුම් කරන",
+    "tabsLabel": "වර්ග අනුව කෑම",
+    "chefsPick": "සූපවේදියාගේ තේරීම",
+    "openNowCooking": "දැන් විවෘතයි · මුළුතැන්ගෙවල් {count}ක් උයනවා",
+    "closedOpensAt": "දැන් වසා ඇත · {time}ට විවෘත වේ",
+    "quickOrder": "ඇණවුම් කරන්න හෝ වෙන් කරන්න"
   },
   "Menu": {
     "title": "අපේ මෙනුව",

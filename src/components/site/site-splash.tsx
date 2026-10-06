@@ -5,7 +5,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 import { SPLASH_SEEN_KEY } from "@/lib/splash";
 
 /** Milliseconds after page load to take the splash out of the page, once the hero's entrance is over. */
-const REMOVE_AFTER = 3000;
+const REMOVE_AFTER = 4500;
 
 const subscribe = () => () => {};
 
@@ -20,8 +20,8 @@ const LAMP_LINES = [
 /**
  * The branded splash (see ./splash.tsx): a magul pahana, the oil lamp lit to
  * open anything auspicious, drawn in saffron on lacquer red. Its flame lights,
- * the name and a welcome in the three languages rise, and the panel lifts away
- * like a curtain. Its timing is pure CSS (globals.css, .site-splash), so it
+ * the name and a welcome in the three languages rise, and the flame's glow
+ * opens out into the page. Its timing is pure CSS (globals.css, .site-splash), so it
  * leaves on its own even before or without JavaScript; this component only
  * takes it out of the page afterwards, and renders nothing after a client
  * navigation.
@@ -90,14 +90,16 @@ export function SiteSplash({ name, greeting }: { name: string; greeting: string 
             ))}
           </g>
         </svg>
-        <div className="splash-words space-y-3">
-          <p className="font-display text-5xl lg:text-7xl">{name}</p>
+        <div className="space-y-4">
+          <p className="splash-name font-display text-5xl lg:text-7xl">{name}</p>
           {/* The phone's own Sinhala and Tamil fonts: the site's web fonts for
               those scripts load only on pages in those languages. */}
-          <p className="font-system text-sm tracking-[0.18em] text-highlight">{greeting}</p>
+          <p className="splash-greeting font-system text-sm tracking-[0.18em] text-highlight">
+            {greeting}
+          </p>
+          <span className="splash-line" />
         </div>
       </div>
-      <div aria-hidden className="splash-edge lotus-border" />
     </div>
   );
 }

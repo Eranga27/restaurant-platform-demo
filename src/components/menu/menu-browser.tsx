@@ -4,7 +4,6 @@ import { Search, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Suspense, useDeferredValue, useMemo, useState } from "react";
 
-import { Ornament } from "@/components/site/ornament";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -108,18 +107,15 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
         <ItemQuerySync onChange={setOpenSlug} />
       </Suspense>
 
-      <div className="grid gap-5 border-y border-current/12 py-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
+      <div className="grid gap-4 rounded-3xl bg-card p-4 shadow-soft ring-1 ring-border/70 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-5">
         <div className="space-y-2">
-          <label
-            htmlFor="menu-search"
-            className="font-mono text-[0.7rem] font-medium tracking-[0.2em] text-muted-foreground uppercase"
-          >
+          <label htmlFor="menu-search" className="text-sm font-medium text-muted-foreground">
             {t("search")}
           </label>
           <div className="relative">
             <Search
               aria-hidden
-              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+              className="pointer-events-none absolute top-1/2 left-4 size-4 -translate-y-1/2 text-muted-foreground"
             />
             <Input
               id="menu-search"
@@ -127,22 +123,19 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t("searchPlaceholder")}
-              className="h-11 rounded-full pl-9"
+              className="h-12 rounded-full bg-background pl-10 text-base"
               autoComplete="off"
             />
           </div>
         </div>
         <div className="space-y-2">
-          <span
-            id="branch-label"
-            className="font-mono text-[0.7rem] font-medium tracking-[0.2em] text-muted-foreground uppercase"
-          >
+          <span id="branch-label" className="text-sm font-medium text-muted-foreground">
             {t("orderingFrom")}
           </span>
           <Select value={branchId} onValueChange={setBranchId}>
             <SelectTrigger
               aria-labelledby="branch-label"
-              className="h-11 w-full rounded-full bg-card px-4 sm:w-60"
+              className="h-12 w-full rounded-full bg-background px-5 sm:w-60"
             >
               <SelectValue />
             </SelectTrigger>
@@ -163,7 +156,7 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
               size="sm"
               pressed={filters.has(filter)}
               onPressedChange={(on) => toggleFilter(filter, on)}
-              className="rounded-full px-3 data-[state=on]:border-secondary data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground"
+              className="h-9 rounded-full px-4 transition-[background-color,color,border-color,scale] active:scale-[0.97] data-[state=on]:border-secondary data-[state=on]:bg-secondary data-[state=on]:text-secondary-foreground"
             >
               {filter === "nut-free" ? t("nutFree") : dietary(filter)}
             </Toggle>
@@ -175,7 +168,15 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
         {filtering ? t("results", { count: resultCount }) : ""}
       </p>
 
-      {categories.length > 0 && <CategoryNav categories={categories} />}
+      {categories.length > 0 && (
+        <CategoryNav
+          categories={categories.map((c) => ({
+            slug: c.slug,
+            name: c.name,
+            count: c.items.length,
+          }))}
+        />
+      )}
 
       {categories.length === 0 ? (
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed p-10 text-center">
@@ -192,30 +193,23 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
           </Button>
         </div>
       ) : (
-        <div className="space-y-20">
-          {categories.map((category, index) => (
+        <div className="space-y-16 lg:space-y-20">
+          {categories.map((category) => (
             <section
               key={category.id}
               id={category.slug}
               aria-labelledby={`${category.slug}-title`}
-              className="grid scroll-mt-40 gap-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16"
+              className="scroll-mt-40"
             >
-              <div data-reveal className="space-y-4 lg:sticky lg:top-44 lg:self-start">
-                <p className="font-mono text-xs tracking-[0.2em] text-muted-foreground tabular-nums">
-                  {String(index + 1).padStart(2, "0")} /{" "}
-                  {String(categories.length).padStart(2, "0")}
-                </p>
+              <div data-reveal className="mb-6 max-w-2xl space-y-2">
                 <h2 id={`${category.slug}-title`} className="text-display-lg text-balance">
                   {category.name}
                 </h2>
                 {category.description && (
-                  <p className="max-w-sm text-sm text-pretty text-muted-foreground">
-                    {category.description}
-                  </p>
+                  <p className="text-pretty text-muted-foreground">{category.description}</p>
                 )}
-                <Ornament className="w-20" />
               </div>
-              <ul className="border-b border-current/12">
+              <ul className="grid gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
                 {category.items.map((item) => (
                   <li key={item.id} data-reveal>
                     <MenuItemCard

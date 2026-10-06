@@ -9,17 +9,22 @@ A walk through everything the platform does, in plain steps. Use a phone and a l
 3. **Make a staff account** for one branch: sign up a second account (another email), then in Admin → Staff give it the "staff" role at Colombo 07.
 4. Online card payments are paused (PayHere isn't set up yet), so orders are paid in cash for now. Emails only arrive once Resend is set up.
 
-## 1. First impressions (Phases 8 to 11)
+## 1. First impressions (Phases 8 to 11 and V2)
 
 - [ ] **Colours:** the site is in lacquer red, saffron and curry-leaf green on a cream background, with dark brown sections. Headlines are in a warm serif with italic accents in red or saffron.
-- [ ] **Splash:** open the home page in a new tab. On a red screen a saffron oil lamp draws itself, its flame lights and flickers, and "Kithul & Co." rises with "Welcome · ආයුබෝවන් · வணக்கம்". Then the red panel lifts up like a curtain, in about two seconds. Refresh: it doesn't come back in that tab.
+- [ ] **Splash:** open the home page in a new tab. On a red screen a saffron oil lamp draws itself, its flame lights and flickers, "Kithul & Co." rises with "Welcome · ආයුබෝවන් · வணக்கம்", and a thin saffron line fills. Then the flame's glow blooms and a circle opens from it into the page. About three and a half seconds in all. Refresh: it doesn't come back in that tab.
+- [ ] **Open now:** at the top of the hero, a badge says "Open now · 3 kitchens cooking" during opening hours, or "Closed now · opens at …" outside them.
+- [ ] **Chef's pick (laptop):** to the right of the headline, a card with a dish photo and price; clicking it opens that dish on the menu.
 - [ ] **First screen:** the kitchen video fills the screen, and over it, without scrolling: "Sri Lankan home cooking, hot at your door.", a saffron "Order now" and "Book a table", and a line with the rating, "Free delivery over Rs. 7,500", cash on delivery and halal options. The headline rises word by word.
 - [ ] **Pause:** the round button at the bottom right pauses the video; reload and it stays paused until you press play. On a phone held upright the video is a tall cut, still sharp.
-- [ ] **Bestsellers:** six dish cards with photo, price in whole rupees and a red "Add". On a laptop, point at a card: it lifts, the photo leans in and steam rises off the plate. "Add" opens the dish on the menu, ready to add to the order.
+- [ ] **Dish tabs:** above the dishes, tabs: "Most ordered", "Rice & Curry" and others. Tap one: its dishes fade in one after another. With a keyboard, the arrow keys move between tabs.
+- [ ] **Bestsellers:** dish cards with photo, price in whole rupees and a red "Add". On a laptop, point at a card: it lifts, the photo leans in and steam rises off the plate. "Add" opens the dish on the menu, ready to add to the order.
 - [ ] **Why guests come back:** a dark section with a rice and curry photo and three numbered reasons.
 - [ ] **This week:** offers as cards on red, each with a saffron button.
 - [ ] **Branches:** a map of Sri Lanka with each branch pinned. Point at a branch in the list: its pin grows. "Use my location" adds you and sorts by distance.
 - [ ] **Guests:** a green section with the average rating and the number of reviews, and one large quote at a time.
+- [ ] **Order bar (phone):** scroll past the first screen: a dark bar with "Order now" and "Book a table" slides up from the bottom. It steps aside when you reach the footer.
+- [ ] **Loading line:** click "Menu" in the header: a thin saffron line runs along the very top until the menu appears. Buttons and cards press in slightly when tapped.
 - [ ] **Scrolling:** flick quickly to the bottom, then back up: every section is there, nothing is left blank. On a laptop, scrolling glides; on a phone it's the phone's normal scrolling.
 - [ ] **Explore menu:** tap "Explore" (top right). A full-screen menu with every page in large type, the branches' numbers and the time in Sri Lanka.
 - [ ] **Footer:** a last invitation to order or book, the branches, and the brand name across the full width.
@@ -27,7 +32,7 @@ A walk through everything the platform does, in plain steps. Use a phone and a l
 
 ## 2. Browsing
 
-- [ ] **Menu:** it reads like a printed menu: numbered categories, dish names with dotted lines to the price, in whole rupees. The category bar along the top follows you as you scroll; search ("kottu"), dietary filters (Vegetarian, Halal…) and the branch picker work. Dolphin kottu shows as sold out at Nugegoda.
+- [ ] **Menu:** a white toolbar card with search, the branch and dietary chips; below it, category pills with the number of dishes (the current one in red, following you as you scroll); dishes as cards with a photo, price in whole rupees and a red "+". The category bar along the top follows you as you scroll; search ("kottu"), dietary filters (Vegetarian, Halal…) and the branch picker work. Dolphin kottu shows as sold out at Nugegoda.
 - [ ] **Dish window:** tap a dish. Choose a portion, add-ons, spice level and quantity; the price updates. Copy the link from the address bar into another tab: the same dish opens.
 - [ ] **Languages:** use the language menu (EN) in the header to switch to සිංහල, then தமிழ். The whole page changes; your place on the page stays.
 - [ ] **Branches, About, Contact, FAQ, policies:** all load, with opening hours and "Open now"/"Closed" for each branch.

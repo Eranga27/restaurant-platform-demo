@@ -4,6 +4,22 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [2.0.0] - V2
+
+### Added
+
+- A longer, staged splash (about 3.6 s): the lamp draws itself, the flame lights, the name and welcome rise, a saffron line fills, then a circle opens from the flame into the page.
+- A live "Open now · 3 kitchens cooking" badge in the hero, and a "Chef's pick" card beside the headline on large screens.
+- Dish tabs on the home page: most ordered, then the main categories, with a crossfade and arrow-key support.
+- An "Order now · Book a table" bar on phones once the hero has scrolled away.
+- A saffron loading line at the top while the next page loads.
+- Press feedback on buttons, tabs, chips and cards.
+
+### Changed
+
+- The menu as cards: a toolbar card, category pills with dish counts, and dish cards with a photo, price and "+".
+- Home sections reordered so guest reviews come just before the final invitation.
+
 ## [1.3.0] - Restaurant feel
 
 ### Added
