@@ -10,6 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 # Project conventions
 
+- Current status, working agreements and safety rules: `docs/HANDOVER.md`. Read it first in a new session.
 - Plan: `docs/PLAN.md`. Agreed changes to it: `docs/DECISIONS.md` (wins over the plan). Read both before starting a phase.
 - Money is always integer cents; percentages are integer basis points. Use `src/lib/money.ts`.
 - Brand values come from `src/config/brand.ts` (later merged with the `settings` table). Never hardcode the restaurant name, colours or charges.
