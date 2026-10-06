@@ -17,7 +17,7 @@ export function CartButton() {
     <Button
       variant="outline"
       size="icon"
-      className="relative bg-card"
+      className="relative border-[var(--hdr-border-strong,var(--border))] bg-transparent text-current hover:bg-[var(--hdr-hover,var(--muted))] hover:text-current"
       onClick={() => setOpen(true)}
       onPointerEnter={preloadCartSheet}
       onFocus={preloadCartSheet}

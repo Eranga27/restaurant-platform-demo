@@ -28,7 +28,7 @@ export default function SiteError({
   return (
     <section className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-6 px-4 py-24 text-center">
       <Ornament />
-      <h1 className="text-display-lg text-balance text-primary">{t("title")}</h1>
+      <h1 className="text-display-xl text-balance">{t("title")}</h1>
       <p className="text-pretty text-muted-foreground">{t("body")}</p>
       <div className="flex flex-wrap justify-center gap-3">
         <Button size="lg" onClick={() => retry()}>

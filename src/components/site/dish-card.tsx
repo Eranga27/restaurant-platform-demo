@@ -1,46 +1,49 @@
 import { getTranslations } from "next-intl/server";
 
-import { Badge } from "@/components/ui/badge";
 import { Link } from "@/i18n/navigation";
 import type { MenuItemView } from "@/lib/data/catalogue";
+import { formatLKR } from "@/lib/money";
 
 import { DietaryBadge } from "./dietary-badge";
 import { DishImage } from "./dish-image";
-import { Price } from "./price";
 
-/** Signature dish card for the home page. Links to the dish on the menu. */
-export async function DishCard({ item, priority }: { item: MenuItemView; priority?: boolean }) {
-  const [t, dietary] = await Promise.all([getTranslations("Menu"), getTranslations("Dietary")]);
+/** A signature dish on the home page: a tall photo, its number, name and price. Opens the dish on the menu. */
+export async function DishCard({ item, index }: { item: MenuItemView; index: number }) {
+  const dietary = await getTranslations("Dietary");
   return (
     <Link
       href={{ pathname: "/menu", query: { item: item.slug } }}
-      className="group flex flex-col overflow-hidden rounded-2xl border bg-card shadow-soft transition-shadow hover:shadow-lifted"
+      data-cursor="View"
+      className="group flex h-full flex-col gap-5"
     >
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-md bg-muted">
         <DishImage
           src={item.imageUrl}
           alt={item.name}
-          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 78vw"
-          priority={priority}
-          className="transition-transform duration-500 ease-out-soft group-hover:scale-105"
+          sizes="(min-width: 1024px) 30vw, 78vw"
+          className="transition-transform duration-[1.2s] ease-out-soft group-hover:scale-[1.06]"
         />
-        <Badge variant="highlight" className="absolute top-3 left-3">
-          {t("signature")}
-        </Badge>
+        <span className="absolute top-4 left-4 font-mono text-xs tracking-[0.2em] text-white mix-blend-difference">
+          {String(index + 1).padStart(2, "0")}
+        </span>
       </div>
-      <div className="flex flex-1 flex-col gap-2 p-5">
-        <h3 className="font-display text-xl text-foreground group-hover:text-primary">
-          {item.name}
-        </h3>
-        <p className="line-clamp-2 text-sm text-muted-foreground">{item.description}</p>
-        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-2">
-          <Price cents={item.basePriceCents} className="text-primary" />
-          <span className="flex flex-wrap gap-1.5">
-            {item.dietaryTags.map((tag) => (
-              <DietaryBadge key={tag} tag={tag} label={dietary(tag)} />
-            ))}
-          </span>
+      <div className="flex items-start justify-between gap-4 border-t border-current/15 pt-4">
+        <div className="space-y-2">
+          <h3 className="font-display text-3xl leading-none transition-colors group-hover:text-primary">
+            {item.name}
+          </h3>
+          <p className="line-clamp-2 max-w-xs text-sm text-muted-foreground">{item.description}</p>
+          {item.dietaryTags.length > 0 && (
+            <span className="flex flex-wrap gap-1.5 pt-1">
+              {item.dietaryTags.map((tag) => (
+                <DietaryBadge key={tag} tag={tag} label={dietary(tag)} />
+              ))}
+            </span>
+          )}
         </div>
+        <span className="shrink-0 font-mono text-sm tabular-nums">
+          {formatLKR(item.basePriceCents)}
+        </span>
       </div>
     </Link>
   );

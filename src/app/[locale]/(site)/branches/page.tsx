@@ -5,7 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { BranchMapLoader } from "@/components/branches/branch-map-loader";
 import { ContactLink } from "@/components/site/contact-link";
 import { OpenStatus } from "@/components/site/open-status";
-import { Ornament } from "@/components/site/ornament";
+import { PageHeader } from "@/components/site/page-header";
 import { Splash } from "@/components/site/splash";
 import { Button } from "@/components/ui/button";
 import type { Locale } from "@/i18n/routing";
@@ -35,12 +35,8 @@ export default async function BranchesPage({ params }: PageProps<"/[locale]/bran
   return (
     <>
       <Splash />
-      <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
-        <header className="mb-8 max-w-2xl space-y-3">
-          <Ornament />
-          <h1 className="text-display-xl text-primary">{t("title")}</h1>
-          <p className="text-pretty text-muted-foreground">{t("subtitle")}</p>
-        </header>
+      <div className="mx-auto w-full max-w-7xl px-4 pt-14 pb-20 sm:px-6 lg:px-8 lg:pt-24">
+        <PageHeader title={t("title")} intro={t("subtitle")} />
 
         <div className="mb-10 h-72 overflow-hidden rounded-3xl border shadow-soft sm:h-96">
           <BranchMapLoader

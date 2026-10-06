@@ -1,30 +1,36 @@
-import { Banknote, CalendarDays, Clock, ShoppingBag, Store } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import Image from "next/image";
-import type { CSSProperties } from "react";
 import { getTranslations } from "next-intl/server";
+import type { CSSProperties } from "react";
 
+import { SplitWords } from "@/components/site/split-words";
 import { Button } from "@/components/ui/button";
 import type { Brand } from "@/config/brand";
 import { siteMedia } from "@/config/media";
 import { Link } from "@/i18n/navigation";
 
+import { HeaderTone } from "./header-tone";
+
 /** Order in the hero's entrance (globals.css, .intro). */
 const intro = (i: number) => ({ "--i": i }) as CSSProperties;
 
+/**
+ * The home page's opening: a full-screen photo under the transparent header,
+ * the headline rising word by word, and a line of facts along the bottom.
+ */
 export async function Hero({ brand, branchNames }: { brand: Brand; branchNames: string[] }) {
-  const branchCount = branchNames.length;
   const t = await getTranslations("Home");
   const nav = await getTranslations("Nav");
-
-  const highlights = [
-    { icon: Store, label: t("highlightKitchens", { count: branchCount }) },
-    { icon: Clock, label: t("highlightHours") },
-    { icon: Banknote, label: t("highlightCash") },
-    { icon: null, label: t("highlightHalal") },
+  const facts = [
+    t("highlightKitchens", { count: branchNames.length }),
+    t("highlightHours"),
+    t("highlightCash"),
+    t("highlightHalal"),
   ];
 
   return (
-    <section className="relative isolate flex min-h-[min(88svh,760px)] items-end overflow-hidden">
+    <section className="relative isolate -mt-18 flex min-h-[100svh] flex-col overflow-hidden surface-ink">
+      <HeaderTone />
       <div className="hero-drift absolute inset-0 -z-10">
         <Image
           src={siteMedia.hero}
@@ -40,63 +46,57 @@ export async function Hero({ brand, branchNames }: { brand: Brand; branchNames: 
       </div>
       <div
         aria-hidden
-        className="absolute inset-0 -z-10 bg-gradient-to-t from-foreground/95 via-foreground/70 to-foreground/25"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,color-mix(in_srgb,var(--foreground)_70%,transparent)_0%,color-mix(in_srgb,var(--foreground)_25%,transparent)_35%,color-mix(in_srgb,var(--foreground)_55%,transparent)_65%,var(--foreground)_100%)]"
       />
 
-      <div className="mx-auto w-full max-w-6xl px-4 pt-32 pb-12 sm:px-6 sm:pb-16 lg:pb-20">
-        <div className="max-w-2xl text-white">
-          <p
-            className="intro mb-4 text-xs font-medium tracking-[0.2em] text-highlight uppercase sm:text-sm"
-            style={intro(0)}
-          >
-            {t("heroEyebrow", { tagline: brand.tagline, places: branchNames.join(" · ") })}
-          </p>
-          <h1 className="intro text-display-2xl text-balance text-white" style={intro(1)}>
-            {t("heroTitle")}
-          </h1>
-          <p className="intro mt-5 max-w-xl text-lg text-pretty text-white/85" style={intro(2)}>
+      <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-end px-4 pt-32 pb-8 sm:px-6 lg:px-8">
+        <p
+          className="intro font-mono text-[0.7rem] font-medium tracking-[0.22em] text-highlight uppercase"
+          style={intro(0)}
+        >
+          {t("heroEyebrow", { tagline: brand.tagline, places: branchNames.join(" · ") })}
+        </p>
+        <h1 className="intro-words mt-6 max-w-[15ch] text-display-3xl text-balance">
+          <SplitWords markup={t.markup("heroTitle", { em: (c) => `<em>${c}</em>` })} />
+        </h1>
+        <div className="mt-10 grid gap-8 md:grid-cols-[minmax(0,28rem)_auto] md:items-end md:justify-between">
+          <p className="intro text-lg text-pretty opacity-85" style={intro(3)}>
             {t("heroSubtitle")}
           </p>
-
-          <div className="intro mt-8 flex flex-wrap gap-3" style={intro(3)}>
+          <div className="intro flex flex-wrap gap-3" style={intro(4)}>
             <Button
               asChild
               size="lg"
               className="bg-highlight text-highlight-foreground hover:bg-highlight/90"
             >
-              <Link href="/menu">
-                <ShoppingBag data-icon="inline-start" aria-hidden />
-                {nav("orderNow")}
-              </Link>
+              <Link href="/menu">{nav("orderNow")}</Link>
             </Button>
             <Button
               asChild
               size="lg"
               variant="outline"
-              className="border-white/40 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white"
+              className="border-current/40 bg-transparent text-current hover:bg-white/10 hover:text-current"
             >
-              <Link href="/reservations">
-                <CalendarDays data-icon="inline-start" aria-hidden />
-                {nav("bookTable")}
-              </Link>
+              <Link href="/reservations">{nav("bookTable")}</Link>
             </Button>
           </div>
-
-          <ul
-            className="intro mt-10 flex flex-wrap gap-x-6 gap-y-2 text-sm text-white/80"
-            style={intro(4)}
-          >
-            {highlights.map(({ icon: Icon, label }) => (
-              <li key={label} className="flex items-center gap-2">
-                {Icon ? (
-                  <Icon aria-hidden className="size-4 text-highlight" />
-                ) : (
-                  <span aria-hidden className="size-1.5 rounded-full bg-highlight" />
-                )}
-                {label}
+        </div>
+        <div
+          className="intro mt-14 flex flex-wrap items-center justify-between gap-x-8 gap-y-3 border-t border-current/15 pt-5 font-mono text-[0.68rem] tracking-[0.2em] uppercase opacity-80"
+          style={intro(5)}
+        >
+          <ul className="flex flex-wrap gap-x-6 gap-y-2">
+            {facts.map((fact) => (
+              <li key={fact} className="flex items-center gap-2">
+                <span aria-hidden className="size-1 rounded-full bg-highlight" />
+                {fact}
               </li>
             ))}
           </ul>
+          <a href="#kitchen" className="inline-flex items-center gap-2 hover:opacity-100">
+            {t("scroll")}
+            <ArrowDown aria-hidden className="size-3.5 animate-bounce" />
+          </a>
         </div>
       </div>
     </section>

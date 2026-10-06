@@ -27,10 +27,7 @@ export function NavLinks({
               href={item.href}
               aria-current={current ? "page" : undefined}
               onClick={onNavigate}
-              className={cn(
-                "rounded-md text-foreground/80 transition-colors hover:text-primary aria-[current=page]:font-semibold aria-[current=page]:text-primary",
-                linkClassName,
-              )}
+              className={cn("rounded-md transition-[color,opacity]", linkClassName)}
             >
               {item.label}
             </Link>

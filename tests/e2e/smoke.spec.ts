@@ -17,7 +17,9 @@ test.describe("public site", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "Sri Lankan home cooking, done properly.",
     );
-    await expect(page.getByRole("heading", { name: "Our signatures" })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: "The dishes people cross town for." }),
+    ).toBeVisible();
     await expect(page.getByRole("heading", { name: "Colombo 07" })).toBeVisible();
     await expect(page.getByText("Demo site")).toBeVisible();
     expect(errors).toEqual([]);

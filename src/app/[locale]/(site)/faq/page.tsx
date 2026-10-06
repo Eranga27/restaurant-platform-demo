@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 
 import { JsonLd } from "@/components/site/json-ld";
-import { Ornament } from "@/components/site/ornament";
+import { PageHeader } from "@/components/site/page-header";
 import { Splash } from "@/components/site/splash";
 import {
   Accordion,
@@ -49,7 +49,7 @@ export default async function FaqPage() {
   return (
     <>
       <Splash />
-      <div className="mx-auto w-full max-w-3xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
+      <div className="mx-auto w-full max-w-4xl px-4 pt-14 pb-24 sm:px-6 lg:px-8 lg:pt-24">
         <JsonLd
           data={{
             "@context": "https://schema.org",
@@ -61,8 +61,7 @@ export default async function FaqPage() {
             })),
           }}
         />
-        <Ornament className="mb-3" />
-        <h1 className="mb-8 text-display-xl text-primary">{t("title")}</h1>
+        <PageHeader eyebrow={brand.name} title={t("title")} />
         <Accordion
           type="single"
           collapsible

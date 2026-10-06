@@ -60,10 +60,10 @@ export default async function TrackPage({
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
       <header className="space-y-2">
-        <p className="text-sm font-medium tracking-[0.2em] text-secondary uppercase">
+        <p className="font-mono text-[0.7rem] font-medium tracking-[0.2em] text-muted-foreground uppercase">
           {t("title", { number: order.order_number })}
         </p>
-        <h1 className="text-display-lg text-balance text-primary">
+        <h1 className="text-display-xl text-balance">
           {t("thanks", { name: order.customer_name })}
         </h1>
         <p className="text-muted-foreground">{t("saveLink")}</p>

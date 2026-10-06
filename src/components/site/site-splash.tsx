@@ -56,7 +56,7 @@ export function SiteSplash({
   return (
     <div className="site-splash" aria-hidden>
       <div className="flex flex-col items-center gap-6 px-6 text-center">
-        <div className="relative size-36">
+        <div className="relative size-36 lg:size-48">
           <svg viewBox="0 0 120 120" className="absolute inset-0 size-full">
             {OUTER.map((angle, i) => (
               <g key={angle} transform={`rotate(${angle} 60 60)`}>
@@ -81,12 +81,19 @@ export function SiteSplash({
               </g>
             ))}
           </svg>
-          <div className="mark absolute inset-0 m-auto flex size-14 items-center justify-center rounded-full bg-background shadow-soft">
-            <Image src={mark} alt="" width={44} height={44} priority />
+          <div className="mark absolute inset-0 m-auto flex size-14 items-center justify-center rounded-full bg-background shadow-soft lg:size-18">
+            <Image
+              src={mark}
+              alt=""
+              width={56}
+              height={56}
+              priority
+              className="size-11 lg:size-14"
+            />
           </div>
         </div>
         <div className="words space-y-2">
-          <p className="font-display text-3xl text-primary">{name}</p>
+          <p className="font-display text-4xl text-primary lg:text-6xl">{name}</p>
           {/* The phone's own Sinhala and Tamil fonts: the site's web fonts for
               those scripts load only on pages in those languages. */}
           <p className="font-system text-sm tracking-[0.18em] text-muted-foreground">{greeting}</p>

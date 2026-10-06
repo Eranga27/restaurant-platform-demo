@@ -11,7 +11,7 @@ export function Logo({ brand, className }: { brand: Brand; className?: string })
       {brand.logo.wordmark ? (
         <Image src={brand.logo.wordmark} alt={brand.name} width={140} height={32} priority />
       ) : (
-        <span className="font-display text-xl leading-none text-primary">{brand.name}</span>
+        <span className="font-display text-2xl leading-none tracking-tight">{brand.name}</span>
       )}
     </Link>
   );

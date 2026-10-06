@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 import { InquiryForm } from "@/components/events/inquiry-form";
-import { Ornament } from "@/components/site/ornament";
+import { PageHeader } from "@/components/site/page-header";
 import { UnavailableNotice } from "@/components/site/unavailable-notice";
 import type { Locale } from "@/i18n/routing";
 import { contactPrefill } from "@/lib/auth/prefill";
@@ -50,12 +50,8 @@ export default async function EventsPage({ params }: PageProps<"/[locale]/events
   }));
 
   return (
-    <div className="mx-auto w-full max-w-5xl space-y-10 px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
-      <header className="max-w-3xl space-y-3">
-        <Ornament />
-        <h1 className="text-display-xl text-primary">{t("title")}</h1>
-        <p className="text-lg text-muted-foreground">{t("intro")}</p>
-      </header>
+    <div className="mx-auto w-full max-w-6xl space-y-14 px-4 pt-14 pb-24 sm:px-6 lg:px-8 lg:pt-24">
+      <PageHeader title={t("title")} intro={t("intro")} className="pb-0 lg:pb-0" />
 
       <section aria-labelledby="packages-title" className="space-y-4">
         <h2 id="packages-title" className="font-display text-2xl text-primary">

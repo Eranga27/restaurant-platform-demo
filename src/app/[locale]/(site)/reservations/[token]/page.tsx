@@ -61,10 +61,10 @@ export default async function ReservationPage({
   return (
     <div className="mx-auto w-full max-w-2xl space-y-6 px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
       <header className="space-y-2">
-        <p className="text-sm font-medium tracking-[0.2em] text-secondary uppercase">
+        <p className="font-mono text-[0.7rem] font-medium tracking-[0.2em] text-muted-foreground uppercase">
           {t("eyebrow", { reference: booking.reference })}
         </p>
-        <h1 className="text-display-lg text-balance text-primary">
+        <h1 className="text-display-xl text-balance">
           {t(`titles.${booking.status}`, { name: booking.guest_name })}
         </h1>
         {booking.status === "confirmed" && <p className="text-muted-foreground">{t("saveLink")}</p>}
