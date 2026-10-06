@@ -136,7 +136,7 @@ src/
   messages/       UI text in English, Sinhala and Tamil
   proxy.ts        Locale routing, per-request CSP and session refresh
 supabase/         Migrations and generated seed data
-scripts/          Seed, favicon and app icon generators, translation checker
+scripts/          Seed, favicon, app icon, map and hero video generators, translation checker
 tests/            unit/ (Vitest, including database tests on PGlite) and e2e/ (Playwright)
 docs/             Plan, decisions, security, credits, rebranding
 ```

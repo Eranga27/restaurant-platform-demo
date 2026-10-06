@@ -44,3 +44,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Source videos for scripts/build-hero-video.mjs (the built files are in public/media/hero/)
+/*.mp4
+/*.mov

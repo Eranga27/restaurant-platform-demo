@@ -250,6 +250,29 @@ test.describe("motion", () => {
     await expect(page.locator(".site-splash")).toHaveCount(0);
   });
 
+  test("the home video starts once the page has loaded, and stays paused when asked", async ({
+    page,
+  }) => {
+    const errors = trackErrors(page);
+    await page.goto("/");
+    // The splash covers the page on a first visit; it leaves by itself.
+    await expect(page.locator(".site-splash")).toHaveCount(0, { timeout: 6_000 });
+    const video = page.locator("video");
+    await page.getByRole("button", { name: "Pause the video" }).click();
+    await expect(page.getByRole("button", { name: "Play the video" })).toBeVisible();
+    expect(await video.evaluate((v: HTMLVideoElement) => v.currentSrc)).toMatch(/\/media\/hero\//);
+    expect(await video.evaluate((v: HTMLVideoElement) => v.paused)).toBe(true);
+
+    // The choice lasts for the visit.
+    await page.reload();
+    await expect(page.getByRole("button", { name: "Play the video" })).toBeVisible();
+    await page.getByRole("button", { name: "Play the video" }).click();
+    await expect
+      .poll(() => video.evaluate((v: HTMLVideoElement) => v.currentTime))
+      .toBeGreaterThan(0);
+    expect(errors).toEqual([]);
+  });
+
   test("sections below the fold rise in as they scroll into view", async ({ page }) => {
     const errors = trackErrors(page);
     await page.goto("/about");
@@ -263,6 +286,23 @@ test.describe("motion", () => {
 });
 
 test.describe("reduced motion", () => {
+  test("the home page keeps a still of the video and doesn't download it", async ({ page }) => {
+    const videos: string[] = [];
+    page.on("request", (request) => {
+      if (request.url().endsWith(".mp4")) videos.push(request.url());
+    });
+    await page.goto("/");
+    const still = page.locator("picture img");
+    await expect(still).toHaveJSProperty("complete", true);
+    expect(await still.evaluate((img: HTMLImageElement) => img.naturalWidth)).toBeGreaterThan(0);
+    // Past the point where the video would have started.
+    await page.evaluate(
+      () => new Promise((done) => requestIdleCallback(() => setTimeout(done, 500))),
+    );
+    expect(videos).toEqual([]);
+    await expect(page.getByRole("button", { name: /the video/ })).toHaveCount(0);
+  });
+
   test("shows everything straight away, with no splash", async ({ page }) => {
     await page.goto("/about");
     await expect(page.locator(".site-splash")).toBeHidden();

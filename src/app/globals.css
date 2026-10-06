@@ -352,17 +352,12 @@ html {
       calc(var(--reveal-delay, 0ms) + var(--i, 0) * 55ms);
   }
 
-  /* The home hero's entrance, line by line; after the splash on a first visit. */
-  .intro {
-    animation: intro-rise 900ms var(--ease-out-soft) both;
-    animation-delay: calc(var(--intro-start, 0ms) + var(--i, 0) * 110ms);
-  }
-  /* The hero headline: its words rise one after another on arrival. */
+  /* Page titles: their words rise one after another on arrival, after the splash on a first visit. */
   .intro-words .w > span {
     animation: word-rise 1100ms var(--ease-out-soft) both;
     animation-delay: calc(var(--intro-start, 0ms) + 150ms + var(--i, 0) * 70ms);
   }
-  :root:not([data-splash="seen"]):has(.site-splash) :is(.intro, .intro-words) {
+  :root:not([data-splash="seen"]):has(.site-splash) .intro-words {
     --intro-start: calc(var(--splash-hold) + 150ms);
   }
 }
@@ -373,19 +368,6 @@ html {
   }
 }
 
-@keyframes intro-rise {
-  from {
-    opacity: 0;
-    translate: 0 1.25rem;
-  }
-}
-
-/*
- * Scroll-linked depth, where the browser supports scroll-driven animations
- * (others show the page as it is): the hero photo drifts, photo bands move
- * a little slower than the page, and the header gains a shadow once the
- * page scrolls.
- */
 /* Header tones (src/components/site/site-header.tsx). */
 .site-header {
   --hdr-bg: color-mix(in srgb, var(--background) 84%, transparent);
@@ -405,10 +387,16 @@ html {
   animation: none;
 }
 
+/*
+ * Scroll-linked depth, where the browser supports scroll-driven animations
+ * (others show the page as it is): the home video sinks back and dims as the
+ * next section slides over it, photo bands move a little slower than the
+ * page, and the header gains a shadow once the page scrolls.
+ */
 @supports (animation-timeline: scroll()) {
   @media (prefers-reduced-motion: no-preference) {
-    .hero-drift {
-      animation: hero-drift linear both;
+    .hero-recede {
+      animation: hero-recede linear both;
       animation-timeline: scroll(root);
       animation-range: 0 100svh;
     }
@@ -425,9 +413,36 @@ html {
   }
 }
 
-@keyframes hero-drift {
+@keyframes hero-recede {
   to {
-    translate: 0 14%;
+    scale: 0.9;
+    translate: 0 -6%;
+    opacity: 0.35;
+  }
+}
+
+/* The hero's scroll cue: a light running down a hairline. */
+.scroll-cue::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: currentColor;
+  animation: scroll-cue 2.2s var(--ease-in-out-soft) infinite;
+}
+@keyframes scroll-cue {
+  from {
+    translate: 0 -100%;
+  }
+  to {
+    translate: 0 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue::after {
+    animation: none;
+    translate: 0 0;
+    scale: 1 0.4;
+    transform-origin: top;
   }
 }
 

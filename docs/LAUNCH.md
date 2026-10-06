@@ -45,6 +45,7 @@ Never upload `.env.local` (it can hold a Vercel token). Every variable is descri
 ## 4. Content
 
 - [ ] Menu, prices and photos are the client's own; stock photos credited in `docs/CREDITS.md`.
+- [ ] The home video is the client's (`node scripts/build-hero-video.mjs`, docs/REBRANDING.md), or `heroVideo: null` for a photo.
 - [ ] Home and About copy rewritten for the client (`src/messages/*.json`, `Home` and `About`).
 - [ ] Sinhala and Tamil reviewed by a native speaker.
 - [ ] Privacy, terms and refund policies reviewed by the client's lawyer (`src/content/legal`), aligned with the Personal Data Protection Act.
@@ -72,16 +73,18 @@ Never upload `.env.local` (it can hold a Vercel token). Every variable is descri
 - Watch Vercel's function logs and Supabase's logs for errors; flagged PayHere notifications appear in Admin → Payments.
 - Keep Dependabot updates merged. Rotate keys when someone leaves.
 
-## Quality at v1.1.0
+## Quality at v1.2.0
 
-Measured on a production build (`next start`), October 2026, after the design overhaul.
+Measured on a production build (`next start`), October 2026, with the hero video.
 
-| Check                                                          | Result                                                                                                           |
-| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Lighthouse, desktop (home)                                     | Performance 95, Accessibility 100, Best Practices 100                                                            |
-| Lighthouse, mobile (home, menu)                                | Performance 76 to 78, Accessibility 100, Best Practices 100                                                      |
-| Fonts on a first visit                                         | 83 KB                                                                                                            |
-| SEO                                                            | 61 in demo mode (indexing deliberately off); with indexing on and the real domain set, the remaining checks pass |
-| axe, WCAG 2.2 AA (16 pages and two dialogs, phone and desktop) | No violations                                                                                                    |
+| Check                                                          | Result                                                                                                                       |
+| -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Lighthouse, desktop (home)                                     | Performance 95, Accessibility 100, Best Practices 100                                                                        |
+| Lighthouse, mobile (home)                                      | Performance 70 to 76 over five runs (76 to 78 with the photo), Accessibility 100, Best Practices 100; LCP unchanged at 4.7 s |
+| Lighthouse, mobile (menu)                                      | Performance 76 to 78, Accessibility 100, Best Practices 100                                                                  |
+| Fonts on a first visit                                         | 83 KB                                                                                                                        |
+| Home video                                                     | 3.5 MB on desktop, 2.2 MB on phones (AV1), loaded after the page                                                             |
+| SEO                                                            | 61 in demo mode (indexing deliberately off); with indexing on and the real domain set, the remaining checks pass             |
+| axe, WCAG 2.2 AA (16 pages and two dialogs, phone and desktop) | No violations                                                                                                                |
 
-Lighthouse's mobile run simulates a slow 4G phone (1.6 Mbps): there, the framework's JavaScript and the web fonts share the line with the hero photo. The scroll animations load after the page appears, so they don't count against it. Ways to go further are in docs/DECISIONS.md (D71).
+Lighthouse's mobile run simulates a slow 4G phone (1.6 Mbps): there, the framework's JavaScript and the web fonts share the line with the hero's still. The video and the scroll animations load after the page appears; the few points the video costs come from starting the player, not from the download. Ways to go further are in docs/DECISIONS.md (D71).

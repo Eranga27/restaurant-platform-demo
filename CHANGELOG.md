@@ -4,6 +4,20 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [1.2.0] - Hero video
+
+### Added
+
+- The home page opens on a full-screen video of the kitchen, on its own under the header. Scrolling, the headline slides up over it on a sheet of paper while the video sinks back and dims.
+- A pause button on the video; the choice lasts for the visit.
+- A portrait cut of the video for phones, so it stays sharp on a tall screen.
+- `scripts/build-hero-video.mjs`: turns a client's video into the hero's files (seamless loop, two cuts, AV1 and H.264, stills).
+
+### Changed
+
+- The video went from 33.5 MB to 3.5 MB on desktop and 2.2 MB on phones, with no visible loss.
+- It loads after the page, over a still of its first frame; with reduced motion, data saver or a 2G connection, only the still shows.
+
 ## [1.1.0] - Phase 10: Design overhaul
 
 ### Added
