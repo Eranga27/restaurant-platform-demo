@@ -4,7 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { CartBar } from "@/components/cart/cart-bar";
 import { MenuBrowser } from "@/components/menu/menu-browser";
 import { JsonLd } from "@/components/site/json-ld";
-import { Ornament } from "@/components/site/ornament";
+import { PageHeader } from "@/components/site/page-header";
 import { Splash } from "@/components/site/splash";
 import { getPathname } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -41,14 +41,12 @@ export default async function MenuPage({ params }: PageProps<"/[locale]/menu">) 
       <Splash />
       <JsonLd data={menuJsonLd(brand, menu, getPathname({ locale, href: "/menu" }))} />
       {/* Extra room at the bottom on phones for the order bar. */}
-      <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-28 sm:px-6 md:pb-20 lg:pt-14">
-        <header data-reveal className="mb-8 max-w-2xl space-y-3">
-          <Ornament />
-          <h1 className="text-display-xl text-primary">{t("title")}</h1>
-          <p className="text-pretty text-muted-foreground">
-            {t("subtitle", { serviceCharge: brand.charges.serviceChargeBps / 100 })}
-          </p>
-        </header>
+      <div className="mx-auto w-full max-w-7xl px-4 pt-14 pb-28 sm:px-6 md:pb-20 lg:px-8 lg:pt-24">
+        <PageHeader
+          eyebrow={brand.tagline}
+          title={t("title")}
+          intro={t("subtitle", { serviceCharge: brand.charges.serviceChargeBps / 100 })}
+        />
         <MenuBrowser menu={menu} branches={branches.map((b) => ({ id: b.id, name: b.name }))} />
       </div>
       <CartBar />

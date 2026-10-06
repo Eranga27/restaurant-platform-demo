@@ -72,16 +72,16 @@ Never upload `.env.local` (it can hold a Vercel token). Every variable is descri
 - Watch Vercel's function logs and Supabase's logs for errors; flagged PayHere notifications appear in Admin → Payments.
 - Keep Dependabot updates merged. Rotate keys when someone leaves.
 
-## Quality at v1.0.0
+## Quality at v1.1.0
 
-Measured on a production build (`next start`), October 2026.
+Measured on a production build (`next start`), October 2026, after the design overhaul.
 
 | Check                                                          | Result                                                                                                           |
 | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Lighthouse, desktop (home, menu)                               | Performance 98, Accessibility 100, Best Practices 100                                                            |
-| Lighthouse, mobile (home, menu)                                | Performance 75 to 79, Accessibility 100, Best Practices 100                                                      |
-| Real page load, this machine                                   | Main image painted in about 1 s                                                                                  |
+| Lighthouse, desktop (home)                                     | Performance 95, Accessibility 100, Best Practices 100                                                            |
+| Lighthouse, mobile (home, menu)                                | Performance 76 to 78, Accessibility 100, Best Practices 100                                                      |
+| Fonts on a first visit                                         | 83 KB                                                                                                            |
 | SEO                                                            | 61 in demo mode (indexing deliberately off); with indexing on and the real domain set, the remaining checks pass |
 | axe, WCAG 2.2 AA (16 pages and two dialogs, phone and desktop) | No violations                                                                                                    |
 
-Lighthouse's mobile run simulates a slow 4G phone (1.6 Mbps): there, the framework's JavaScript and the two web fonts share the line with the hero photo. Ways to go further if a client needs it are in docs/DECISIONS.md (D71).
+Lighthouse's mobile run simulates a slow 4G phone (1.6 Mbps): there, the framework's JavaScript and the web fonts share the line with the hero photo. The scroll animations load after the page appears, so they don't count against it. Ways to go further are in docs/DECISIONS.md (D71).

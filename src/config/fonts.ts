@@ -1,4 +1,10 @@
-import { DM_Sans, Fraunces, Noto_Sans_Sinhala, Noto_Sans_Tamil } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  Instrument_Serif,
+  Noto_Sans_Sinhala,
+  Noto_Sans_Tamil,
+} from "next/font/google";
 
 /**
  * Brand typography. Fonts are self-hosted at build time by `next/font`, so a
@@ -7,23 +13,32 @@ import { DM_Sans, Fraunces, Noto_Sans_Sinhala, Noto_Sans_Tamil } from "next/font
  */
 
 /**
- * Headings: a warm, soft serif. Not preloaded: at 118 KB it would compete with
- * the hero photo on slow connections; headings show in a size-matched
- * fallback for a moment (behind the splash on a first visit), then swap.
+ * Headlines: an editorial serif, set very large, with italic accent words.
+ * One weight, roman and italic. Not preloaded, so it never competes with the
+ * hero photo; headlines show in a size-matched fallback for a moment.
  */
-export const displayFont = Fraunces({
+export const displayFont = Instrument_Serif({
+  weight: "400",
+  style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-display-latin",
-  axes: ["SOFT", "opsz"],
   display: "swap",
   preload: false,
 });
 
 /** Body and UI text. */
-export const bodyFont = DM_Sans({
+export const bodyFont = Geist({
   subsets: ["latin"],
   variable: "--font-body-latin",
   display: "swap",
+});
+
+/** Small labels, numbers and prices: chapter labels ("02 — Signatures"), times. */
+export const monoFont = Geist_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono-latin",
+  display: "swap",
+  preload: false,
 });
 
 // Sinhala and Tamil scripts. Not preloaded: only pages in those locales use them,
@@ -42,6 +57,6 @@ export const tamilFont = Noto_Sans_Tamil({
   preload: false,
 });
 
-export const fontVariables = [displayFont, bodyFont, sinhalaFont, tamilFont]
+export const fontVariables = [displayFont, bodyFont, monoFont, sinhalaFont, tamilFont]
   .map((font) => font.variable)
   .join(" ");

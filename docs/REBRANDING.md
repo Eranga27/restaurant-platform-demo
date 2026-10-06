@@ -45,14 +45,14 @@ With a database, change these in the admin panel (`/admin`). The starting data l
 
 ## 6. Fonts: `src/config/fonts.ts`
 
-Fonts are bundled at build time, so this one needs a deploy. Swap the `next/font/google` imports for `displayFont` and `bodyFont`, keeping the `variable` names. Pairings that suit the design:
+Fonts are bundled at build time, so this one needs a deploy. Swap the `next/font/google` imports for `displayFont` (headlines, with an italic for the accent words), `bodyFont` and `monoFont` (small labels and prices), keeping the `variable` names. Pairings that suit the design:
 
-| Feel                    | Display             | Body    |
-| ----------------------- | ------------------- | ------- |
-| Warm heritage (default) | Fraunces            | DM Sans |
-| Modern clean            | Plus Jakarta Sans   | Inter   |
-| Fine dining             | Cormorant Garamond  | Manrope |
-| Street food, bold       | Bricolage Grotesque | Figtree |
+| Feel                | Display (with italic) | Body    | Labels        |
+| ------------------- | --------------------- | ------- | ------------- |
+| Editorial (default) | Instrument Serif      | Geist   | Geist Mono    |
+| Warm heritage       | Fraunces              | DM Sans | DM Mono       |
+| Fine dining         | Cormorant Garamond    | Manrope | IBM Plex Mono |
+| Street food, bold   | Bricolage Grotesque   | Figtree | Space Mono    |
 
 ## 7. Settings that need no deploy
 

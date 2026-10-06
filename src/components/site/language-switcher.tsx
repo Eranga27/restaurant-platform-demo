@@ -30,17 +30,17 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "relative inline-flex h-8 items-center gap-1.5 rounded-lg border border-input bg-card px-2.5 text-sm",
-        "transition-colors hover:bg-muted has-[select:focus-visible]:ring-2 has-[select:focus-visible]:ring-ring",
+        "relative inline-flex h-10 items-center gap-1.5 rounded-full border border-[var(--hdr-border-strong,var(--input))] px-3 text-sm",
+        "transition-colors hover:bg-[var(--hdr-hover,var(--muted))] has-[select:focus-visible]:ring-2 has-[select:focus-visible]:ring-ring",
         isPending && "opacity-60",
         className,
       )}
     >
-      <Languages aria-hidden className="size-4 text-muted-foreground" />
+      <Languages aria-hidden className="size-4 opacity-70" />
       <span aria-hidden lang={locale}>
         {LOCALE_SHORT[locale]}
       </span>
-      <ChevronDown aria-hidden className="size-4 text-muted-foreground" />
+      <ChevronDown aria-hidden className="size-4 opacity-70" />
       <select
         aria-label={t("changeLanguage")}
         value={locale}

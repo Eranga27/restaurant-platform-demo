@@ -4,7 +4,7 @@ import { getFormatter, getTranslations } from "next-intl/server";
 import type { LegalDocument } from "@/content/legal";
 import { publicEnv } from "@/lib/public-env";
 
-import { Ornament } from "./ornament";
+import { PageHeader } from "./page-header";
 import { Splash } from "./splash";
 
 export async function LegalPage({ title, document }: { title: string; document: LegalDocument }) {
@@ -18,8 +18,7 @@ export async function LegalPage({ title, document }: { title: string; document: 
       <Splash />
       <article className="mx-auto w-full max-w-3xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
         <header className="mb-8 space-y-3">
-          <Ornament />
-          <h1 className="text-display-xl text-primary">{title}</h1>
+          <PageHeader title={title} className="pb-0 lg:pb-0" />
           <p className="text-sm text-muted-foreground">{t("updated", { date: updated })}</p>
         </header>
 

@@ -25,7 +25,7 @@ export function CategoryNav({ categories }: { categories: { slug: string; name: 
         if (visible[0]) setActive(visible[0].target.id);
       },
       // A band just below the sticky header and tabs.
-      { rootMargin: "-140px 0px -60% 0px" },
+      { rootMargin: "-170px 0px -60% 0px" },
     );
     sections.forEach((s) => observer.observe(s));
     return () => observer.disconnect();
@@ -40,11 +40,11 @@ export function CategoryNav({ categories }: { categories: { slug: string; name: 
   return (
     <nav
       aria-label={t("categories")}
-      className="sticky top-16 z-30 -mx-4 border-b bg-background/95 backdrop-blur sm:-mx-6"
+      className="sticky top-18 z-30 -mx-4 border-b border-current/10 bg-background/90 backdrop-blur-md sm:-mx-6 lg:-mx-8"
     >
       <ul
         ref={listRef}
-        className="flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 py-3 sm:px-6"
+        className="flex [scrollbar-width:none] gap-1 overflow-x-auto px-4 py-3 sm:px-6 lg:px-8"
       >
         {categories.map((c) => (
           <li key={c.slug} data-slug={c.slug} className="shrink-0">
@@ -52,10 +52,10 @@ export function CategoryNav({ categories }: { categories: { slug: string; name: 
               href={`#${c.slug}`}
               aria-current={active === c.slug ? "true" : undefined}
               className={cn(
-                "inline-flex h-9 items-center rounded-full border px-4 text-sm font-medium whitespace-nowrap transition-colors",
+                "inline-flex h-9 items-center rounded-full px-4 font-mono text-[0.7rem] tracking-[0.15em] whitespace-nowrap uppercase transition-colors",
                 active === c.slug
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "bg-card text-foreground/80 hover:border-primary/40 hover:text-primary",
+                  ? "bg-foreground text-background"
+                  : "text-foreground/70 hover:bg-muted hover:text-foreground",
               )}
             >
               {c.name}

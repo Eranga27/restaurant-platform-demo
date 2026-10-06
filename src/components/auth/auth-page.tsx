@@ -19,7 +19,7 @@ export async function AuthPage({ mode, next }: { mode: "sign-in" | "sign-up"; ne
   return (
     <div className="mx-auto w-full max-w-md px-4 pt-12 pb-20 sm:px-6">
       <div className="space-y-2 pb-8 text-center">
-        <h1 className="text-display-lg text-primary">
+        <h1 className="text-display-xl text-balance">
           {mode === "sign-in" ? t("signInTitle") : t("signUpTitle")}
         </h1>
         <p className="text-muted-foreground">

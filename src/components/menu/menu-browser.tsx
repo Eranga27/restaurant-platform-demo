@@ -108,9 +108,12 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
         <ItemQuerySync onChange={setOpenSlug} />
       </Suspense>
 
-      <div className="grid gap-4 rounded-2xl border bg-card p-4 shadow-soft sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-5">
+      <div className="grid gap-5 border-y border-current/12 py-6 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
         <div className="space-y-2">
-          <label htmlFor="menu-search" className="text-sm font-medium">
+          <label
+            htmlFor="menu-search"
+            className="font-mono text-[0.7rem] font-medium tracking-[0.2em] text-muted-foreground uppercase"
+          >
             {t("search")}
           </label>
           <div className="relative">
@@ -124,17 +127,23 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t("searchPlaceholder")}
-              className="pl-9"
+              className="h-11 rounded-full pl-9"
               autoComplete="off"
             />
           </div>
         </div>
         <div className="space-y-2">
-          <span id="branch-label" className="text-sm font-medium">
+          <span
+            id="branch-label"
+            className="font-mono text-[0.7rem] font-medium tracking-[0.2em] text-muted-foreground uppercase"
+          >
             {t("orderingFrom")}
           </span>
           <Select value={branchId} onValueChange={setBranchId}>
-            <SelectTrigger aria-labelledby="branch-label" className="h-10 w-full bg-card sm:w-56">
+            <SelectTrigger
+              aria-labelledby="branch-label"
+              className="h-11 w-full rounded-full bg-card px-4 sm:w-60"
+            >
               <SelectValue />
             </SelectTrigger>
             <SelectContent position="popper">
@@ -183,24 +192,30 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
           </Button>
         </div>
       ) : (
-        <div className="space-y-12">
-          {categories.map((category) => (
+        <div className="space-y-20">
+          {categories.map((category, index) => (
             <section
               key={category.id}
               id={category.slug}
               aria-labelledby={`${category.slug}-title`}
-              className="scroll-mt-36"
+              className="grid scroll-mt-40 gap-8 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)] lg:gap-16"
             >
-              <div data-reveal className="mb-4 space-y-1">
-                <Ornament className="w-20" />
-                <h2 id={`${category.slug}-title`} className="text-display-md text-primary">
+              <div data-reveal className="space-y-4 lg:sticky lg:top-44 lg:self-start">
+                <p className="font-mono text-xs tracking-[0.2em] text-muted-foreground tabular-nums">
+                  {String(index + 1).padStart(2, "0")} /{" "}
+                  {String(categories.length).padStart(2, "0")}
+                </p>
+                <h2 id={`${category.slug}-title`} className="text-display-lg text-balance">
                   {category.name}
                 </h2>
                 {category.description && (
-                  <p className="text-sm text-muted-foreground">{category.description}</p>
+                  <p className="max-w-sm text-sm text-pretty text-muted-foreground">
+                    {category.description}
+                  </p>
                 )}
+                <Ornament className="w-20" />
               </div>
-              <ul className="grid gap-4 md:grid-cols-2">
+              <ul className="border-b border-current/12">
                 {category.items.map((item) => (
                   <li key={item.id} data-reveal>
                     <MenuItemCard

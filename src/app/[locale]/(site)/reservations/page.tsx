@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { headers } from "next/headers";
 
 import { BookingForm } from "@/components/reservations/booking-form";
-import { Ornament } from "@/components/site/ornament";
+import { PageHeader } from "@/components/site/page-header";
 import { UnavailableNotice } from "@/components/site/unavailable-notice";
 import type { Locale } from "@/i18n/routing";
 import { contactPrefill } from "@/lib/auth/prefill";
@@ -50,12 +50,8 @@ export default async function ReservationsPage({
   const wanted = typeof query.branch === "string" ? query.branch : undefined;
 
   return (
-    <div className="mx-auto w-full max-w-4xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
-      <header className="mb-8 space-y-2">
-        <Ornament />
-        <h1 className="text-display-xl text-primary">{t("title")}</h1>
-        <p className="text-lg text-muted-foreground">{t("intro")}</p>
-      </header>
+    <div className="mx-auto w-full max-w-5xl px-4 pt-14 pb-24 sm:px-6 lg:px-8 lg:pt-24">
+      <PageHeader title={t("title")} intro={t("intro")} />
       <BookingForm
         branches={branches.map((b) => ({ id: b.id, slug: b.slug, name: b.name, city: b.city }))}
         initialBranchSlug={wanted}

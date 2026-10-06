@@ -1,11 +1,13 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
+import { Cursor } from "@/components/site/cursor";
 import { DemoRibbon } from "@/components/site/demo-ribbon";
 import { MotionObserver } from "@/components/site/motion-observer";
 import { PageTransition } from "@/components/site/page-transition";
 import { PoyaBanner } from "@/components/site/poya-banner";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { SmoothScroll } from "@/components/site/smooth-scroll";
 import type { Locale } from "@/i18n/routing";
 import { getBrand } from "@/lib/data/brand";
 import { getBranches, getTodaysHoliday } from "@/lib/data/catalogue";
@@ -33,12 +35,17 @@ export default async function SiteLayout({ children }: LayoutProps<"/[locale]">)
       </a>
       <DemoRibbon />
       <PoyaBanner holiday={holiday} />
-      <SiteHeader brand={brand} branches={branches.map((b) => ({ id: b.id, name: b.name }))} />
+      <SiteHeader
+        brand={brand}
+        branches={branches.map((b) => ({ id: b.id, name: b.name, phone: b.phone }))}
+      />
       <main id="main" tabIndex={-1} className="flex flex-1 flex-col outline-none">
         <PageTransition>{children}</PageTransition>
       </main>
       <SiteFooter brand={brand} branches={branches} />
       <MotionObserver />
+      <SmoothScroll />
+      <Cursor />
     </>
   );
 }

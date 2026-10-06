@@ -165,8 +165,8 @@ export const defaultBrand = brandSchema.parse({
     accent: "#e0a526",
     accentForeground: "#2a1a0e",
     // Coconut cream
-    background: "#fbf6ee",
-    foreground: "#2a1d14",
+    background: "#f4eee4",
+    foreground: "#1c140e",
   },
   contact: {
     // 000 blocks: unlikely to be anyone's real number. Calls are disabled in demo mode.

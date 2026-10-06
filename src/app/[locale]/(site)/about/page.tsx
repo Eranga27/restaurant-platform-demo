@@ -4,6 +4,7 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
 import { Ornament } from "@/components/site/ornament";
+import { PageHeader } from "@/components/site/page-header";
 import { Splash } from "@/components/site/splash";
 import { Button } from "@/components/ui/button";
 import { siteMedia } from "@/config/media";
@@ -36,12 +37,11 @@ export default async function AboutPage() {
   return (
     <>
       <Splash />
-      <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
+      <div className="mx-auto w-full max-w-7xl px-4 pt-14 pb-20 sm:px-6 lg:px-8 lg:pt-24">
         <div className="grid items-start gap-10 lg:grid-cols-[1.1fr_0.9fr]">
           <div className="space-y-6">
-            <Ornament />
-            <h1 className="text-display-xl text-primary">{t("title")}</h1>
-            <p className="font-display text-2xl text-pretty text-foreground">{t("lead")}</p>
+            <PageHeader title={t("title")} className="pb-0 lg:pb-0" />
+            <p className="font-display text-display-md text-pretty text-foreground">{t("lead")}</p>
             <p className="text-lg text-pretty text-foreground/85">{t("p1")}</p>
             <p className="text-lg text-pretty text-foreground/85">{t("p2")}</p>
             <p className="text-lg text-pretty text-foreground/85">{t("p3")}</p>
