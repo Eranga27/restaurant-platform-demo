@@ -12,6 +12,7 @@ import type { OpeningHours } from "@/lib/hours";
 import { formatLKR } from "@/lib/money";
 
 import { DishImage } from "@/components/site/dish-image";
+import { CURTAIN, LAMP } from "@/lib/transitions";
 import { HeroScene } from "./hero-scene";
 import { OpenNowBadge } from "./open-now-badge";
 
@@ -123,7 +124,7 @@ export async function Hero({
               size="lg"
               className="group bg-highlight text-highlight-foreground hover:bg-highlight/90"
             >
-              <Link href="/menu">
+              <Link href="/menu" transitionTypes={LAMP}>
                 {nav("orderNow")}
                 <ArrowRight
                   aria-hidden
@@ -137,7 +138,9 @@ export async function Hero({
               variant="outline"
               className="border-current/40 bg-transparent text-current hover:bg-white/10 hover:text-current"
             >
-              <Link href="/reservations">{nav("bookTable")}</Link>
+              <Link href="/reservations" transitionTypes={CURTAIN}>
+                {nav("bookTable")}
+              </Link>
             </Button>
           </div>
           <ul className="intro-fade mt-10 flex flex-wrap gap-x-7 gap-y-3 border-t border-current/20 pt-6 text-sm [--d:650ms]">
@@ -152,6 +155,7 @@ export async function Hero({
         {pick && (
           <Link
             href={{ pathname: "/menu", query: { item: pick.slug } }}
+            transitionTypes={LAMP}
             className="intro-fade group hidden overflow-hidden rounded-2xl border border-current/15 bg-black/30 backdrop-blur-md transition-[translate,background-color] duration-300 [--d:850ms] hover:-translate-y-1 hover:bg-black/40 active:scale-[0.98] lg:block"
           >
             <div className="relative aspect-[4/3] overflow-hidden">

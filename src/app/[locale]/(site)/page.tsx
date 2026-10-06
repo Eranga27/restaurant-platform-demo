@@ -30,6 +30,7 @@ import {
 } from "@/lib/data/catalogue";
 import { pageMetadata } from "@/lib/seo";
 import { restaurantJsonLd } from "@/lib/structured-data";
+import { CURTAIN, LAMP } from "@/lib/transitions";
 
 export async function generateMetadata({ params }: PageProps<"/[locale]">): Promise<Metadata> {
   const locale = (await params).locale as Locale;
@@ -122,7 +123,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             <p className="text-lg text-muted-foreground">{t("signatureSubtitle")}</p>
           </div>
           <Button asChild variant="outline" size="lg" className="group">
-            <Link href="/menu">
+            <Link href="/menu" transitionTypes={CURTAIN}>
               {t("viewFullMenu")}
               <ArrowRight
                 aria-hidden
@@ -222,6 +223,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
                   {promo.ctaHref && promo.ctaLabel && (
                     <Link
                       href={promo.ctaHref}
+                      transitionTypes={LAMP}
                       className="mt-auto inline-flex items-center gap-2 self-start rounded-full bg-highlight px-5 py-2.5 text-sm font-semibold text-highlight-foreground transition-colors hover:bg-highlight/90"
                     >
                       {promo.ctaLabel}
@@ -275,7 +277,9 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
               size="lg"
               className="bg-highlight text-highlight-foreground hover:bg-highlight/90"
             >
-              <Link href="/events">{t("eventsCta")}</Link>
+              <Link href="/events" transitionTypes={CURTAIN}>
+                {t("eventsCta")}
+              </Link>
             </Button>
           </div>
         </div>
@@ -363,14 +367,18 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           asChild
           className="h-11 flex-1 bg-highlight text-highlight-foreground hover:bg-highlight/90"
         >
-          <Link href="/menu">{nav("orderNow")}</Link>
+          <Link href="/menu" transitionTypes={LAMP}>
+            {nav("orderNow")}
+          </Link>
         </Button>
         <Button
           asChild
           variant="outline"
           className="h-11 flex-1 border-background/30 bg-transparent text-background hover:bg-background/10 hover:text-background"
         >
-          <Link href="/reservations">{nav("bookTable")}</Link>
+          <Link href="/reservations" transitionTypes={CURTAIN}>
+            {nav("bookTable")}
+          </Link>
         </Button>
       </StickyOrderBar>
     </>

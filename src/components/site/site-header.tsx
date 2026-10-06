@@ -7,6 +7,7 @@ import { LazyCartSheet } from "@/components/cart/lazy-cart-sheet";
 import { Button } from "@/components/ui/button";
 import type { Brand } from "@/config/brand";
 import { Link } from "@/i18n/navigation";
+import { CURTAIN, LAMP } from "@/lib/transitions";
 
 import { AccountMenu } from "./account-menu";
 import { LanguageSwitcher } from "./language-switcher";
@@ -64,10 +65,14 @@ export async function SiteHeader({
             variant="outline"
             className="hidden border-[var(--hdr-border-strong)] bg-transparent text-current hover:bg-[var(--hdr-hover)] hover:text-current xl:inline-flex"
           >
-            <Link href="/reservations">{t("bookTable")}</Link>
+            <Link href="/reservations" transitionTypes={CURTAIN}>
+              {t("bookTable")}
+            </Link>
           </Button>
           <Button asChild className="hidden md:inline-flex">
-            <Link href="/menu">{t("orderNow")}</Link>
+            <Link href="/menu" transitionTypes={LAMP}>
+              {t("orderNow")}
+            </Link>
           </Button>
           <CartButton />
           <MobileNav

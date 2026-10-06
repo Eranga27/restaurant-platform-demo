@@ -14,6 +14,7 @@ All notable changes to this project are documented here. The format is based on 
 - An "Order now · Book a table" bar on phones once the hero has scrolled away.
 - A saffron loading line at the top while the next page loads.
 - Press feedback on buttons, tabs, chips and cards.
+- Three page transitions: "Order now", dishes and offers open the next page in a circle from where you clicked; the header, menus and footer raise it like a curtain; the logo fades home.
 
 ### Changed
 

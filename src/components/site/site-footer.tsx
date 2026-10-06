@@ -6,6 +6,7 @@ import type { Brand } from "@/config/brand";
 import { Link } from "@/i18n/navigation";
 import type { BranchView } from "@/lib/data/catalogue";
 import { formatPhone } from "@/lib/phone";
+import { CURTAIN, LAMP } from "@/lib/transitions";
 
 import { ContactLink } from "./contact-link";
 import { Kolam } from "./kolam";
@@ -49,7 +50,9 @@ export async function SiteFooter({ brand, branches }: { brand: Brand; branches: 
               size="lg"
               className="bg-highlight text-highlight-foreground hover:bg-highlight/90"
             >
-              <Link href="/menu">{nav("orderNow")}</Link>
+              <Link href="/menu" transitionTypes={LAMP}>
+                {nav("orderNow")}
+              </Link>
             </Button>
             <Button
               asChild
@@ -57,7 +60,9 @@ export async function SiteFooter({ brand, branches }: { brand: Brand; branches: 
               variant="outline"
               className="border-[var(--border)] bg-transparent text-current hover:bg-white/5 hover:text-current"
             >
-              <Link href="/reservations">{nav("bookTable")}</Link>
+              <Link href="/reservations" transitionTypes={CURTAIN}>
+                {nav("bookTable")}
+              </Link>
             </Button>
           </div>
         </div>
@@ -120,7 +125,7 @@ export async function SiteFooter({ brand, branches }: { brand: Brand; branches: 
                 ] as const
               ).map(([href, label]) => (
                 <li key={href}>
-                  <Link href={href} className={link}>
+                  <Link href={href} transitionTypes={CURTAIN} className={link}>
                     {label}
                   </Link>
                 </li>
