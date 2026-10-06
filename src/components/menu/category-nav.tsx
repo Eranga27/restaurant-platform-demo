@@ -5,8 +5,12 @@ import { useEffect, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
-/** Sticky category tabs that follow the scroll position. */
-export function CategoryNav({ categories }: { categories: { slug: string; name: string }[] }) {
+/** Sticky category tabs, each with its number of dishes, that follow the scroll position. */
+export function CategoryNav({
+  categories,
+}: {
+  categories: { slug: string; name: string; count: number }[];
+}) {
   const t = useTranslations("Menu");
   const [active, setActive] = useState(categories[0]?.slug);
   const listRef = useRef<HTMLUListElement>(null);
@@ -40,11 +44,11 @@ export function CategoryNav({ categories }: { categories: { slug: string; name: 
   return (
     <nav
       aria-label={t("categories")}
-      className="sticky top-18 z-30 -mx-4 border-b border-current/10 bg-background/90 backdrop-blur-md sm:-mx-6 lg:-mx-8"
+      className="sticky top-18 z-30 -mx-4 bg-background/85 backdrop-blur-md sm:-mx-6 lg:-mx-8"
     >
       <ul
         ref={listRef}
-        className="flex [scrollbar-width:none] gap-1 overflow-x-auto px-4 py-3 sm:px-6 lg:px-8"
+        className="flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 py-3 sm:px-6 lg:px-8"
       >
         {categories.map((c) => (
           <li key={c.slug} data-slug={c.slug} className="shrink-0">
@@ -52,13 +56,21 @@ export function CategoryNav({ categories }: { categories: { slug: string; name: 
               href={`#${c.slug}`}
               aria-current={active === c.slug ? "true" : undefined}
               className={cn(
-                "inline-flex h-9 items-center rounded-full px-4 font-mono text-[0.7rem] tracking-[0.15em] whitespace-nowrap uppercase transition-colors",
+                "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-medium whitespace-nowrap transition-[background-color,color,border-color,scale] duration-200 active:scale-[0.97]",
                 active === c.slug
-                  ? "bg-foreground text-background"
-                  : "text-foreground/70 hover:bg-muted hover:text-foreground",
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card text-foreground/80 hover:border-foreground/30 hover:text-foreground",
               )}
             >
               {c.name}
+              <span
+                className={cn(
+                  "rounded-full px-1.5 text-xs tabular-nums",
+                  active === c.slug ? "bg-white/20" : "bg-muted text-muted-foreground",
+                )}
+              >
+                {c.count}
+              </span>
             </a>
           </li>
         ))}

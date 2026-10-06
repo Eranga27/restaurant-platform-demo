@@ -1,8 +1,8 @@
 # Handover
 
-Status and working notes for whoever picks this project up next, person or Claude session. Last updated 7 October 2026, at v1.3.0.
+Status and working notes for whoever picks this project up next, person or Claude session. Last updated 7 October 2026, at v2.0.0.
 
-**New Claude session: read this file first.** Then read `AGENTS.md` (project conventions), `docs/PLAN.md` (the original plan) and `docs/DECISIONS.md` (D1 to D87 and B1 to B7; these override the plan). Check facts against the repository: this file describes the state on the date above.
+**New Claude session: read this file first.** Then read `AGENTS.md` (project conventions), `docs/PLAN.md` (the original plan) and `docs/DECISIONS.md` (D1 to D94 and B1 to B7; these override the plan). Check facts against the repository: this file describes the state on the date above.
 
 ## 1. What this is
 
@@ -32,6 +32,7 @@ Everything planned is built, merged, tagged and live. There are no open pull req
 | v1.1.0  | Phase 10: editorial redesign (chapters, map, printed menu)           | #17    |
 | v1.2.0  | Home hero video with a curtain transition                            | #18    |
 | v1.3.0  | Restaurant feel: Sri Lankan palette, lamp splash, offer-first home   | #20    |
+| v2.0.0  | V2: staged splash, live hero, dish tabs, card menu, phone order bar  | #21    |
 
 The roadmap in `docs/PLAN.md` lists eight phases; the owner later added UI/UX polish before v1.0 (D48), and after it the design overhaul, the hero video and the restaurant-feel redesign (D81 to D87). `CHANGELOG.md` has the details of each release.
 
@@ -142,8 +143,9 @@ Environment variables are listed, by name, in `.env.example` and the README.
 
 - **Colours:** Kandyan lacquer red, saffron, curry leaf, coconut milk and kithul treacle. Three surfaces: cream, dark (`surface-ink`) and red (`surface-lacquer`).
 - **Type:** Fraunces for headlines (with italic accent words), DM Sans for text and small labels, Geist Mono only for figures in the staff screens.
-- **Splash:** an oil lamp (magul pahana) lights on lacquer red, then the panel lifts away.
-- **Home page:** the offer on the first screen, then bestsellers, why us, offers, branches, guests and events. The menu is set like a printed menu.
+- **Splash:** an oil lamp (magul pahana) lights on lacquer red, a loading line fills, then a circle opens from the flame into the page (about 3.6 s).
+- **Home page:** the offer on the first screen with a live open badge and a chef's pick, then dish tabs, why us, offers, events, branches and guests. A sticky order bar on phones.
+- **Menu:** a toolbar card, category pills with counts, and dish cards in a grid.
 - **Hero:** the kitchen video with the headline, the two buttons and the reasons to order over it (`hero-scene.tsx` and `hero.tsx`). The video loads after the page, over a still of its first frame. It has a pause button. With reduced motion, data saver or 2G, only the still shows.
 - **Motion:** everything respects `prefers-reduced-motion`.
 

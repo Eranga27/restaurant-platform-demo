@@ -4,8 +4,10 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
 import { BranchesMap } from "@/components/home/branches-map";
+import { DishTabs } from "@/components/home/dish-tabs";
 import { Hero } from "@/components/home/hero";
 import { ReviewCarousel } from "@/components/home/review-carousel";
+import { StickyOrderBar } from "@/components/home/sticky-order-bar";
 import { DishCard } from "@/components/site/dish-card";
 import { Eyebrow } from "@/components/site/eyebrow";
 import { JsonLd } from "@/components/site/json-ld";
@@ -18,7 +20,14 @@ import { siteMedia } from "@/config/media";
 import { getPathname, Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getBrand } from "@/lib/data/brand";
-import { getBranches, getPromotions, getReviews, getSignatureItems } from "@/lib/data/catalogue";
+import {
+  getBranches,
+  getMenu,
+  getPromotions,
+  getReviews,
+  getSignatureItems,
+  type MenuItemView,
+} from "@/lib/data/catalogue";
 import { pageMetadata } from "@/lib/seo";
 import { restaurantJsonLd } from "@/lib/structured-data";
 
@@ -39,20 +48,52 @@ const em = { em: (chunks: string) => `<em>${chunks}</em>` };
 /** What sets the kitchen apart, in the order a guest would care about it. */
 const REASONS = ["Spices", "Coconut", "Delivery"] as const;
 
+/** Dishes per tab, and how many with photos a category needs to get a tab. */
+const TAB_DISHES = 6;
+const MIN_TAB_DISHES = 3;
+const MAX_CATEGORY_TABS = 4;
+
+function DishGrid({ items }: { items: MenuItemView[] }) {
+  return (
+    <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+      {items.map((item, i) => (
+        <li key={item.id} style={{ "--n": i } as React.CSSProperties}>
+          <DishCard item={item} />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const locale = (await params).locale as Locale;
-  const [t, te, tc, brand, branches, signatures, promotions, reviews] = await Promise.all([
-    getTranslations("Home"),
-    getTranslations("Events"),
-    getTranslations("Common"),
-    getBrand(),
-    getBranches(locale),
-    getSignatureItems(locale),
-    getPromotions(locale),
-    getReviews(locale),
-  ]);
+  const [t, te, tc, nav, brand, branches, signatures, promotions, reviews, menu] =
+    await Promise.all([
+      getTranslations("Home"),
+      getTranslations("Events"),
+      getTranslations("Common"),
+      getTranslations("Nav"),
+      getBrand(),
+      getBranches(locale),
+      getSignatureItems(locale),
+      getPromotions(locale),
+      getReviews(locale),
+      getMenu(locale),
+    ]);
   const average = reviews.length ? reviews.reduce((n, r) => n + r.rating, 0) / reviews.length : 0;
   const rating = reviews.length ? average.toFixed(1) : null;
+  // "Most ordered", then the main categories that have enough dishes with photos.
+  const tabs = [
+    { key: "popular", label: t("tabPopular"), items: signatures },
+    ...menu.categories
+      .map((c) => ({
+        key: c.slug,
+        label: c.name,
+        items: c.items.filter((i) => i.imageUrl && !i.isAlcohol).slice(0, TAB_DISHES),
+      }))
+      .filter((tab) => tab.items.length >= MIN_TAB_DISHES)
+      .slice(0, MAX_CATEGORY_TABS),
+  ];
 
   return (
     <>
@@ -61,8 +102,10 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <Hero
         brand={brand}
         branchNames={branches.map((b) => b.name)}
+        hours={branches.map((b) => b.openingHours)}
         rating={rating}
         reviewCount={reviews.length}
+        pick={signatures.find((i) => i.imageUrl) ?? null}
       />
 
       <section
@@ -88,17 +131,16 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             </Link>
           </Button>
         </div>
-        <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 lg:gap-6">
-          {signatures.map((item, i) => (
-            <li
-              key={item.id}
-              data-reveal
-              style={{ "--reveal-delay": `${(i % 3) * 80}ms` } as React.CSSProperties}
-            >
-              <DishCard item={item} />
-            </li>
-          ))}
-        </ul>
+        <div data-reveal>
+          <DishTabs
+            label={t("tabsLabel")}
+            tabs={tabs.map((tab) => ({
+              key: tab.key,
+              label: tab.label,
+              panel: <DishGrid items={tab.items} />,
+            }))}
+          />
+        </div>
       </section>
 
       <section id="why" aria-labelledby="why-title" className="scroll-mt-24 surface-ink">
@@ -194,6 +236,52 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       )}
 
       <section
+        id="events"
+        aria-labelledby="events-title"
+        className="relative isolate scroll-mt-24 overflow-hidden surface-ink"
+      >
+        <div className="parallax absolute inset-x-0 -inset-y-[12%] -z-10">
+          <Image src={siteMedia.events} alt="" fill sizes="100vw" className="object-cover" />
+        </div>
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--foreground)_92%,transparent)_0%,color-mix(in_srgb,var(--foreground)_70%,transparent)_100%)]"
+        />
+        <div className="mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
+          <Eyebrow className="text-highlight">{t("eventsLabel")}</Eyebrow>
+          <h2
+            id="events-title"
+            data-reveal="words"
+            className="mt-5 max-w-3xl text-display-2xl text-balance"
+          >
+            <SplitWords markup={t.markup("eventsTitle", em)} />
+          </h2>
+          <div className="mt-10 grid gap-10 md:grid-cols-[minmax(0,32rem)_auto] md:items-end md:justify-between">
+            <div className="space-y-6">
+              <p className="text-lg text-pretty opacity-85">{t("eventsBody")}</p>
+              <ul className="flex flex-wrap gap-2">
+                {(["birthday", "office", "dana", "wedding", "homecoming"] as const).map((type) => (
+                  <li
+                    key={type}
+                    className="rounded-full border border-[var(--border)] px-3.5 py-1.5 text-sm"
+                  >
+                    {te(`types.${type}`)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <Button
+              asChild
+              size="lg"
+              className="bg-highlight text-highlight-foreground hover:bg-highlight/90"
+            >
+              <Link href="/events">{t("eventsCta")}</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      <section
         id="branches"
         aria-labelledby="branches-title"
         className="mx-auto w-full max-w-7xl scroll-mt-24 px-4 py-20 sm:px-6 lg:px-8 lg:py-28"
@@ -270,51 +358,21 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         </section>
       )}
 
-      <section
-        id="events"
-        aria-labelledby="events-title"
-        className="relative isolate scroll-mt-24 overflow-hidden surface-ink"
-      >
-        <div className="parallax absolute inset-x-0 -inset-y-[12%] -z-10">
-          <Image src={siteMedia.events} alt="" fill sizes="100vw" className="object-cover" />
-        </div>
-        <div
-          aria-hidden
-          className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--foreground)_92%,transparent)_0%,color-mix(in_srgb,var(--foreground)_70%,transparent)_100%)]"
-        />
-        <div className="mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
-          <Eyebrow className="text-highlight">{t("eventsLabel")}</Eyebrow>
-          <h2
-            id="events-title"
-            data-reveal="words"
-            className="mt-5 max-w-3xl text-display-2xl text-balance"
-          >
-            <SplitWords markup={t.markup("eventsTitle", em)} />
-          </h2>
-          <div className="mt-10 grid gap-10 md:grid-cols-[minmax(0,32rem)_auto] md:items-end md:justify-between">
-            <div className="space-y-6">
-              <p className="text-lg text-pretty opacity-85">{t("eventsBody")}</p>
-              <ul className="flex flex-wrap gap-2">
-                {(["birthday", "office", "dana", "wedding", "homecoming"] as const).map((type) => (
-                  <li
-                    key={type}
-                    className="rounded-full border border-[var(--border)] px-3.5 py-1.5 text-sm"
-                  >
-                    {te(`types.${type}`)}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <Button
-              asChild
-              size="lg"
-              className="bg-highlight text-highlight-foreground hover:bg-highlight/90"
-            >
-              <Link href="/events">{t("eventsCta")}</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
+      <StickyOrderBar watch="welcome" label={t("quickOrder")}>
+        <Button
+          asChild
+          className="h-11 flex-1 bg-highlight text-highlight-foreground hover:bg-highlight/90"
+        >
+          <Link href="/menu">{nav("orderNow")}</Link>
+        </Button>
+        <Button
+          asChild
+          variant="outline"
+          className="h-11 flex-1 border-background/30 bg-transparent text-background hover:bg-background/10 hover:text-background"
+        >
+          <Link href="/reservations">{nav("bookTable")}</Link>
+        </Button>
+      </StickyOrderBar>
     </>
   );
 }

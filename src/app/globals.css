@@ -309,8 +309,8 @@ body::after {
   --duration-base: 250ms;
   --duration-reveal: 700ms;
   /* When the splash screen is up, the hero's entrance waits for it. */
-  --splash-hold: 1250ms;
-  --splash-fade: 650ms;
+  --splash-hold: 2800ms;
+  --splash-fade: 800ms;
 }
 
 html {
@@ -488,9 +488,16 @@ html {
 /*
  * Splash screen on a full page load (src/components/site/site-splash.tsx): a
  * magul pahana, the oil lamp lit to open anything auspicious, is drawn in
- * saffron, its flame lights, and the lacquer panel lifts away like a curtain.
+ * saffron and its flame lights. Then its glow blooms and opens a circle from
+ * the flame that grows until the lacquer panel is gone: the lamp lights the
+ * room. Browsers that can't animate the circle fade the panel instead.
  * Timed in CSS, so it leaves even if JavaScript never runs.
  */
+@property --splash-hole {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
 .site-splash {
   position: fixed;
   inset: 0;
@@ -499,35 +506,65 @@ html {
   place-items: center;
   background: var(--primary);
   color: var(--primary-foreground);
-  animation: splash-out var(--splash-fade) var(--ease-in-out-soft) var(--splash-hold) forwards;
+  /* Where the flame sits: the middle of the screen, a little above the name. */
+  --flame-at: 50% calc(50% - 5.5rem);
+  mask: radial-gradient(
+    circle at var(--flame-at),
+    transparent var(--splash-hole),
+    #000 calc(var(--splash-hole) + 1px)
+  );
+  animation: splash-out var(--splash-fade) cubic-bezier(0.55, 0, 0.75, 0.2) var(--splash-hold)
+    forwards;
+}
+@media (min-width: 64rem) {
+  .site-splash {
+    --flame-at: 50% calc(50% - 6.75rem);
+  }
 }
 .site-splash .splash-content {
   animation: splash-content-out 380ms ease-in var(--splash-hold) forwards;
 }
 .site-splash .lamp-line {
   stroke-dasharray: 1;
-  animation: lamp-draw 650ms var(--ease-out-soft) both;
-  animation-delay: calc(var(--i) * 70ms);
+  animation: lamp-draw 800ms var(--ease-out-soft) both;
+  animation-delay: calc(150ms + var(--i) * 120ms);
 }
 .site-splash .lamp-flame {
   transform-box: fill-box;
   transform-origin: 50% 100%;
   animation:
-    flame-light 450ms var(--ease-out-soft) 520ms both,
-    flame-flicker 1.4s ease-in-out 970ms infinite alternate;
+    flame-light 500ms var(--ease-out-soft) 900ms both,
+    flame-flicker 1.4s ease-in-out 1400ms infinite alternate;
 }
 .site-splash .lamp-glow {
   transform-box: fill-box;
   transform-origin: center;
-  animation: glow-in 900ms var(--ease-out-soft) 560ms both;
+  animation:
+    glow-in 1000ms var(--ease-out-soft) 1000ms both,
+    glow-bloom 500ms ease-in calc(var(--splash-hold) - 150ms) forwards;
 }
-.site-splash .splash-words {
-  animation: splash-words-in 700ms var(--ease-out-soft) 420ms both;
+.site-splash .splash-name {
+  animation: splash-words-in 800ms var(--ease-out-soft) 1300ms both;
 }
-.site-splash .splash-edge {
-  position: absolute;
-  inset-inline: 0;
-  bottom: -0.875rem;
+.site-splash .splash-greeting {
+  animation: splash-words-in 700ms var(--ease-out-soft) 1700ms both;
+}
+/* Fills while the page gets ready, so the wait reads as loading. */
+.site-splash .splash-line {
+  display: block;
+  width: 8rem;
+  height: 1px;
+  margin-inline: auto;
+  background: color-mix(in srgb, var(--highlight) 25%, transparent);
+  animation: splash-words-in 500ms ease-out 1500ms both;
+}
+.site-splash .splash-line::after {
+  content: "";
+  display: block;
+  height: 100%;
+  background: var(--highlight);
+  transform-origin: left;
+  animation: splash-fill 1300ms var(--ease-in-out-soft) 1500ms both;
 }
 [data-splash="seen"] .site-splash {
   display: none;
@@ -539,9 +576,24 @@ html {
 }
 
 @keyframes splash-out {
+  70% {
+    opacity: 1;
+  }
   to {
-    translate: 0 -100%;
+    --splash-hole: 150%;
+    opacity: 0;
     visibility: hidden;
+  }
+}
+@keyframes splash-fill {
+  from {
+    scale: 0 1;
+  }
+}
+@keyframes glow-bloom {
+  to {
+    opacity: 1;
+    scale: 3.2;
   }
 }
 @keyframes splash-content-out {
@@ -587,6 +639,51 @@ html {
   from {
     opacity: 0;
     translate: 0 1rem;
+  }
+}
+
+/*
+ * Page loading line (src/components/site/nav-progress.tsx): eases most of the
+ * way while the next page loads, then completes and fades as it arrives.
+ */
+.nav-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 110;
+  height: 2px;
+  background: var(--highlight);
+  transform-origin: left;
+  scale: 0 1;
+  opacity: 0;
+  pointer-events: none;
+}
+.nav-progress[data-state="loading"] {
+  opacity: 1;
+  scale: 0.85 1;
+  transition: scale 2.5s cubic-bezier(0.1, 0.7, 0.2, 1);
+}
+.nav-progress[data-state="done"] {
+  opacity: 0;
+  scale: 1 1;
+  transition:
+    scale 200ms ease-out,
+    opacity 250ms ease-in 200ms;
+}
+
+/*
+ * Dish tabs (src/components/home/dish-tabs.tsx): the panel that comes in
+ * crossfades, its cards rising one after another (40ms apart).
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .dish-panel:not([hidden]) > ul > li {
+    animation: dish-in 450ms var(--ease-out-soft) both;
+    animation-delay: calc(var(--n, 0) * 40ms);
+  }
+}
+@keyframes dish-in {
+  from {
+    opacity: 0;
+    translate: 0 0.75rem;
   }
 }
 

@@ -2,6 +2,7 @@ import { getLocale, getTranslations } from "next-intl/server";
 
 import { DemoRibbon } from "@/components/site/demo-ribbon";
 import { MotionObserver } from "@/components/site/motion-observer";
+import { NavProgress } from "@/components/site/nav-progress";
 import { PageTransition } from "@/components/site/page-transition";
 import { PoyaBanner } from "@/components/site/poya-banner";
 import { SiteFooter } from "@/components/site/site-footer";
@@ -32,6 +33,7 @@ export default async function SiteLayout({ children }: LayoutProps<"/[locale]">)
       >
         {t("skipToContent")}
       </a>
+      <NavProgress />
       <DemoRibbon />
       <PoyaBanner holiday={holiday} />
       <SiteHeader

@@ -117,7 +117,7 @@
     "heroRating": "{rating} ★ from {count, plural, one {# review} other {# reviews}}",
     "heroFreeDelivery": "Free delivery over {amount}",
     "addDish": "Add",
-    "bestsellersLabel": "Most ordered",
+    "bestsellersLabel": "From our kitchen",
     "whyLabel": "Why guests come back",
     "whyTitle": "Cooked the way it's cooked <em>at home.</em>",
     "whySpicesTitle": "Spices roasted every morning",
@@ -130,7 +130,13 @@
     "branchesLabel": "Our kitchens",
     "guestsLabel": "Guests",
     "ratingCount": "from {count, plural, one {# review} other {# reviews}}",
-    "eventsLabel": "Events and catering"
+    "eventsLabel": "Events and catering",
+    "tabPopular": "Most ordered",
+    "tabsLabel": "Dishes by category",
+    "chefsPick": "Chef's pick",
+    "openNowCooking": "Open now · {count, plural, one {# kitchen} other {# kitchens}} cooking",
+    "closedOpensAt": "Closed now · opens at {time}",
+    "quickOrder": "Order or book"
   },
   "Menu": {
     "title": "Our menu",

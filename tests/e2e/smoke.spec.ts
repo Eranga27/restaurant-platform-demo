@@ -236,6 +236,37 @@ test.describe("installable app", () => {
   });
 });
 
+test.describe("home page", () => {
+  test("dish tabs switch by click and by arrow keys", async ({ page }) => {
+    await page.goto("/");
+    const tabs = page.getByRole("tablist", { name: "Dishes by category" });
+    const first = tabs.getByRole("tab", { name: "Most ordered" });
+    await expect(first).toHaveAttribute("aria-selected", "true");
+    await expect(
+      page.getByRole("tabpanel").getByRole("heading", { name: "Chicken kottu" }),
+    ).toBeVisible();
+
+    await tabs.getByRole("tab", { name: "Rice & Curry" }).click();
+    await expect(
+      page.getByRole("tabpanel").getByRole("heading", { name: "Fish rice & curry" }),
+    ).toBeVisible();
+
+    await page.keyboard.press("ArrowLeft");
+    await expect(first).toBeFocused();
+    await expect(first).toHaveAttribute("aria-selected", "true");
+  });
+
+  test("on a phone, the order bar comes in once the hero has gone", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "phones only");
+    await page.goto("/");
+    const bar = page.getByRole("group", { name: "Order or book", includeHidden: true });
+    await expect(bar).not.toBeInViewport();
+    await page.locator("#bestsellers").scrollIntoViewIfNeeded();
+    await expect(bar).toBeInViewport();
+    await expect(bar.getByRole("link", { name: "Order now" })).toHaveAttribute("href", "/menu");
+  });
+});
+
 test.describe("motion", () => {
   test.use({ contextOptions: { reducedMotion: "no-preference" } });
 
