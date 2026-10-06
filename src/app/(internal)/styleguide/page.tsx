@@ -308,8 +308,9 @@ export default function StyleguidePage() {
             header stays still.
           </li>
           <li>
-            <code>.parallax</code> and <code>.hero-drift</code> move photos with the scroll, where
-            the browser supports scroll-driven animations.
+            <code>.parallax</code> moves photos with the scroll and <code>.hero-recede</code> sinks
+            the home video back as the next section covers it, where the browser supports
+            scroll-driven animations.
           </li>
           <li>Everything is switched off for visitors who ask for reduced motion.</li>
         </ul>
