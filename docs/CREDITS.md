@@ -4,12 +4,13 @@ Third-party assets used in the demo. Every image, video, sound and icon set that
 
 ## Fonts
 
-| Font              | Source                    | Licence                   |
-| ----------------- | ------------------------- | ------------------------- |
-| Instrument Serif  | Google Fonts (Instrument) | SIL Open Font License 1.1 |
-| Geist, Geist Mono | Google Fonts (Vercel)     | SIL Open Font License 1.1 |
-| Noto Sans Sinhala | Google Fonts              | SIL Open Font License 1.1 |
-| Noto Sans Tamil   | Google Fonts              | SIL Open Font License 1.1 |
+| Font              | Source                   | Licence                   |
+| ----------------- | ------------------------ | ------------------------- |
+| Fraunces          | Google Fonts (Undercase) | SIL Open Font License 1.1 |
+| DM Sans           | Google Fonts (Colophon)  | SIL Open Font License 1.1 |
+| Geist Mono        | Google Fonts (Vercel)    | SIL Open Font License 1.1 |
+| Noto Sans Sinhala | Google Fonts             | SIL Open Font License 1.1 |
+| Noto Sans Tamil   | Google Fonts             | SIL Open Font License 1.1 |
 
 ## Map data
 

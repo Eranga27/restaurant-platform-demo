@@ -1,31 +1,24 @@
 import { cn } from "@/lib/utils";
 
 /**
- * A chapter label in small monospaced capitals: "02 — Signatures". The number
- * and the rule are decorative; the label is read as plain text.
+ * A short section label in small capitals, led by a saffron diamond (a nod to
+ * the lacquer and kolam patterns). The diamond is decorative.
  */
 export function Eyebrow({
-  index,
   children,
   className,
 }: {
-  index?: number;
   children: React.ReactNode;
   className?: string;
 }) {
   return (
     <p
       className={cn(
-        "flex items-center gap-3 font-mono text-[0.7rem] font-medium tracking-[0.2em] uppercase",
+        "flex items-center gap-2.5 text-xs font-semibold tracking-[0.16em] uppercase",
         className,
       )}
     >
-      {index !== undefined && (
-        <span aria-hidden className="tabular-nums">
-          {String(index).padStart(2, "0")}
-        </span>
-      )}
-      {index !== undefined && <span aria-hidden className="h-px w-8 bg-current opacity-40" />}
+      <span aria-hidden className="size-1.5 shrink-0 rotate-45 bg-highlight" />
       <span>{children}</span>
     </p>
   );

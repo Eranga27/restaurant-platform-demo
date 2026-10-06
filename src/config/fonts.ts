@@ -1,7 +1,7 @@
 import {
-  Geist,
+  DM_Sans,
+  Fraunces,
   Geist_Mono,
-  Instrument_Serif,
   Noto_Sans_Sinhala,
   Noto_Sans_Tamil,
 } from "next/font/google";
@@ -13,12 +13,12 @@ import {
  */
 
 /**
- * Headlines: an editorial serif, set very large, with italic accent words.
- * One weight, roman and italic. Not preloaded, so it never competes with the
- * hero photo; headlines show in a size-matched fallback for a moment.
+ * Headlines: a warm, soft serif with italic accent words. Variable weight only:
+ * its optical-size axis would double the download for a detail few would see.
+ * Not preloaded, so it never competes with the hero; headlines show in a
+ * size-matched fallback for a moment.
  */
-export const displayFont = Instrument_Serif({
-  weight: "400",
+export const displayFont = Fraunces({
   style: ["normal", "italic"],
   subsets: ["latin"],
   variable: "--font-display-latin",
@@ -26,14 +26,14 @@ export const displayFont = Instrument_Serif({
   preload: false,
 });
 
-/** Body and UI text. */
-export const bodyFont = Geist({
+/** Body and UI text: a friendly, very readable sans. */
+export const bodyFont = DM_Sans({
   subsets: ["latin"],
   variable: "--font-body-latin",
   display: "swap",
 });
 
-/** Small labels, numbers and prices: chapter labels ("02 — Signatures"), times. */
+/** Figures in the staff screens: times, order numbers and totals. */
 export const monoFont = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono-latin",

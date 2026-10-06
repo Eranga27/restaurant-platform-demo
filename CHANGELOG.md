@@ -4,6 +4,33 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [1.3.0] - Restaurant feel
+
+### Added
+
+- A Sri Lankan palette: Kandyan lacquer red, saffron, curry leaf, coconut milk and kithul treacle. New logo and app icon colours.
+- A new splash: an oil lamp (magul pahana) drawn in saffron lights its flame, then the red panel lifts away like a curtain.
+- The home page's first screen now carries the offer: the headline over the kitchen video, "Order now" and "Book a table", the guest rating, free delivery over Rs. 7,500, cash on delivery and halal options.
+- Bestsellers as cards with photo, price and "Add"; steam rises off the plate on hover.
+- "Why guests come back": three short reasons beside a photo.
+- A rating summary beside the guest quotes.
+
+### Changed
+
+- Headlines in Fraunces and text in DM Sans; small labels lose their numbers and the monospaced face.
+- A calmer headline scale, softer cards and rounder corners.
+- The home page keeps the essentials: bestsellers, why us, offers, branches, guests, events.
+- Menu and dish prices in whole rupees ("Rs. 1,450"). The cart and checkout keep cents.
+
+### Removed
+
+- The chapter labels and guide, the moving category band, the sideways signature row (and GSAP), and the cursor follower.
+
+### Fixed
+
+- Sections could stay blank after a quick scroll or a jump down the page.
+- The old splash's welcome line never animated (its animation was missing).
+
 ## [1.2.0] - Hero video
 
 ### Added

@@ -15,7 +15,7 @@ function accentLastWord(title: string): string {
 }
 
 /**
- * The top of a content page: a chapter label, a very large title whose last
+ * The top of a content page: a short label, a large title whose last
  * word is set in italic, rising word by word on arrival, and an intro.
  */
 export function PageHeader({

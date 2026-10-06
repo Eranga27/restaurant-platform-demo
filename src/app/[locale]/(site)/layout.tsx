@@ -1,6 +1,5 @@
 import { getLocale, getTranslations } from "next-intl/server";
 
-import { Cursor } from "@/components/site/cursor";
 import { DemoRibbon } from "@/components/site/demo-ribbon";
 import { MotionObserver } from "@/components/site/motion-observer";
 import { PageTransition } from "@/components/site/page-transition";
@@ -45,7 +44,6 @@ export default async function SiteLayout({ children }: LayoutProps<"/[locale]">)
       <SiteFooter brand={brand} branches={branches} />
       <MotionObserver />
       <SmoothScroll />
-      <Cursor />
     </>
   );
 }

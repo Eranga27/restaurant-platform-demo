@@ -50,7 +50,7 @@ export default function DeliveryMap({ value, onChange, areas, label }: DeliveryM
             key={a.id}
             center={[a.lat, a.lng]}
             radius={a.radiusKm * 1000}
-            pathOptions={{ color: "#2f5a3a", weight: 1, fillOpacity: 0.06 }}
+            pathOptions={{ color: "#1f4a36", weight: 1, fillOpacity: 0.06 }}
           />
         ))}
         <PickOnClick onPick={onChange} />

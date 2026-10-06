@@ -12,7 +12,7 @@ A white-label restaurant website and ordering platform, built as a sales demo fo
 
 ## Stack
 
-Next.js 16 (App Router, TypeScript strict), Tailwind CSS 4, shadcn/ui, GSAP and Lenis for scroll motion, Supabase (Postgres, Auth, Realtime, Storage), Zod, Vitest, Playwright. Hosted on Vercel. Everything runs on free tiers.
+Next.js 16 (App Router, TypeScript strict), Tailwind CSS 4, shadcn/ui, Lenis for smooth scrolling, Supabase (Postgres, Auth, Realtime, Storage), Zod, Vitest, Playwright. Hosted on Vercel. Everything runs on free tiers.
 
 ## Getting started
 
@@ -53,7 +53,7 @@ Ordering, tracking and accounts need Supabase; without it the checkout shows a "
 Without PayHere keys, customers pay in cash. To take payments online (sandbox, no real money):
 
 1. Create a free account at [sandbox.payhere.lk](https://sandbox.payhere.lk).
-2. In **Integrations**, add the production domain (for this demo `restaurant-platform-demo-alpha.vercel.app`) and copy the Merchant ID and the Merchant Secret shown next to the domain.
+2. In **Integrations**, add the production domain (for this demo `kithulco.vercel.app`) and copy the Merchant ID and the Merchant Secret shown next to the domain.
 3. In Vercel, add `PAYHERE_MERCHANT_ID`, `PAYHERE_MERCHANT_SECRET` (mark it sensitive) and `PAYHERE_SANDBOX=true` for **Production** only, then redeploy.
 
 PayHere only accepts payments started from the registered domain and must be able to reach `/api/payments/payhere/notify`, so online payment works on production, not on previews or localhost (docs/DECISIONS.md D32). Sandbox test card: `4916 2175 0161 1292`, any future expiry, any name and CVV. `4024 0071 9434 9121` is declined.

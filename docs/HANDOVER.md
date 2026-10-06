@@ -1,15 +1,15 @@
 # Handover
 
-Status and working notes for whoever picks this project up next, person or Claude session. Last updated 6 October 2026, at v1.2.0.
+Status and working notes for whoever picks this project up next, person or Claude session. Last updated 7 October 2026, at v1.3.0.
 
-**New Claude session: read this file first.** Then read `AGENTS.md` (project conventions), `docs/PLAN.md` (the original plan) and `docs/DECISIONS.md` (D1 to D80 and B1 to B7; these override the plan). Check facts against the repository: this file describes the state on the date above.
+**New Claude session: read this file first.** Then read `AGENTS.md` (project conventions), `docs/PLAN.md` (the original plan) and `docs/DECISIONS.md` (D1 to D87 and B1 to B7; these override the plan). Check facts against the repository: this file describes the state on the date above.
 
 ## 1. What this is
 
 A white-label online ordering platform for Sri Lankan restaurants, built as a sales demo. The demo brand is **Kithul & Co.**, a fictional restaurant with three branches (Colombo 07, Nugegoda, Kandy). Everything brand-specific comes from configuration, so the platform can be re-skinned for a real client (`docs/REBRANDING.md`).
 
 - **Owner:** Eranga Bowatte (GitHub `Eranga27`).
-- **Live site:** <https://restaurant-platform-demo-alpha.vercel.app> (production, deploys `main`).
+- **Live site:** <https://kithulco.vercel.app> (production, deploys `main`). The older `restaurant-platform-demo-alpha.vercel.app` redirects there.
 - **Repository:** <https://github.com/Eranga27/restaurant-platform-demo> (public).
 - **On the owner's laptop:** `D:\restaurant-site`, Windows 11, 16 GB RAM.
 
@@ -31,8 +31,9 @@ Everything planned is built, merged, tagged and live. There are no open pull req
 | v1.0.0  | Phase 9: hardening, accessibility, `/demo` tour, launch docs         | #16    |
 | v1.1.0  | Phase 10: editorial redesign (chapters, map, printed menu)           | #17    |
 | v1.2.0  | Home hero video with a curtain transition                            | #18    |
+| v1.3.0  | Restaurant feel: Sri Lankan palette, lamp splash, offer-first home   | #20    |
 
-The roadmap in `docs/PLAN.md` lists eight phases; the owner later added UI/UX polish before v1.0 (D48) and the design overhaul and hero video after it. `CHANGELOG.md` has the details of each release.
+The roadmap in `docs/PLAN.md` lists eight phases; the owner later added UI/UX polish before v1.0 (D48), and after it the design overhaul, the hero video and the restaurant-feel redesign (D81 to D87). `CHANGELOG.md` has the details of each release.
 
 **What the owner is doing now:** testing the whole site with `docs/TEST-GUIDE.md`, and working through the "Not set up yet" list in section 9.
 
@@ -67,7 +68,7 @@ The roadmap in `docs/PLAN.md` lists eight phases; the owner later added UI/UX po
     - `supabase-keepalive.yml`: pings the free project daily so it doesn't pause.
 - **Vercel:**
   - Connected to the GitHub repository. Each PR gets a preview link from the Vercel bot.
-  - Production is `https://restaurant-platform-demo-alpha.vercel.app`. Don't test `restaurant-platform-demo.vercel.app`: it belongs to an unrelated project. The `-eranga-bowatte.vercel.app` addresses sit behind Vercel's login.
+  - Production is `https://kithulco.vercel.app` (`NEXT_PUBLIC_SITE_URL` is set to it). Don't test `restaurant-platform-demo.vercel.app`: it belongs to an unrelated project. The `-eranga-bowatte.vercel.app` addresses sit behind Vercel's login.
 - **Supabase:**
   - Project "Sample-Restaurant", Tokyo region, Postgres 17, free plan.
   - All seven migrations in `supabase/migrations/` are applied on the hosted database.
@@ -90,7 +91,7 @@ Environment variables are listed, by name, in `.env.example` and the README.
 | Languages | next-intl 4 (English, Sinhala, Tamil)                                               |
 | Back end  | Supabase: Postgres with row-level security everywhere, Auth, Realtime, Storage      |
 | Services  | PayHere, Resend, Upstash rate limiting, Cloudflare Turnstile, Web Push              |
-| Motion    | GSAP and Lenis, loaded lazily                                                       |
+| Motion    | CSS (scroll-driven where supported) and Lenis, loaded lazily                        |
 | Tests     | Vitest (with PGlite for database and RLS tests), Playwright                         |
 
 **This is not the Next.js in most training data.** Read the guide in `node_modules/next/dist/docs/` before writing Next.js code. Differences that came up:
@@ -137,15 +138,13 @@ Environment variables are listed, by name, in `.env.example` and the README.
 - Check the session and role inside every protected page, Server Action and Route Handler.
 - Colour tokens live in `src/app/globals.css`; a unit test enforces WCAG AA contrast.
 
-**Design language** (D73 to D80):
+**Design language** (D81 to D87, on top of D76 and D80):
 
-- **Type:** Instrument Serif for headlines (with italic accent words), Geist for text, Geist Mono for small labels.
-- **Surfaces:** warm paper (`#f4eee4`) and dark "ink" sections (`#1c140e`, the `surface-ink` utility).
-- **Home page:**
-  - Numbered chapters with a floating chapter guide.
-  - A pinned sideways row of signature dishes (GSAP, large screens only).
-  - The menu is set like a printed menu.
-- **Hero:** the kitchen video, with the headline section sliding over it like a curtain (`hero-scene.tsx` and `hero.tsx`). The video loads after the page, over a still of its first frame. It has a pause button. With reduced motion, data saver or 2G, only the still shows.
+- **Colours:** Kandyan lacquer red, saffron, curry leaf, coconut milk and kithul treacle. Three surfaces: cream, dark (`surface-ink`) and red (`surface-lacquer`).
+- **Type:** Fraunces for headlines (with italic accent words), DM Sans for text and small labels, Geist Mono only for figures in the staff screens.
+- **Splash:** an oil lamp (magul pahana) lights on lacquer red, then the panel lifts away.
+- **Home page:** the offer on the first screen, then bestsellers, why us, offers, branches, guests and events. The menu is set like a printed menu.
+- **Hero:** the kitchen video with the headline, the two buttons and the reasons to order over it (`hero-scene.tsx` and `hero.tsx`). The video loads after the page, over a still of its first frame. It has a pause button. With reduced motion, data saver or 2G, only the still shows.
 - **Motion:** everything respects `prefers-reduced-motion`.
 
 ## 7. Checking your work
@@ -173,7 +172,7 @@ Environment variables are listed, by name, in `.env.example` and the README.
 
 - **Lighthouse:**
   - `npx lighthouse` hangs on this laptop. Install `lighthouse` into a temporary folder and run its CLI with `CHROME_PATH` set to Playwright's Chromium (`node -e "console.log(require('@playwright/test').chromium.executablePath())"`).
-  - Baselines at v1.2.0, all with accessibility 100:
+  - Baselines at v1.2.0, all with accessibility 100 (re-measure after v1.3.0; the fonts changed):
 
     | Page | Device  | Performance |
     | ---- | ------- | ----------- |
