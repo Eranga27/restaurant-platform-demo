@@ -4,12 +4,18 @@ Third-party assets used in the demo. Every image, video, sound and icon set that
 
 ## Fonts
 
-| Font              | Source                          | Licence                   |
-| ----------------- | ------------------------------- | ------------------------- |
-| Fraunces          | Google Fonts (Undercase Type)   | SIL Open Font License 1.1 |
-| DM Sans           | Google Fonts (Colophon Foundry) | SIL Open Font License 1.1 |
-| Noto Sans Sinhala | Google Fonts                    | SIL Open Font License 1.1 |
-| Noto Sans Tamil   | Google Fonts                    | SIL Open Font License 1.1 |
+| Font              | Source                    | Licence                   |
+| ----------------- | ------------------------- | ------------------------- |
+| Instrument Serif  | Google Fonts (Instrument) | SIL Open Font License 1.1 |
+| Geist, Geist Mono | Google Fonts (Vercel)     | SIL Open Font License 1.1 |
+| Noto Sans Sinhala | Google Fonts              | SIL Open Font License 1.1 |
+| Noto Sans Tamil   | Google Fonts              | SIL Open Font License 1.1 |
+
+## Map data
+
+| Data                      | Source                                                                 | Licence       |
+| ------------------------- | ---------------------------------------------------------------------- | ------------- |
+| Sri Lanka outline (1:10m) | Natural Earth, via the `world-atlas` package (`scripts/build-map.mjs`) | Public domain |
 
 ## Icons
 

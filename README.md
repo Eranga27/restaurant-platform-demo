@@ -12,7 +12,7 @@ A white-label restaurant website and ordering platform, built as a sales demo fo
 
 ## Stack
 
-Next.js 16 (App Router, TypeScript strict), Tailwind CSS 4, shadcn/ui, Supabase (Postgres, Auth, Realtime, Storage), Zod, Vitest, Playwright. Hosted on Vercel. Everything runs on free tiers.
+Next.js 16 (App Router, TypeScript strict), Tailwind CSS 4, shadcn/ui, GSAP and Lenis for scroll motion, Supabase (Postgres, Auth, Realtime, Storage), Zod, Vitest, Playwright. Hosted on Vercel. Everything runs on free tiers.
 
 ## Getting started
 

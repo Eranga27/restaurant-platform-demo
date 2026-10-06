@@ -9,18 +9,22 @@ A walk through everything the platform does, in plain steps. Use a phone and a l
 3. **Make a staff account** for one branch: sign up a second account (another email), then in Admin → Staff give it the "staff" role at Colombo 07.
 4. Online card payments are paused (PayHere isn't set up yet), so orders are paid in cash for now. Emails only arrive once Resend is set up.
 
-## 1. First impressions (Phase 8)
+## 1. First impressions (Phases 8 and 10)
 
-- [ ] **Splash:** open the home page in a new tab. The brand mark opens like a lotus, with "Welcome · ආයුබෝවන් · வணக்கம்", then fades by itself in under two seconds. Refresh: it doesn't come back in that tab. Open a new tab: it plays once more.
-- [ ] **Hero:** after the splash, the heading, text and buttons rise in one after another. Scrolling down, the photo drifts gently.
-- [ ] **Scroll animations:** keep scrolling. Headings, dish cards, offers, branches and reviews rise in as they appear.
-- [ ] **Page changes:** tap Menu, then Branches, then Our story. Each page fades in; the header stays still.
-- [ ] **Details:** a small gold lotus sits above section headings, a lotus border runs along the top of the footer, and the header gets a soft shadow once you scroll.
-- [ ] **Reduced motion:** on a phone with "Reduce motion" on (iPhone: Accessibility → Motion; Android: Accessibility → Remove animations), there's no splash and nothing moves.
+- [ ] **Splash:** open the home page in a new tab. The brand mark opens like a lotus, with "Welcome · ආයුබෝවන් · வணக்கம்", then fades by itself in under two seconds. Refresh: it doesn't come back in that tab.
+- [ ] **Hero:** the header is see-through over the photo; the headline rises word by word, with "done properly." in gold italics. Scrolling, the header turns solid.
+- [ ] **Smooth scrolling (laptop):** with a mouse or trackpad, scrolling glides. On a phone it's the phone's normal scrolling.
+- [ ] **Chapters:** keep scrolling. Each section has a small numbered label ("02 — Signatures"); on a laptop a dark guide at the bottom shows which chapter you're in, with arrows to move between them.
+- [ ] **Signatures (laptop):** when you reach the dishes, the section holds still and the row of dishes slides sideways as you scroll, then lets go. Over a dish, the pointer shows a gold "View" circle. On a phone, swipe the row.
+- [ ] **Branches:** a map of Sri Lanka with each branch pinned. Point at a branch in the list: its pin grows. "Use my location" adds you and sorts by distance.
+- [ ] **Guests:** one large quote at a time; it moves on by itself, and the arrows step through them.
+- [ ] **Explore menu:** tap "Explore" (top right). A full-screen menu with every page in large type, the branches' numbers and the time in Sri Lanka.
+- [ ] **Footer:** a last invitation to order or book, the branches, and the brand name across the full width.
+- [ ] **Reduced motion:** on a phone with "Reduce motion" on (iPhone: Accessibility → Motion; Android: Accessibility → Remove animations), there's no splash and nothing moves or glides.
 
 ## 2. Browsing
 
-- [ ] **Menu:** categories along the top follow you as you scroll; search ("kottu"), dietary filters (Vegetarian, Halal…) and the branch picker work. Dolphin kottu shows as sold out at Nugegoda.
+- [ ] **Menu:** it reads like a printed menu: numbered categories, dish names with dotted lines to the price. The category bar along the top follows you as you scroll; search ("kottu"), dietary filters (Vegetarian, Halal…) and the branch picker work. Dolphin kottu shows as sold out at Nugegoda.
 - [ ] **Dish window:** tap a dish. Choose a portion, add-ons, spice level and quantity; the price updates. Copy the link from the address bar into another tab: the same dish opens.
 - [ ] **Languages:** use the language menu (EN) in the header to switch to සිංහල, then தமிழ். The whole page changes; your place on the page stays.
 - [ ] **Branches, About, Contact, FAQ, policies:** all load, with opening hours and "Open now"/"Closed" for each branch.

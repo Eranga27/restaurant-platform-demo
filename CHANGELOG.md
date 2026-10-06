@@ -4,6 +4,29 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [1.1.0] - Phase 10: Design overhaul
+
+### Added
+
+- A new editorial look: very large serif headlines with italic accents, a clean sans for text, small monospaced chapter labels, pill buttons, and dark "ink" sections alternating with warm paper.
+- The home page as chapters: a full-screen hero under a transparent header, a moving band of the menu's categories, an opening statement with live counts, a pinned sideways row of signature dishes, this week's offers as a numbered list, a Sri Lanka map with every branch pinned, large guest quotes, the story and celebrations.
+- A floating chapter guide ("03 / 07 · Our kitchens") with a progress line on large screens.
+- Smooth scrolling for mouse and trackpad, headlines that rise word by word, and a cursor that labels dishes.
+- A full-screen "Explore" menu with every page in large type, the branches' numbers and the time in Sri Lanka.
+- A new footer: a last invitation to order or book, and the brand name edge to edge.
+- Kolam line patterns and a lotus border as Sri Lankan details.
+- The menu set like a printed menu, with numbered categories and dotted leaders to the prices.
+
+### Changed
+
+- Every content page opens with a large title whose last word is in italic.
+- The splash screen is larger on desktop, in the new typeface.
+- Fonts weigh about half as much as before (83 KB on a first visit).
+
+### Fixed
+
+- The offers heading and the branch count no longer name Kithul & Co. or "three" in the translations.
+
 ## [1.0.0] - Phase 9: Hardening and launch
 
 ### Added
