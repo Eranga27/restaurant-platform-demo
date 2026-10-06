@@ -7,7 +7,8 @@ import { useEffect, useState } from "react";
  * A thin saffron line along the top of the screen while the next page loads:
  * it starts when a link to another page of the site is clicked and finishes
  * when the new page arrives. Clicks that open a new tab, stay on the page
- * (anchors, ?item= links) or leave the site don't start it.
+ * (anchors, ?item= links) or leave the site don't start it. It also notes
+ * where the click was, for the "lamp" page transition.
  */
 export function NavProgress() {
   const pathname = usePathname();
@@ -29,10 +30,23 @@ export function NavProgress() {
       const url = new URL(link.href, window.location.href);
       if (url.origin !== window.location.origin) return;
       if (url.pathname === window.location.pathname) return;
+      // Where the "lamp" page transition opens from: the click (or the
+      // link's middle, from the keyboard), relative to the new page, which
+      // arrives scrolled to the top just under the header.
+      const box = link.getBoundingClientRect();
+      const keyboard = event.detail === 0;
+      const x = keyboard ? box.left + box.width / 2 : event.clientX;
+      const y = keyboard ? box.top + box.height / 2 : event.clientY;
+      const top = document.getElementById("main")?.offsetTop ?? 0;
+      const root = document.documentElement.style;
+      root.setProperty("--vt-x", `${x}px`);
+      root.setProperty("--vt-y", `${y - top}px`);
       setState("loading");
     };
-    document.addEventListener("click", onClick);
-    return () => document.removeEventListener("click", onClick);
+    // Capture phase: links cancel the browser's navigation in their own
+    // click handler, which would otherwise run first.
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
   }, []);
 
   useEffect(() => {

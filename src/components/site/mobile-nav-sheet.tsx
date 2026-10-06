@@ -7,6 +7,7 @@ import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/
 import { Link, usePathname } from "@/i18n/navigation";
 import { formatPhone } from "@/lib/phone";
 import { cn } from "@/lib/utils";
+import { CURTAIN } from "@/lib/transitions";
 
 import { Kolam } from "./kolam";
 import { LocalTime } from "./local-time";
@@ -57,6 +58,7 @@ export function MobileNavSheet({
                   <li key={item.href}>
                     <Link
                       href={item.href}
+                      transitionTypes={CURTAIN}
                       onClick={() => onOpenChange(false)}
                       aria-current={current ? "page" : undefined}
                       className={cn(

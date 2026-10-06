@@ -2,6 +2,7 @@
 
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
+import { CURTAIN } from "@/lib/transitions";
 
 export type NavItem = { href: string; label: string };
 
@@ -25,6 +26,7 @@ export function NavLinks({
           <li key={item.href}>
             <Link
               href={item.href}
+              transitionTypes={CURTAIN}
               aria-current={current ? "page" : undefined}
               onClick={onNavigate}
               className={cn("rounded-md transition-[color,opacity]", linkClassName)}
