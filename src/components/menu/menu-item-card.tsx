@@ -34,10 +34,7 @@ export function MenuItemCard({
   const unavailable = availability !== "available";
 
   return (
-    <article
-      data-cursor={unavailable ? undefined : t("view")}
-      className="group relative grid grid-cols-[minmax(0,1fr)_auto] gap-5 border-t border-current/12 py-6 focus-within:bg-accent/40"
-    >
+    <article className="group relative grid grid-cols-[minmax(0,1fr)_auto] gap-5 border-t border-current/12 py-6 focus-within:bg-accent/40">
       <div className="min-w-0 space-y-2">
         <div className="flex items-baseline gap-3">
           <h3 className="font-display text-2xl leading-tight sm:text-[1.75rem]">
@@ -63,7 +60,7 @@ export function MenuItemCard({
               unavailable && "text-muted-foreground line-through decoration-1",
             )}
           >
-            {formatLKR(priceCents)}
+            {formatLKR(priceCents, { whole: true })}
           </span>
         </div>
         {item.description && (

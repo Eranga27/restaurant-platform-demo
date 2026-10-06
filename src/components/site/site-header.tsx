@@ -52,7 +52,7 @@ export async function SiteHeader({
         <nav aria-label={t("mainNavigation")} className="hidden lg:block">
           <NavLinks
             items={items.slice(0, 5)}
-            className="flex items-center gap-7 text-sm"
+            className="flex items-center gap-6 text-sm whitespace-nowrap"
             linkClassName="relative py-2 text-current opacity-85 hover:opacity-100 aria-[current=page]:opacity-100 after:absolute after:inset-x-0 after:bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-500 after:ease-out-soft hover:after:scale-x-100 aria-[current=page]:after:scale-x-100"
           />
         </nav>

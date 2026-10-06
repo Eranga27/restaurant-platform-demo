@@ -8,11 +8,19 @@ const numberFormat = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 2,
 });
 
-/** `125000` → `"Rs. 1,250.00"`. Negative amounts (discounts) → `"-Rs. 100.00"`. */
-export function formatLKR(cents: number): string {
+const wholeFormat = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
+
+/**
+ * `125000` → `"Rs. 1,250.00"`. Negative amounts (discounts) → `"-Rs. 100.00"`.
+ * With `whole`, for prices shown on the menu and in marketing copy, whole
+ * rupees drop the cents: `"Rs. 1,250"`. Amounts with cents keep them.
+ */
+export function formatLKR(cents: number, { whole = false }: { whole?: boolean } = {}): string {
   assertCents(cents);
   const sign = cents < 0 ? "-" : "";
-  return `${sign}Rs. ${numberFormat.format(Math.abs(cents) / 100)}`;
+  const amount = Math.abs(cents);
+  const format = whole && amount % 100 === 0 ? wholeFormat : numberFormat;
+  return `${sign}Rs. ${format.format(amount / 100)}`;
 }
 
 /** Applies a basis-point rate (1000 = 10%), rounding half up to the nearest cent. */

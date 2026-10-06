@@ -3,6 +3,14 @@ import { describe, expect, it } from "vitest";
 import { applyBasisPoints, formatLKR } from "@/lib/money";
 
 describe("formatLKR", () => {
+  it("drops the cents of whole rupees when asked, and only then", () => {
+    expect(formatLKR(750_000, { whole: true })).toBe("Rs. 7,500");
+    expect(formatLKR(0, { whole: true })).toBe("Rs. 0");
+    expect(formatLKR(-10_000, { whole: true })).toBe("-Rs. 100");
+    expect(formatLKR(125_050, { whole: true })).toBe("Rs. 1,250.50");
+    expect(formatLKR(750_000)).toBe("Rs. 7,500.00");
+  });
+
   it("formats cents as rupees with grouping and two decimals", () => {
     expect(formatLKR(125_000)).toBe("Rs. 1,250.00");
     expect(formatLKR(0)).toBe("Rs. 0.00");

@@ -340,7 +340,7 @@ function OptionRow({
             ? showFree
               ? t("free")
               : null
-            : `${delta > 0 ? "+" : ""}${formatLKR(delta)}`}
+            : `${delta > 0 ? "+" : ""}${formatLKR(delta, { whole: true })}`}
         </span>
       </Label>
     </div>

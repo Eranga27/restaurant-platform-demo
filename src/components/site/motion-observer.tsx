@@ -40,7 +40,7 @@ export function MotionObserver() {
             reveal(entry.target as HTMLElement, Math.min(i, MAX_STAGGER) * STAGGER_MS);
           });
       },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.1 },
+      { rootMargin: "0px 0px -6% 0px", threshold: 0 },
     );
 
     const scan = () => {
@@ -48,8 +48,9 @@ export function MotionObserver() {
       document
         .querySelectorAll<HTMLElement>("[data-reveal]:not([data-reveal-state])")
         .forEach((el) => {
-          const { top, bottom } = el.getBoundingClientRect();
-          if (top < fold && bottom > 0) {
+          const { top } = el.getBoundingClientRect();
+          // On screen or above it: leave it be. Only what's still to come is hidden.
+          if (top < fold) {
             el.dataset.revealState = "done";
           } else {
             el.dataset.revealState = "hidden";
@@ -57,6 +58,22 @@ export function MotionObserver() {
           }
         });
     };
+
+    // Jumped past without ever being on screen (a fast flick, an anchor
+    // link): the observer never hears about those, so after each scroll,
+    // anything still hidden above the screen is shown as it is.
+    let scrollFrame = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(scrollFrame);
+      scrollFrame = requestAnimationFrame(() => {
+        document.querySelectorAll<HTMLElement>('[data-reveal-state="hidden"]').forEach((el) => {
+          if (el.getBoundingClientRect().bottom > 0) return;
+          observer.unobserve(el);
+          el.dataset.revealState = "done";
+        });
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     let frame = 0;
     const mutations = new MutationObserver(() => {
@@ -66,9 +83,15 @@ export function MotionObserver() {
     scan();
     mutations.observe(document.body, { childList: true, subtree: true });
     return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(scrollFrame);
       cancelAnimationFrame(frame);
       mutations.disconnect();
       observer.disconnect();
+      // Unwatched from here on: hand hidden elements back, so they're never stuck invisible.
+      document
+        .querySelectorAll<HTMLElement>('[data-reveal-state="hidden"]')
+        .forEach((el) => delete el.dataset.revealState);
     };
   }, []);
   return null;

@@ -11,15 +11,23 @@ function trackErrors(page: Page) {
 }
 
 test.describe("public site", () => {
-  test("home page renders the hero, signatures and branches", async ({ page }) => {
+  test("home page leads with the offer, then bestsellers and branches", async ({ page }) => {
     const errors = trackErrors(page);
     await page.goto("/");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "Sri Lankan home cooking, done properly.",
+      "Sri Lankan home cooking, hot at your door.",
     );
+    // The first screen says why to order now, and how.
+    const hero = page.locator("#welcome");
+    await expect(hero.getByRole("link", { name: "Order now" })).toHaveAttribute("href", "/menu");
+    await expect(hero.getByText("Free delivery over Rs. 7,500")).toBeVisible();
     await expect(
       page.getByRole("heading", { name: "The dishes people cross town for." }),
     ).toBeVisible();
+    // Each bestseller opens its dish on the menu, ready to add.
+    await expect(
+      page.locator("#bestsellers").getByRole("link", { name: /Chicken kottu/ }),
+    ).toHaveAttribute("href", "/menu?item=chicken-kottu");
     await expect(page.getByRole("heading", { name: "Colombo 07" })).toBeVisible();
     await expect(page.getByText("Demo site")).toBeVisible();
     expect(errors).toEqual([]);
@@ -63,7 +71,7 @@ test.describe("public site", () => {
     await page.goto("/si");
     await expect(page.locator("html")).toHaveAttribute("lang", "si");
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
-      "ශ්‍රී ලාංකේය ගෙදර කෑම, නියම විදිහට.",
+      "ශ්‍රී ලාංකේය ගෙදර කෑම, උණු උණුවේ ඔබේ දොරකඩටම.",
     );
   });
 
@@ -282,6 +290,28 @@ test.describe("motion", () => {
     await expect(values).toHaveAttribute("data-reveal-state", /shown|done/);
     await expect(values).toBeVisible();
     expect(errors).toEqual([]);
+  });
+
+  test("a jump down the page leaves nothing above it hidden", async ({ page }) => {
+    await page.goto("/about");
+    await expect(page.locator("li[data-reveal]").first()).toHaveAttribute(
+      "data-reveal-state",
+      "hidden",
+    );
+    // Straight to the bottom, as a fast flick or an anchor link would.
+    await page.evaluate(() =>
+      window.scrollTo({ top: document.body.scrollHeight, behavior: "instant" }),
+    );
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () =>
+            [...document.querySelectorAll<HTMLElement>("[data-reveal-state='hidden']")].filter(
+              (el) => el.getBoundingClientRect().bottom <= 0,
+            ).length,
+        ),
+      )
+      .toBe(0);
   });
 });
 

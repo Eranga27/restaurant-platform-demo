@@ -155,18 +155,19 @@ export const defaultBrand = brandSchema.parse({
     wordmark: null,
   },
   colors: {
-    // Kithul treacle brown
-    primary: "#6b3a1d",
-    primaryForeground: "#fffaf2",
+    // Kandyan lacquer red
+    primary: "#8c1d18",
+    primaryForeground: "#fff8ef",
     // Curry leaf green
-    secondary: "#2f5a3a",
-    secondaryForeground: "#f6fbf5",
-    // Turmeric gold
-    accent: "#e0a526",
-    accentForeground: "#2a1a0e",
-    // Coconut cream
-    background: "#f4eee4",
-    foreground: "#1c140e",
+    secondary: "#1f4a36",
+    secondaryForeground: "#f4faf5",
+    // Saffron and turmeric
+    accent: "#e9a31a",
+    accentForeground: "#2b1608",
+    // Coconut milk
+    background: "#fbf5ea",
+    // Kithul treacle, almost black
+    foreground: "#1f1410",
   },
   contact: {
     // 000 blocks: unlikely to be anyone's real number. Calls are disabled in demo mode.

@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { SPLASH_SEEN_KEY } from "@/lib/splash";
@@ -10,25 +9,24 @@ const REMOVE_AFTER = 3000;
 
 const subscribe = () => () => {};
 
-const OUTER = Array.from({ length: 8 }, (_, i) => i * 45);
-const INNER = OUTER.map((angle) => angle + 22.5);
+/** The lamp's outline, drawn in order: rim, bowl, stem, foot. */
+const LAMP_LINES = [
+  "M26 70h68",
+  "M30 70c4 15 15 22 30 22s26-7 30-22",
+  "M55 92v14M65 92v14",
+  "M44 106h32l7 11H37Z",
+];
 
 /**
- * The branded splash (see ./splash.tsx): the brand mark opens like a lotus
- * (the nil manel, Sri Lanka's national flower), with a welcome in the three
- * languages. Its timing is pure CSS (globals.css, .site-splash), so it fades
- * on its own even before or without JavaScript; this component only takes it
- * out of the page afterwards, and renders nothing after a client navigation.
+ * The branded splash (see ./splash.tsx): a magul pahana, the oil lamp lit to
+ * open anything auspicious, drawn in saffron on lacquer red. Its flame lights,
+ * the name and a welcome in the three languages rise, and the panel lifts away
+ * like a curtain. Its timing is pure CSS (globals.css, .site-splash), so it
+ * leaves on its own even before or without JavaScript; this component only
+ * takes it out of the page afterwards, and renders nothing after a client
+ * navigation.
  */
-export function SiteSplash({
-  name,
-  mark,
-  greeting,
-}: {
-  name: string;
-  mark: string;
-  greeting: string;
-}) {
+export function SiteSplash({ name, greeting }: { name: string; greeting: string }) {
   // True while hydrating the server's HTML, false when mounted by a client
   // navigation; the splash only ever plays on a full page load.
   const hydrating = useSyncExternalStore(
@@ -55,50 +53,51 @@ export function SiteSplash({
   if (!visible) return null;
   return (
     <div className="site-splash" aria-hidden>
-      <div className="flex flex-col items-center gap-6 px-6 text-center">
-        <div className="relative size-36 lg:size-48">
-          <svg viewBox="0 0 120 120" className="absolute inset-0 size-full">
-            {OUTER.map((angle, i) => (
-              <g key={angle} transform={`rotate(${angle} 60 60)`}>
-                <path
-                  className="petal"
-                  style={{ "--i": i } as React.CSSProperties}
-                  d="M60 60C51 46 51 23 60 6c9 17 9 40 0 54Z"
-                  fill={i % 2 ? "var(--highlight)" : "var(--primary)"}
-                  opacity={i % 2 ? 0.9 : 0.82}
-                />
-              </g>
+      <div className="splash-content flex flex-col items-center gap-6 px-6 text-center">
+        <svg viewBox="0 0 120 124" className="size-36 overflow-visible lg:size-44">
+          <defs>
+            <radialGradient id="splash-glow">
+              <stop offset="0" stopColor="var(--highlight)" stopOpacity="0.55" />
+              <stop offset="1" stopColor="var(--highlight)" stopOpacity="0" />
+            </radialGradient>
+            <linearGradient id="splash-flame" x1="0" y1="1" x2="0" y2="0">
+              <stop offset="0" stopColor="var(--highlight)" />
+              <stop offset="1" stopColor="var(--primary-foreground)" />
+            </linearGradient>
+          </defs>
+          <circle className="lamp-glow" cx="60" cy="48" r="44" fill="url(#splash-glow)" />
+          <path
+            className="lamp-flame"
+            d="M60 24c7 11 11 20 7.5 29a8 8 0 0 1-15 0C49 44 53 35 60 24Z"
+            fill="url(#splash-flame)"
+          />
+          <g
+            fill="none"
+            stroke="var(--highlight)"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M60 62v8" />
+            {LAMP_LINES.map((d, i) => (
+              <path
+                key={d}
+                className="lamp-line"
+                pathLength={1}
+                style={{ "--i": i } as React.CSSProperties}
+                d={d}
+              />
             ))}
-            {INNER.map((angle, i) => (
-              <g key={angle} transform={`rotate(${angle} 60 60)`}>
-                <path
-                  className="petal"
-                  style={{ "--i": i + 4 } as React.CSSProperties}
-                  d="M60 60c-5-9-5-22 0-32 5 10 5 23 0 32Z"
-                  fill="var(--secondary)"
-                  opacity={0.75}
-                />
-              </g>
-            ))}
-          </svg>
-          <div className="mark absolute inset-0 m-auto flex size-14 items-center justify-center rounded-full bg-background shadow-soft lg:size-18">
-            <Image
-              src={mark}
-              alt=""
-              width={56}
-              height={56}
-              priority
-              className="size-11 lg:size-14"
-            />
-          </div>
-        </div>
-        <div className="words space-y-2">
-          <p className="font-display text-4xl text-primary lg:text-6xl">{name}</p>
+          </g>
+        </svg>
+        <div className="splash-words space-y-3">
+          <p className="font-display text-5xl lg:text-7xl">{name}</p>
           {/* The phone's own Sinhala and Tamil fonts: the site's web fonts for
               those scripts load only on pages in those languages. */}
-          <p className="font-system text-sm tracking-[0.18em] text-muted-foreground">{greeting}</p>
+          <p className="font-system text-sm tracking-[0.18em] text-highlight">{greeting}</p>
         </div>
       </div>
+      <div aria-hidden className="splash-edge lotus-border" />
     </div>
   );
 }

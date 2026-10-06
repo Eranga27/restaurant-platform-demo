@@ -14,29 +14,29 @@
   --radius: 0.5rem;
 
   /* Surfaces */
-  --background: #f4eee4; /* paper */
-  --foreground: #1c140e; /* kithul ink */
-  --card: #fbf8f2;
-  --card-foreground: #1c140e;
-  --popover: #fbf8f2;
-  --popover-foreground: #1c140e;
+  --background: #fbf5ea; /* coconut milk */
+  --foreground: #1f1410; /* kithul treacle, almost black */
+  --card: #fffbf4;
+  --card-foreground: #1f1410;
+  --popover: #fffbf4;
+  --popover-foreground: #1f1410;
 
   /* Brand */
-  --primary: #6b3a1d; /* kithul treacle */
-  --primary-foreground: #fffaf2;
-  --secondary: #2f5a3a; /* curry leaf */
-  --secondary-foreground: #f6fbf5;
-  --highlight: #e0a526; /* turmeric */
-  --highlight-foreground: #2a1a0e;
+  --primary: #8c1d18; /* Kandyan lacquer red */
+  --primary-foreground: #fff8ef;
+  --secondary: #1f4a36; /* curry leaf */
+  --secondary-foreground: #f4faf5;
+  --highlight: #e9a31a; /* saffron and turmeric */
+  --highlight-foreground: #2b1608;
 
   /* Neutral UI (shadcn naming: `accent` is the subtle hover surface) */
-  --muted: #ebe3d6;
-  --muted-foreground: #5f4e3d;
-  --accent: #efe2c9;
-  --accent-foreground: #1c140e;
-  --border: #d9ccb8;
-  --input: #93806a; /* 3:1 on background and cards (WCAG 1.4.11) */
-  --ring: #b8741a; /* 3.5:1 on the background, for visible focus */
+  --muted: #f2e8d7;
+  --muted-foreground: #6b5443;
+  --accent: #f6e6c6;
+  --accent-foreground: #1f1410;
+  --border: #e6d6bd;
+  --input: #937e68; /* 3:1 on background and cards (WCAG 1.4.11) */
+  --ring: #b0681a; /* 3.5:1 on the background, for visible focus */
 
   /* Feedback */
   --destructive: #b3261e;
@@ -60,21 +60,21 @@
   --diet-nuts: #8a4b14;
 
   /* Charts (reports) */
-  --chart-1: #6b3a1d;
-  --chart-2: #2f5a3a;
-  --chart-3: #e0a526;
-  --chart-4: #b3261e;
+  --chart-1: #8c1d18;
+  --chart-2: #1f4a36;
+  --chart-3: #e9a31a;
+  --chart-4: #6b3a1d;
   --chart-5: #1f5f7a;
 
   /* Staff sidebar (dashboard, admin) */
-  --sidebar: #f6eee2;
-  --sidebar-foreground: #1c140e;
-  --sidebar-primary: #6b3a1d;
-  --sidebar-primary-foreground: #fffaf2;
+  --sidebar: #f7efe1;
+  --sidebar-foreground: #1f1410;
+  --sidebar-primary: #8c1d18;
+  --sidebar-primary-foreground: #fff8ef;
   --sidebar-accent: #ecdfca;
-  --sidebar-accent-foreground: #1c140e;
+  --sidebar-accent-foreground: #1f1410;
   --sidebar-border: #e2d2bb;
-  --sidebar-ring: #b8741a;
+  --sidebar-ring: #b0681a;
 }
 
 @theme inline {
@@ -145,21 +145,21 @@
     var(--font-mono-latin), var(--font-sinhala), var(--font-tamil), ui-monospace, SFMono-Regular,
     Menlo, monospace;
 
-  /* Editorial display sizes: very large, tight. Body text uses Tailwind's scale. */
-  --text-display-3xl: clamp(3.5rem, 0.6rem + 11.5vw, 13rem);
-  --text-display-3xl--line-height: 0.88;
-  --text-display-2xl: clamp(3rem, 1rem + 7vw, 7.75rem);
-  --text-display-2xl--line-height: 0.92;
-  --text-display-xl: clamp(2.6rem, 1.1rem + 5vw, 5.75rem);
-  --text-display-xl--line-height: 0.96;
-  --text-display-lg: clamp(2.1rem, 1.2rem + 3.1vw, 4rem);
-  --text-display-lg--line-height: 1;
-  --text-display-md: clamp(1.7rem, 1.25rem + 1.5vw, 2.6rem);
-  --text-display-md--line-height: 1.05;
+  /* Display sizes for headlines: generous but calm. Body text uses Tailwind's scale. */
+  --text-display-3xl: clamp(2.9rem, 1.2rem + 6.4vw, 7.25rem);
+  --text-display-3xl--line-height: 0.98;
+  --text-display-2xl: clamp(2.5rem, 1.2rem + 4.6vw, 5.5rem);
+  --text-display-2xl--line-height: 1;
+  --text-display-xl: clamp(2.15rem, 1.15rem + 3.4vw, 4.25rem);
+  --text-display-xl--line-height: 1.04;
+  --text-display-lg: clamp(1.85rem, 1.15rem + 2.3vw, 3.25rem);
+  --text-display-lg--line-height: 1.08;
+  --text-display-md: clamp(1.4rem, 1.1rem + 1vw, 2rem);
+  --text-display-md--line-height: 1.15;
 
   /* Warm-tinted shadows */
-  --shadow-soft: 0 1px 2px rgb(66 38 18 / 0.06), 0 4px 16px rgb(66 38 18 / 0.06);
-  --shadow-lifted: 0 2px 4px rgb(66 38 18 / 0.06), 0 12px 32px rgb(66 38 18 / 0.12);
+  --shadow-soft: 0 1px 2px rgb(80 24 14 / 0.06), 0 4px 16px rgb(80 24 14 / 0.07);
+  --shadow-lifted: 0 2px 4px rgb(80 24 14 / 0.06), 0 16px 40px rgb(80 24 14 / 0.14);
 
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
@@ -204,8 +204,8 @@
   h3,
   .font-display {
     font-family: var(--font-display);
-    font-weight: 400;
-    letter-spacing: -0.015em;
+    font-weight: 420;
+    letter-spacing: -0.02em;
   }
 
   /* Italic accent words in headlines ("done <em>properly.</em>"). */
@@ -252,24 +252,6 @@
   display: inline-block;
 }
 
-/* Marquee: two copies of the row move left as one loop. */
-.marquee-track {
-  animation: marquee 38s linear infinite;
-}
-.marquee:hover .marquee-track {
-  animation-play-state: paused;
-}
-@keyframes marquee {
-  to {
-    translate: -100% 0;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .marquee-track {
-    animation: none;
-  }
-}
-
 /* Lenis (smooth scrolling, src/components/site/smooth-scroll.tsx). */
 html.lenis,
 html.lenis body {
@@ -285,6 +267,26 @@ html.lenis body {
   overflow: clip;
 }
 
+/*
+ * On the public site, small labels and prices use the text face: the
+ * monospaced face stays for figures in the staff screens.
+ */
+body:has(.site-header) {
+  --font-mono-latin: var(--font-body-latin);
+}
+
+/*
+ * Lacquer sections: the brand red with cream text and saffron accents, after
+ * Kandyan lacquer work. Saffron is for large headline accents only here.
+ */
+@utility surface-lacquer {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  --em-color: var(--highlight);
+  --muted-foreground: color-mix(in srgb, var(--primary-foreground) 80%, var(--primary));
+  --border: color-mix(in srgb, var(--primary-foreground) 22%, var(--primary));
+}
+
 /* A faint paper grain over the whole site. Decorative; ignored by pointers. */
 body::after {
   content: "";
@@ -292,7 +294,7 @@ body::after {
   inset: 0;
   z-index: 60;
   pointer-events: none;
-  opacity: 0.05;
+  opacity: 0.035;
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
@@ -307,8 +309,8 @@ body::after {
   --duration-base: 250ms;
   --duration-reveal: 700ms;
   /* When the splash screen is up, the hero's entrance waits for it. */
-  --splash-hold: 1150ms;
-  --splash-fade: 450ms;
+  --splash-hold: 1250ms;
+  --splash-fade: 650ms;
 }
 
 html {
@@ -357,7 +359,12 @@ html {
     animation: word-rise 1100ms var(--ease-out-soft) both;
     animation-delay: calc(var(--intro-start, 0ms) + 150ms + var(--i, 0) * 70ms);
   }
-  :root:not([data-splash="seen"]):has(.site-splash) .intro-words {
+  /* Lines that follow a title in: they fade up after its words (`--d` staggers them). */
+  .intro-fade {
+    animation: intro-fade 900ms var(--ease-out-soft) both;
+    animation-delay: calc(var(--intro-start, 0ms) + var(--d, 350ms));
+  }
+  :root:not([data-splash="seen"]):has(.site-splash) :is(.intro-words, .intro-fade) {
     --intro-start: calc(var(--splash-hold) + 150ms);
   }
 }
@@ -365,6 +372,12 @@ html {
 @keyframes word-rise {
   from {
     translate: 0 108%;
+  }
+}
+@keyframes intro-fade {
+  from {
+    opacity: 0;
+    translate: 0 1rem;
   }
 }
 
@@ -415,34 +428,8 @@ html {
 
 @keyframes hero-recede {
   to {
-    scale: 0.9;
-    translate: 0 -6%;
-    opacity: 0.35;
-  }
-}
-
-/* The hero's scroll cue: a light running down a hairline. */
-.scroll-cue::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: currentColor;
-  animation: scroll-cue 2.2s var(--ease-in-out-soft) infinite;
-}
-@keyframes scroll-cue {
-  from {
-    translate: 0 -100%;
-  }
-  to {
-    translate: 0 100%;
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .scroll-cue::after {
-    animation: none;
-    translate: 0 0;
-    scale: 1 0.4;
-    transform-origin: top;
+    translate: 0 18%;
+    opacity: 0.55;
   }
 }
 
@@ -499,7 +486,9 @@ html {
 }
 
 /*
- * Splash screen on a full page load (src/components/site/site-splash.tsx).
+ * Splash screen on a full page load (src/components/site/site-splash.tsx): a
+ * magul pahana, the oil lamp lit to open anything auspicious, is drawn in
+ * saffron, its flame lights, and the lacquer panel lifts away like a curtain.
  * Timed in CSS, so it leaves even if JavaScript never runs.
  */
 .site-splash {
@@ -508,20 +497,37 @@ html {
   z-index: 100;
   display: grid;
   place-items: center;
-  background: var(--background);
+  background: var(--primary);
+  color: var(--primary-foreground);
   animation: splash-out var(--splash-fade) var(--ease-in-out-soft) var(--splash-hold) forwards;
 }
-.site-splash .petal {
-  transform-box: view-box;
-  transform-origin: 60px 60px;
-  animation: petal-bloom 700ms var(--ease-out-soft) both;
-  animation-delay: calc(var(--i) * 55ms);
+.site-splash .splash-content {
+  animation: splash-content-out 380ms ease-in var(--splash-hold) forwards;
 }
-.site-splash .mark {
-  animation: splash-mark 650ms var(--ease-out-soft) 120ms both;
+.site-splash .lamp-line {
+  stroke-dasharray: 1;
+  animation: lamp-draw 650ms var(--ease-out-soft) both;
+  animation-delay: calc(var(--i) * 70ms);
 }
-.site-splash .words {
-  animation: intro-rise 700ms var(--ease-out-soft) 380ms both;
+.site-splash .lamp-flame {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation:
+    flame-light 450ms var(--ease-out-soft) 520ms both,
+    flame-flicker 1.4s ease-in-out 970ms infinite alternate;
+}
+.site-splash .lamp-glow {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: glow-in 900ms var(--ease-out-soft) 560ms both;
+}
+.site-splash .splash-words {
+  animation: splash-words-in 700ms var(--ease-out-soft) 420ms both;
+}
+.site-splash .splash-edge {
+  position: absolute;
+  inset-inline: 0;
+  bottom: -0.875rem;
 }
 [data-splash="seen"] .site-splash {
   display: none;
@@ -534,20 +540,105 @@ html {
 
 @keyframes splash-out {
   to {
-    opacity: 0;
+    translate: 0 -100%;
     visibility: hidden;
   }
 }
-@keyframes petal-bloom {
-  from {
+@keyframes splash-content-out {
+  to {
     opacity: 0;
-    scale: 0.2;
+    translate: 0 -2.5rem;
   }
 }
-@keyframes splash-mark {
+@keyframes lamp-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes flame-light {
   from {
     opacity: 0;
-    scale: 0.6;
+    scale: 0.2 0.1;
+  }
+}
+@keyframes flame-flicker {
+  0% {
+    scale: 1 1;
+    rotate: -1.5deg;
+  }
+  50% {
+    scale: 0.94 1.06;
+  }
+  100% {
+    scale: 1.03 0.97;
+    rotate: 1.5deg;
+  }
+}
+@keyframes glow-in {
+  from {
+    opacity: 0;
+    scale: 0.4;
+  }
+}
+@keyframes splash-words-in {
+  from {
+    opacity: 0;
+    translate: 0 1rem;
+  }
+}
+
+/*
+ * Steam off a hot plate (src/components/site/dish-card.tsx): three soft wisps
+ * rise while the card is hovered. Decorative, and still for reduced motion.
+ */
+.steam {
+  position: absolute;
+  bottom: 38%;
+  left: 50%;
+  display: flex;
+  gap: 0.9rem;
+  translate: -50% 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 500ms var(--ease-out-soft);
+}
+.steam > span {
+  width: 0.55rem;
+  height: 4rem;
+  border-radius: 999px;
+  background: linear-gradient(to top, transparent, rgb(255 255 255 / 0.6), transparent);
+  filter: blur(6px);
+  animation: steam 2.6s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.55s);
+  animation-play-state: paused;
+}
+.group:hover .steam {
+  opacity: 1;
+}
+.group:hover .steam > span {
+  animation-play-state: running;
+}
+@keyframes steam {
+  0% {
+    opacity: 0;
+    translate: 0 1.5rem;
+    scale: 1 0.6;
+  }
+  40% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    translate: 0.5rem -3.5rem;
+    scale: 1.7 1.2;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .steam {
+    display: none;
   }
 }
 

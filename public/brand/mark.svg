@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Kithul &amp; Co.">
-  <circle cx="32" cy="32" r="32" fill="#6b3a1d"/>
-  <path d="M32 11C32 11 18.5 28.5 18.5 38.5a13.5 13.5 0 0 0 27 0C45.5 28.5 32 11 32 11Z" fill="#e0a526"/>
-  <path d="M25.5 41.5c3.2-6.4 8.4-10 14-11" fill="none" stroke="#fbf6ee" stroke-width="2.6" stroke-linecap="round"/>
-  <path d="M30.6 35.6c-1.9-2.4-2.4-5.1-1.6-7.8M35.4 32.2c.4-2.9 2-5.2 4.3-6.6" fill="none" stroke="#fbf6ee" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="32" cy="32" r="32" fill="#8c1d18"/>
+  <path d="M32 11C32 11 18.5 28.5 18.5 38.5a13.5 13.5 0 0 0 27 0C45.5 28.5 32 11 32 11Z" fill="#e9a31a"/>
+  <path d="M25.5 41.5c3.2-6.4 8.4-10 14-11" fill="none" stroke="#fff8ef" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M30.6 35.6c-1.9-2.4-2.4-5.1-1.6-7.8M35.4 32.2c.4-2.9 2-5.2 4.3-6.6" fill="none" stroke="#fff8ef" stroke-width="2" stroke-linecap="round"/>
 </svg>

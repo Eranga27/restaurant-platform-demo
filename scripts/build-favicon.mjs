@@ -35,7 +35,7 @@ console.log(`Wrote ${target} (${statSync(target).size} bytes)`);
 
 // App icons. "Maskable" icons keep the mark inside the middle 80% safe zone,
 // on the brand background, so Android can crop them to any shape.
-const BACKGROUND = "#f4eee4";
+const BACKGROUND = "#fbf5ea";
 mkdirSync("public/icons", { recursive: true });
 const render = (size) => sharp(svg, { density: 384 }).resize(size, size).png().toBuffer();
 async function padded(size, markShare) {

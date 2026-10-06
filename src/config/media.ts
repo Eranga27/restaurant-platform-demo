@@ -29,11 +29,11 @@ export const siteMedia: {
   events: string;
   branches: string;
 } = {
-  /** Home hero photo: rice and curry on a banana leaf. Shown when there's no video. */
+  /** Rice and curry on a banana leaf: the home hero when there's no video, and the home "why us" section. */
   hero: unsplash("photo-1742281095650-dd3c50c08772", 2400),
   /** Home hero video: a chef tossing a flaming wok. `null` shows the photo instead. */
   heroVideo,
-  /** Home story section and About page: a Sri Lankan restaurant at dusk. */
+  /** About page: a Sri Lankan restaurant at dusk. */
   story: unsplash("photo-1783125386230-18640102261a"),
   /** Home events section: a spread of curries. */
   events: unsplash("photo-1743525700011-afac212694d7"),
