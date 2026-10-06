@@ -29,9 +29,11 @@ At runtime, the `brand` JSON in the `settings` table overrides these defaults wi
 
 Replace `mark.svg`, the square mark used in the header and as the app icon, copy it to `src/app/icon.svg`, and run `npm run brand:favicon` to regenerate `src/app/favicon.ico`, the home-screen icons in `public/icons/` and `src/app/apple-icon.png`. By default the brand name is set in the display font next to the mark. If the client has a full wordmark image, add it here and set `logo.wordmark` in `brand.ts`.
 
-## 3. Photos: `src/config/media.ts`
+## 3. Video and photos: `src/config/media.ts`
 
-The home hero, story, events and branches photos. Use the client's own photography where possible; otherwise free stock, recorded in `docs/CREDITS.md`.
+**Home video.** With ffmpeg installed, run `node scripts/build-hero-video.mjs <video> --focus 0.5`. Any length from a few seconds works; 10 to 20 seconds of steady kitchen or dining-room footage loops best. `--focus` is where the action is across the frame (0 is the left edge, 1 the right), used to cut the portrait version for phones. The script writes the files to `public/media/hero/` and lists them in `src/data/hero-video.ts`; look at the two stills it makes and commit both. Keep the original out of the repository. For a photo instead, set `heroVideo: null` and the `hero` photo is used.
+
+**Photos.** The home hero (without a video), story, events and branches photos. Use the client's own photography where possible; otherwise free stock, recorded in `docs/CREDITS.md`.
 
 ## 4. Copy: `src/messages/{en,si,ta}.json`
 

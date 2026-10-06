@@ -12,7 +12,8 @@ A walk through everything the platform does, in plain steps. Use a phone and a l
 ## 1. First impressions (Phases 8 and 10)
 
 - [ ] **Splash:** open the home page in a new tab. The brand mark opens like a lotus, with "Welcome · ආයුබෝවන් · வணக்கம்", then fades by itself in under two seconds. Refresh: it doesn't come back in that tab.
-- [ ] **Hero:** the header is see-through over the photo; the headline rises word by word, with "done properly." in gold italics. Scrolling, the header turns solid.
+- [ ] **Hero video:** after the splash, the kitchen video fills the screen with only the header over it, and loops without a jump. Start scrolling: a sheet of paper with the headline slides up over the video, which shrinks back and darkens; the header turns solid as the sheet reaches it. The headline rises word by word, with "done properly." in italics.
+- [ ] **Pause:** the round button at the bottom right pauses the video; reload and it stays paused until you press play. On a phone held upright the video is a tall cut, still sharp.
 - [ ] **Smooth scrolling (laptop):** with a mouse or trackpad, scrolling glides. On a phone it's the phone's normal scrolling.
 - [ ] **Chapters:** keep scrolling. Each section has a small numbered label ("02 — Signatures"); on a laptop a dark guide at the bottom shows which chapter you're in, with arrows to move between them.
 - [ ] **Signatures (laptop):** when you reach the dishes, the section holds still and the row of dishes slides sideways as you scroll, then lets go. Over a dish, the pointer shows a gold "View" circle. On a phone, swipe the row.
@@ -20,7 +21,7 @@ A walk through everything the platform does, in plain steps. Use a phone and a l
 - [ ] **Guests:** one large quote at a time; it moves on by itself, and the arrows step through them.
 - [ ] **Explore menu:** tap "Explore" (top right). A full-screen menu with every page in large type, the branches' numbers and the time in Sri Lanka.
 - [ ] **Footer:** a last invitation to order or book, the branches, and the brand name across the full width.
-- [ ] **Reduced motion:** on a phone with "Reduce motion" on (iPhone: Accessibility → Motion; Android: Accessibility → Remove animations), there's no splash and nothing moves or glides.
+- [ ] **Reduced motion:** on a phone with "Reduce motion" on (iPhone: Accessibility → Motion; Android: Accessibility → Remove animations), there's no splash, the hero shows a still instead of the video, and nothing moves or glides.
 
 ## 2. Browsing
 
