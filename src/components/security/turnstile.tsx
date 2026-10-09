@@ -27,12 +27,15 @@ export function Turnstile({
   action,
   onToken,
   resetKey,
+  theme = "light",
 }: {
   nonce?: string;
   action: string;
   onToken?: (token: string | null) => void;
   /** Change to get a fresh token (tokens are single-use). */
   resetKey?: number;
+  /** "dark" on dark surfaces, such as the booking summary. */
+  theme?: "light" | "dark";
 }) {
   const container = useRef<HTMLDivElement>(null);
   const callback = useRef(onToken);
@@ -48,13 +51,13 @@ export function Turnstile({
       sitekey: publicEnv.turnstileSiteKey,
       action,
       size: "flexible",
-      theme: "light",
+      theme,
       callback: (token: string) => callback.current?.(token),
       "expired-callback": () => callback.current?.(null),
       "error-callback": () => callback.current?.(null),
     });
     return () => window.turnstile?.remove(id);
-  }, [ready, action, resetKey]);
+  }, [ready, action, resetKey, theme]);
 
   return (
     <>

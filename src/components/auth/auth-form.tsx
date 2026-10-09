@@ -98,7 +98,7 @@ export function AuthForm({
               link: (chunks) => (
                 <Link
                   href={{ pathname: "/signup", query: { next } }}
-                  className="font-medium text-primary underline-offset-4 hover:underline"
+                  className="link-sweep font-medium text-primary"
                 >
                   {chunks}
                 </Link>
@@ -108,7 +108,7 @@ export function AuthForm({
               link: (chunks) => (
                 <Link
                   href={{ pathname: "/login", query: { next } }}
-                  className="font-medium text-primary underline-offset-4 hover:underline"
+                  className="link-sweep font-medium text-primary"
                 >
                   {chunks}
                 </Link>

@@ -11,6 +11,7 @@ import { getBrand } from "@/lib/data/brand";
 import { getBranches } from "@/lib/data/catalogue";
 import { reservationsEnabled } from "@/lib/reservations/service";
 import { bookableDates } from "@/lib/reservations/slots";
+import { siteMedia } from "@/config/media";
 
 // Per-request nonce (strict CSP), today's dates and the signed-in user.
 export const dynamic = "force-dynamic";
@@ -50,8 +51,8 @@ export default async function ReservationsPage({
   const wanted = typeof query.branch === "string" ? query.branch : undefined;
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-4 pt-14 pb-24 sm:px-6 lg:px-8 lg:pt-24">
-      <PageHeader title={t("title")} intro={t("intro")} />
+    <div className="mx-auto w-full max-w-6xl px-4 pt-14 pb-24 sm:px-6 lg:px-8 lg:pt-24">
+      <PageHeader title={t("title")} intro={t("intro")} image={{ src: siteMedia.story }} />
       <BookingForm
         branches={branches.map((b) => ({ id: b.id, slug: b.slug, name: b.name, city: b.city }))}
         initialBranchSlug={wanted}

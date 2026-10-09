@@ -14,6 +14,7 @@ import { getBranches } from "@/lib/data/catalogue";
 import { formatTime, groupHours } from "@/lib/hours";
 import { formatPhone } from "@/lib/phone";
 import { pageMetadata } from "@/lib/seo";
+import { siteMedia } from "@/config/media";
 
 export async function generateMetadata({
   params,
@@ -36,7 +37,7 @@ export default async function BranchesPage({ params }: PageProps<"/[locale]/bran
     <>
       <Splash />
       <div className="mx-auto w-full max-w-7xl px-4 pt-14 pb-20 sm:px-6 lg:px-8 lg:pt-24">
-        <PageHeader title={t("title")} intro={t("subtitle")} />
+        <PageHeader title={t("title")} intro={t("subtitle")} image={{ src: siteMedia.branches }} />
 
         <div className="mb-10 h-72 overflow-hidden rounded-3xl border shadow-soft sm:h-96">
           <BranchMapLoader
@@ -57,7 +58,7 @@ export default async function BranchesPage({ params }: PageProps<"/[locale]/bran
               key={branch.id}
               id={branch.slug}
               data-reveal
-              className="flex scroll-mt-24 flex-col gap-5 rounded-2xl border bg-card p-6 shadow-soft"
+              className="flex scroll-mt-24 flex-col gap-5 rounded-2xl border bg-card p-6 shadow-soft transition-[translate,box-shadow,border-color] duration-500 ease-out-soft hover:-translate-y-1 hover:border-foreground/20 hover:shadow-lifted"
             >
               <div className="space-y-2">
                 <h2 className="font-display text-2xl text-primary">{branch.name}</h2>

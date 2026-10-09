@@ -1,4 +1,4 @@
-import { ArrowUp, Mail, MessageCircle, Phone } from "lucide-react";
+import { ArrowRight, ArrowUp, Mail, MessageCircle, Phone } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 
 import { Button } from "@/components/ui/button";
@@ -32,7 +32,7 @@ export async function SiteFooter({ brand, branches }: { brand: Brand; branches: 
   ].filter((s): s is typeof s & { href: string } => Boolean(s.href));
 
   return (
-    <footer className="relative mt-auto overflow-hidden surface-ink">
+    <footer className="site-footer relative mt-auto overflow-hidden rounded-t-[2rem] surface-ink lg:rounded-t-[2.5rem]">
       <div aria-hidden className="lotus-border opacity-70" />
       <Kolam
         size={9}
@@ -45,20 +45,17 @@ export async function SiteFooter({ brand, branches }: { brand: Brand; branches: 
             <SplitWords markup={t.markup("ctaTitle", { em: (c) => `<em>${c}</em>` })} />
           </h2>
           <div className="flex flex-wrap gap-3">
-            <Button
-              asChild
-              size="lg"
-              className="bg-highlight text-highlight-foreground hover:bg-highlight/90"
-            >
+            <Button asChild size="lg" variant="highlight">
               <Link href="/menu" transitionTypes={LAMP}>
                 {nav("orderNow")}
+                <ArrowRight aria-hidden className="size-4" />
               </Link>
             </Button>
             <Button
               asChild
               size="lg"
               variant="outline"
-              className="border-[var(--border)] bg-transparent text-current hover:bg-white/5 hover:text-current"
+              className="border-[var(--border)] bg-transparent text-current"
             >
               <Link href="/reservations" transitionTypes={CURTAIN}>
                 {nav("bookTable")}
@@ -178,7 +175,7 @@ export async function SiteFooter({ brand, branches }: { brand: Brand; branches: 
       </div>
 
       <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Wordmark text={brand.name} className="text-background/95" />
+        <Wordmark text={brand.name} className="wordmark-rise text-background/95" />
       </div>
 
       <div className="relative border-t border-[var(--border)]">

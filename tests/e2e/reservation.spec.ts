@@ -19,7 +19,8 @@ const local = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(supabaseUrl);
 test("a guest books a table, then cancels it", async ({ page }) => {
   test.setTimeout(90_000);
   await page.goto("/reservations");
-  await page.locator("#main").getByText("Colombo 07", { exact: true }).click();
+  // The branch's radio: the booking summary beside the form also names the branch.
+  await page.getByRole("radio", { name: "Colombo 07", exact: true }).click();
   // Tomorrow, so the test passes at any hour.
   await page.getByRole("radiogroup", { name: "Date" }).getByRole("radio").nth(1).click();
   const firstFree = page

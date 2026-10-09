@@ -193,6 +193,8 @@
   html {
     -webkit-tap-highlight-color: transparent;
     text-size-adjust: 100%;
+    /* Native radios, checkboxes and date pickers in the brand red, not the browser's blue. */
+    accent-color: var(--primary);
   }
 
   body {
@@ -238,6 +240,37 @@
   --em-color: var(--highlight);
   --muted-foreground: color-mix(in srgb, var(--background) 72%, var(--foreground));
   --border: color-mix(in srgb, var(--background) 16%, var(--foreground));
+  /* Outline buttons fill with paper on hover (see "Interaction" below). */
+  --btn-fill: var(--background);
+  --btn-fill-ink: var(--foreground);
+}
+
+/* Curry-leaf sections (guest reviews): the brand green with paper text. */
+@utility surface-leaf {
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+  --em-color: var(--highlight);
+  --muted-foreground: color-mix(in srgb, var(--secondary-foreground) 78%, var(--secondary));
+  --border: color-mix(in srgb, var(--secondary-foreground) 20%, var(--secondary));
+  --btn-fill: var(--secondary-foreground);
+  --btn-fill-ink: var(--secondary);
+}
+
+/*
+ * A link in running text: its underline draws in from the left on hover and
+ * slips away to the right when the pointer leaves.
+ */
+@utility link-sweep {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+  background-size: 0% 1px;
+  transition: background-size 500ms var(--ease-out-soft);
+  &:hover,
+  &:focus-visible {
+    background-position: 0 100%;
+    background-size: 100% 1px;
+  }
 }
 
 /* SplitWords: each word in its own clipping box (room for descenders and italics). */
@@ -285,6 +318,184 @@ body:has(.site-header) {
   --em-color: var(--highlight);
   --muted-foreground: color-mix(in srgb, var(--primary-foreground) 80%, var(--primary));
   --border: color-mix(in srgb, var(--primary-foreground) 22%, var(--primary));
+  --btn-fill: var(--primary-foreground);
+  --btn-fill-ink: var(--primary);
+}
+
+/* ---------------------------------------------------------------------------
+ * Interaction on the public site (docs/DECISIONS.md D98). Buttons: a colour
+ * sweeps up from the bottom on hover (pointer devices only, so a tap never
+ * leaves one filled) and a trailing arrow steps forward; they press in when
+ * tapped (button.tsx). Icon buttons keep the plain hover, so badges on them
+ * aren't clipped. The staff screens keep the plain shadcn behaviour.
+ * ------------------------------------------------------------------------- */
+:root {
+  /* What an outline button fills with on hover, and its text colour then. */
+  --btn-fill: var(--foreground);
+  --btn-fill-ink: var(--background);
+}
+@layer components {
+  body:has(.site-header)
+    [data-slot="button"]:is(
+      [data-variant="default"],
+      [data-variant="outline"],
+      [data-variant="highlight"]
+    ):not([data-size^="icon"]) {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    --btn-sweep: color-mix(in srgb, var(--primary) 70%, var(--foreground));
+  }
+  /* As specific as the rule above, and after it, so each variant keeps its own sweep. */
+  body:has(.site-header) [data-slot="button"][data-variant="highlight"]:not([data-size^="icon"]) {
+    --btn-sweep: color-mix(in srgb, var(--highlight) 76%, white);
+  }
+  body:has(.site-header) [data-slot="button"][data-variant="outline"]:not([data-size^="icon"]) {
+    --btn-sweep: var(--btn-fill);
+  }
+  /* Arrows in buttons and links step forward on hover. */
+  body:has(.site-header) :is(a, button) > svg:is(.lucide-arrow-right, .lucide-arrow-up-right) {
+    transition: translate 350ms var(--ease-out-soft);
+  }
+}
+@media (hover: hover) {
+  body:has(.site-header)
+    [data-slot="button"]:is(
+      [data-variant="default"],
+      [data-variant="outline"],
+      [data-variant="highlight"]
+    ):not([data-size^="icon"])::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--btn-sweep);
+    translate: 0 102%;
+    transition: translate 500ms var(--ease-out-soft);
+  }
+  body:has(.site-header)
+    [data-slot="button"]:is(
+      [data-variant="default"],
+      [data-variant="outline"],
+      [data-variant="highlight"]
+    ):not([data-size^="icon"]):hover::before {
+    translate: 0 0;
+  }
+  /* Unlayered on purpose: wins over the hover:text-* utilities buttons carry. */
+  body:has(.site-header)
+    [data-slot="button"][data-variant="outline"]:not([data-size^="icon"]):hover {
+    color: var(--btn-fill-ink);
+    border-color: var(--btn-fill);
+  }
+  body:has(.site-header) :is(a, button):hover > svg.lucide-arrow-right {
+    translate: 0.2rem 0;
+  }
+  body:has(.site-header) :is(a, button):hover > svg.lucide-arrow-up-right {
+    translate: 0.15rem -0.15rem;
+  }
+}
+
+/*
+ * Form fields on the public site: at least 44 px tall (touch targets), a
+ * darker edge on hover, and a soft glow around the focus ring. Unlayered so it
+ * also lifts fields that set a smaller height; shapes are left to each field.
+ */
+body:has(.site-header) :is([data-slot="input"], [data-slot="select-trigger"], select) {
+  min-height: 2.75rem;
+}
+body:has(.site-header)
+  :is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"]) {
+  transition:
+    border-color 200ms ease,
+    box-shadow 300ms var(--ease-out-soft),
+    background-color 200ms ease;
+}
+@media (hover: hover) {
+  body:has(.site-header)
+    :is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"]):hover:not(
+      :focus-visible,
+      [aria-invalid="true"],
+      :disabled
+    ) {
+    border-color: color-mix(in srgb, var(--foreground) 55%, var(--input));
+  }
+}
+body:has(.site-header)
+  :is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"]):focus-visible:not(
+    [aria-invalid="true"]
+  ) {
+  border-color: var(--ring);
+  box-shadow:
+    0 0 0 1px var(--ring),
+    0 0 0 5px color-mix(in srgb, var(--ring) 18%, transparent);
+}
+
+/*
+ * Home sections as sheets: each lays its rounded top over the end of the one
+ * before. On large screens, where scroll-driven animations are supported, a
+ * sheet also widens to the screen's edges as it comes up.
+ */
+.sheet {
+  position: relative;
+  margin-top: -2rem;
+  border-radius: 2rem 2rem 0 0;
+}
+@media (min-width: 64rem) {
+  .sheet {
+    margin-top: -2.5rem;
+    border-radius: 2.5rem 2.5rem 0 0;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {
+    .sheet {
+      animation: sheet-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+}
+/*
+ * The brand name across the bottom of the footer rises out of its own
+ * baseline as the footer scrolls up, following the scroll.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .wordmark-rise {
+      animation: wordmark-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+  }
+}
+@keyframes wordmark-rise {
+  from {
+    translate: 0 55%;
+    clip-path: inset(0 0 55% 0);
+  }
+  to {
+    translate: 0 0;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* After a page of sheets, the footer lays over the last one the same way. */
+body:has(.sheet) .site-footer {
+  margin-top: -2rem;
+}
+@media (min-width: 64rem) {
+  body:has(.sheet) .site-footer {
+    margin-top: -2.5rem;
+  }
+}
+@keyframes sheet-rise {
+  from {
+    clip-path: inset(0 3.5% 0 3.5% round 2.5rem 2.5rem 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 2.5rem 2.5rem 0 0);
+  }
 }
 
 /* A faint paper grain over the whole site. Decorative; ignored by pointers. */
@@ -309,8 +520,8 @@ body::after {
   --duration-base: 250ms;
   --duration-reveal: 700ms;
   /* When the splash screen is up, the hero's entrance waits for it. */
-  --splash-hold: 2800ms;
-  --splash-fade: 800ms;
+  --splash-hold: 3000ms;
+  --splash-fade: 750ms;
 }
 
 html {
@@ -333,6 +544,22 @@ html {
   [data-reveal="zoom"][data-reveal-state="hidden"] {
     translate: none;
     scale: 0.96;
+  }
+  /* Photos: wiped in from the bottom while the picture settles from a slight zoom. */
+  [data-reveal="image"][data-reveal-state="hidden"] {
+    opacity: 1;
+    translate: none;
+    clip-path: inset(100% 0 0 0);
+  }
+  [data-reveal="image"][data-reveal-state="hidden"] :is(img, video) {
+    scale: 1.14;
+  }
+  [data-reveal="image"][data-reveal-state="shown"] {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 1100ms cubic-bezier(0.77, 0, 0.18, 1) var(--reveal-delay, 0ms);
+  }
+  [data-reveal="image"][data-reveal-state="shown"] :is(img, video) {
+    transition: scale 1500ms var(--ease-out-soft) var(--reveal-delay, 0ms);
   }
   [data-reveal-state="shown"] {
     transition:
@@ -364,8 +591,31 @@ html {
     animation: intro-fade 900ms var(--ease-out-soft) both;
     animation-delay: calc(var(--intro-start, 0ms) + var(--d, 350ms));
   }
-  :root:not([data-splash="seen"]):has(.site-splash) :is(.intro-words, .intro-fade) {
+  /* A page's photo: wiped in from the bottom on arrival while it settles from a slight zoom. */
+  .intro-image {
+    animation: intro-wipe 1200ms cubic-bezier(0.77, 0, 0.18, 1) both;
+    animation-delay: calc(var(--intro-start, 0ms) + var(--d, 200ms));
+  }
+  .intro-image img {
+    animation: intro-settle 1800ms var(--ease-out-soft) both;
+    animation-delay: calc(var(--intro-start, 0ms) + var(--d, 200ms));
+  }
+  :root:not([data-splash="seen"]):has(.site-splash) :is(.intro-words, .intro-fade, .intro-image) {
     --intro-start: calc(var(--splash-hold) + 150ms);
+  }
+}
+
+@keyframes intro-wipe {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes intro-settle {
+  from {
+    scale: 1.16;
   }
 }
 
@@ -383,13 +633,15 @@ html {
 
 /* Header tones (src/components/site/site-header.tsx). */
 .site-header {
-  --hdr-bg: color-mix(in srgb, var(--background) 84%, transparent);
+  --hdr-bg: color-mix(in srgb, var(--background) 93%, transparent);
   --hdr-fg: var(--foreground);
   --hdr-border: color-mix(in srgb, var(--foreground) 10%, transparent);
   --hdr-border-strong: color-mix(in srgb, var(--foreground) 24%, transparent);
   --hdr-hover: color-mix(in srgb, var(--foreground) 6%, transparent);
 }
 :root[data-header-tone="light"] .site-header {
+  --btn-fill: var(--background);
+  --btn-fill-ink: var(--foreground);
   --hdr-bg: transparent;
   --hdr-fg: var(--background);
   --hdr-border: transparent;
@@ -549,86 +801,159 @@ html {
 }
 
 /*
- * Splash screen on a full page load (src/components/site/site-splash.tsx): a
- * magul pahana, the oil lamp lit to open anything auspicious, is drawn in
- * saffron and its flame lights. Then its glow blooms and opens a circle from
- * the flame that grows until the lacquer panel is gone: the lamp lights the
- * room. Browsers that can't animate the circle fade the panel instead.
- * Timed in CSS, so it leaves even if JavaScript never runs.
+ * Splash screen on a full page load (src/components/site/site-splash.tsx),
+ * "the first drop": a thread of kithul treacle runs down the dark screen and
+ * swells into a drop (the SVG "goo" filter gives it a liquid neck). The drop
+ * falls and lands in the brand's mark, which blooms as rings ripple out; the
+ * name rises letter by letter with the welcome, while a counter runs to 100.
+ * Then the page opens through the mark: it grows past the screen while a
+ * circle opens from its middle. Browsers that can't animate the circle fade
+ * the panel instead. Timed in CSS, so it leaves even if JavaScript never runs.
+ *
+ * Beats: thread 0 to 0.45 s, drop swells 0.3 to 1.15 s, falls 1.15 to 1.53 s,
+ * mark and rings from 1.5 s, name from 1.65 s, welcome from 2.05 s, counter
+ * 0.1 to 2.9 s, page from --splash-hold (3 s) for --splash-fade (0.75 s).
  */
 @property --splash-hole {
   syntax: "<length-percentage>";
   inherits: false;
   initial-value: 0%;
 }
+@property --splash-count {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
 .site-splash {
   position: fixed;
   inset: 0;
   z-index: 100;
-  display: grid;
-  place-items: center;
-  background: var(--primary);
-  color: var(--primary-foreground);
-  /* Where the flame sits: the middle of the screen, a little above the name. */
-  --flame-at: 50% calc(50% - 5.5rem);
+  overflow: hidden;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--highlight) 9%, var(--foreground)) 0%,
+    var(--foreground) 55%
+  );
+  color: var(--background);
+  --mark: 7rem;
+  /* Where the drop lands: the round of the drop in the mark, a little below its middle. */
+  --land: calc(var(--mark) * 0.1);
   mask: radial-gradient(
-    circle at var(--flame-at),
-    transparent var(--splash-hole),
-    #000 calc(var(--splash-hole) + 1px)
+    circle at 50% 50%,
+    transparent calc(var(--splash-hole) - 1px),
+    #000 var(--splash-hole)
   );
   animation: splash-out var(--splash-fade) cubic-bezier(0.55, 0, 0.75, 0.2) var(--splash-hold)
     forwards;
 }
 @media (min-width: 64rem) {
   .site-splash {
-    --flame-at: 50% calc(50% - 6.75rem);
+    --mark: 8rem;
   }
 }
 .site-splash .splash-content {
+  position: absolute;
+  inset: 0;
   animation: splash-content-out 380ms ease-in var(--splash-hold) forwards;
 }
-.site-splash .lamp-line {
-  stroke-dasharray: 1;
-  animation: lamp-draw 800ms var(--ease-out-soft) both;
-  animation-delay: calc(150ms + var(--i) * 120ms);
-}
-.site-splash .lamp-flame {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
+
+/* The mark lands in the middle of the screen, then carries the page in. */
+.site-splash .splash-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--mark);
+  height: var(--mark);
+  translate: -50% -50%;
+  scale: 0;
   animation:
-    flame-light 500ms var(--ease-out-soft) 900ms both,
-    flame-flicker 1.4s ease-in-out 1400ms infinite alternate;
+    mark-in 650ms cubic-bezier(0.34, 1.56, 0.64, 1) 1500ms forwards,
+    mark-through var(--splash-fade) cubic-bezier(0.55, 0, 0.75, 0.2) var(--splash-hold) forwards;
 }
-.site-splash .lamp-glow {
+
+/* The pour, drawn 1:1 in CSS pixels so its vh offsets line up with the screen. */
+.site-splash .splash-pour {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;
+  height: 160px;
+  translate: -50% -50%;
+  overflow: visible;
+}
+.site-splash .pour-stream {
+  translate: 0 -56vh;
+  animation:
+    stream-in 450ms var(--ease-out-soft) forwards,
+    stream-out 360ms cubic-bezier(0.5, 0, 0.9, 0.5) 1150ms forwards;
+}
+.site-splash .pour-fall {
+  translate: 0 calc(-24vh + 4px);
+  animation: drop-fall 380ms cubic-bezier(0.55, 0, 0.95, 0.45) 1150ms forwards;
+}
+.site-splash .pour-drop {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  scale: 0.15;
+  animation:
+    drop-swell 850ms var(--ease-in-out-soft) 300ms forwards,
+    drop-land 260ms ease-out 1530ms forwards;
+}
+.site-splash .pour-ring {
+  fill: none;
+  stroke: var(--highlight);
+  stroke-width: 1.2;
   transform-box: fill-box;
   transform-origin: center;
-  animation:
-    glow-in 1000ms var(--ease-out-soft) 1000ms both,
-    glow-bloom 500ms ease-in calc(var(--splash-hold) - 150ms) forwards;
+  translate: 0 var(--land);
+  opacity: 0;
+  animation: ring 1100ms cubic-bezier(0.2, 0.7, 0.3, 1) calc(1530ms + var(--ring, 0) * 170ms)
+    forwards;
+}
+
+/* The name and the welcome sit under the mark. */
+.site-splash .splash-words {
+  position: absolute;
+  inset: calc(50% + var(--mark) / 2 + 1.75rem) 1rem auto;
+  text-align: center;
 }
 .site-splash .splash-name {
-  animation: splash-words-in 800ms var(--ease-out-soft) 1300ms both;
+  line-height: 1.15;
+}
+/* Each word is a window the letters rise into; the padding leaves room for marks above and below the line. */
+.site-splash .splash-name .word {
+  display: inline-block;
+  overflow: clip;
+  padding-block: 0.15em;
+  margin-block: -0.15em;
+  vertical-align: top;
+}
+.site-splash .splash-name .ch {
+  display: inline-block;
+  translate: 0 110%;
+  animation: splash-letter 650ms var(--ease-out-soft) calc(1650ms + var(--i) * 32ms) forwards;
 }
 .site-splash .splash-greeting {
-  animation: splash-words-in 700ms var(--ease-out-soft) 1700ms both;
+  opacity: 0;
+  animation: splash-words-in 600ms var(--ease-out-soft) 2050ms forwards;
 }
-/* Fills while the page gets ready, so the wait reads as loading. */
-.site-splash .splash-line {
-  display: block;
-  width: 8rem;
-  height: 1px;
-  margin-inline: auto;
-  background: color-mix(in srgb, var(--highlight) 25%, transparent);
-  animation: splash-words-in 500ms ease-out 1500ms both;
+
+/* Counts up while the page gets ready, so the wait reads as loading. */
+.site-splash .splash-count {
+  position: absolute;
+  right: 1.5rem;
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+  color: color-mix(in srgb, var(--highlight) 80%, transparent);
+  counter-reset: splash var(--splash-count);
+  animation: splash-count 2800ms linear 100ms forwards;
 }
-.site-splash .splash-line::after {
-  content: "";
-  display: block;
-  height: 100%;
-  background: var(--highlight);
-  transform-origin: left;
-  animation: splash-fill 1300ms var(--ease-in-out-soft) 1500ms both;
+.site-splash .splash-count::before {
+  content: counter(splash, decimal-leading-zero);
 }
+
 [data-splash="seen"] .site-splash {
   display: none;
 }
@@ -648,60 +973,92 @@ html {
     visibility: hidden;
   }
 }
-@keyframes splash-fill {
-  from {
-    scale: 0 1;
-  }
-}
-@keyframes glow-bloom {
-  to {
-    opacity: 1;
-    scale: 3.2;
-  }
-}
 @keyframes splash-content-out {
   to {
     opacity: 0;
-    translate: 0 -2.5rem;
+    translate: 0 -1.5rem;
   }
 }
-@keyframes lamp-draw {
+@keyframes stream-in {
+  to {
+    translate: 0 -24vh;
+  }
+}
+@keyframes stream-out {
   from {
-    stroke-dashoffset: 1;
+    translate: 0 -24vh;
   }
   to {
-    stroke-dashoffset: 0;
+    translate: 0 -62vh;
   }
 }
-@keyframes flame-light {
+@keyframes drop-swell {
+  75% {
+    scale: 1 1.04;
+  }
+  to {
+    scale: 0.94 1.16;
+  }
+}
+@keyframes drop-fall {
+  to {
+    translate: 0 calc(var(--land) - 22px);
+  }
+}
+/* Squashes on landing, then shrinks away (never faded: a transparent shape under the filter leaves a dark box). */
+@keyframes drop-land {
   from {
-    opacity: 0;
-    scale: 0.2 0.1;
+    scale: 0.94 1.16;
+  }
+  40% {
+    scale: 1.35 0.62;
+  }
+  to {
+    scale: 0;
+    visibility: hidden;
   }
 }
-@keyframes flame-flicker {
-  0% {
-    scale: 1 1;
-    rotate: -1.5deg;
-  }
-  50% {
-    scale: 0.94 1.06;
-  }
-  100% {
-    scale: 1.03 0.97;
-    rotate: 1.5deg;
-  }
-}
-@keyframes glow-in {
+@keyframes ring {
   from {
+    opacity: 0.9;
+    scale: 0.5;
+  }
+  to {
     opacity: 0;
-    scale: 0.4;
+    scale: 3.4;
+  }
+}
+@keyframes mark-in {
+  to {
+    scale: 1;
+  }
+}
+@keyframes mark-through {
+  from {
+    scale: 1;
+  }
+  to {
+    scale: 22;
+  }
+}
+@keyframes splash-letter {
+  to {
+    translate: 0 0;
   }
 }
 @keyframes splash-words-in {
   from {
     opacity: 0;
-    translate: 0 1rem;
+    translate: 0 0.75rem;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes splash-count {
+  to {
+    --splash-count: 100;
   }
 }
 
@@ -742,6 +1099,88 @@ html {
     animation: dish-in 450ms var(--ease-out-soft) both;
     animation-delay: calc(var(--n, 0) * 40ms);
   }
+}
+/*
+ * The full-screen menu (mobile-nav-sheet.tsx): as it opens, its pages rise
+ * one after another out of their own lines, then the phone numbers fade in.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .nav-sheet-link {
+    animation: nav-sheet-rise 800ms var(--ease-out-soft) both;
+    animation-delay: calc(140ms + var(--i, 0) * 55ms);
+  }
+  .nav-sheet-foot {
+    animation: intro-fade 700ms var(--ease-out-soft) 560ms both;
+  }
+}
+@keyframes nav-sheet-rise {
+  from {
+    translate: 0 105%;
+  }
+}
+
+/* A story's opening letter, set large in the display face (Latin script only: Sinhala and Tamil letters carry vowel signs). */
+:lang(en) .drop-cap::first-letter {
+  float: left;
+  margin: 0.08em 0.1em 0 0;
+  font-family: var(--font-display);
+  font-size: 3.9em;
+  line-height: 0.8;
+  color: var(--primary);
+}
+
+/* The mark standing in for the 0 of a 404: it bobs gently, like a drop about to fall. */
+@media (prefers-reduced-motion: no-preference) {
+  .lost-mark {
+    animation: lost-bob 3.2s ease-in-out infinite;
+  }
+}
+@keyframes lost-bob {
+  50% {
+    translate: 0 -0.08em;
+    rotate: -4deg;
+  }
+}
+
+/* A value that just changed (the booking summary): it rises into place. */
+@media (prefers-reduced-motion: no-preference) {
+  .summary-swap {
+    animation: summary-swap 450ms var(--ease-out-soft) both;
+  }
+}
+@keyframes summary-swap {
+  from {
+    opacity: 0;
+    translate: 0 0.4rem;
+  }
+}
+
+/* The pill behind the selected tab, sliding from tab to tab once it has been placed. */
+.tab-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--w, 0);
+  height: var(--h, 0);
+  translate: var(--x, 0) var(--y, 0);
+  border-radius: 999px;
+  background: var(--pill-bg, var(--foreground));
+  opacity: 0;
+  pointer-events: none;
+}
+:is([data-pill="placed"], [data-pill="ready"]) > .tab-pill {
+  opacity: 1;
+}
+[data-pill="ready"] > .tab-pill {
+  transition:
+    translate 500ms var(--ease-out-soft),
+    width 500ms var(--ease-out-soft),
+    height 500ms var(--ease-out-soft);
+}
+:is([data-pill="placed"], [data-pill="ready"]) > [role="tab"][aria-selected="true"],
+:is([data-pill="placed"], [data-pill="ready"]) > li > a[aria-current="true"] {
+  border-color: transparent;
+  background-color: transparent;
 }
 @keyframes dish-in {
   from {

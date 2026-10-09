@@ -4,6 +4,35 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [2.2.0] - Site uplift
+
+### Added
+
+- Home sections laid over one another like sheets, widening to the edges as they come up; the footer joins them.
+- Buttons fill with colour from the bottom on hover, and arrows step forward.
+- A photo of the dish flies into the cart when you add it, and the cart bounces.
+- Tabs and the menu's category pills have a pill that slides to the one selected.
+- Photos on the Branches, Events and Book a table pages, wiped in as the page opens.
+- Booking a table shows a summary of your choices beside the steps, with the button next to it.
+- Sign in and sign up beside a photo of the food; a 404 page with the logo as the zero.
+
+### Changed
+
+- About page: an editorial layout with a drop-cap story and the values on red.
+- FAQ: the title stays beside the questions; questions set in the display face.
+- The empty checkout explains what to do and links to the menu.
+- The full-screen menu opens on the dark treacle surface, its pages rising in one after another.
+- The footer's brand name rises out of its baseline as you reach it.
+- Form fields are at least 44 px tall with a softer focus glow; radios and checkboxes are brand red.
+- On phones, the home headline stays readable over the brightest frames of the video.
+- The header's "Book a table" appears once (a link on medium screens, a button on large ones) and the header is a little more opaque.
+
+## [2.1.0] - The first drop
+
+### Changed
+
+- A new splash, "the first drop": a thread of golden kithul treacle runs down the dark screen and swells into a drop, which falls into the logo. The logo blooms as rings ripple out, "Kithul & Co." rises letter by letter with the three-language welcome while a counter runs to 100, and the page opens through the logo. About 3.75 s, once per tab.
+
 ## [2.0.0] - V2
 
 ### Added

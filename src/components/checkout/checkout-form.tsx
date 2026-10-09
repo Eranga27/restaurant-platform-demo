@@ -1,7 +1,17 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Banknote, Bike, CreditCard, Gift, LocateFixed, MapPin, Store } from "lucide-react";
+import {
+  ArrowRight,
+  Banknote,
+  Bike,
+  CreditCard,
+  Gift,
+  LocateFixed,
+  MapPin,
+  ShoppingBag,
+  Store,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
@@ -36,6 +46,7 @@ import type { QuoteRequest } from "@/lib/orders/schema";
 import { slotToIso } from "@/lib/orders/slots";
 import { formatLKR } from "@/lib/money";
 import { normalizeSriLankanPhone } from "@/lib/phone";
+import { LAMP } from "@/lib/transitions";
 import { cn } from "@/lib/utils";
 
 import { DeliveryMap } from "./delivery-map-loader";
@@ -127,6 +138,7 @@ export function CheckoutForm(props: CheckoutFormProps) {
     nonce,
   } = props;
   const t = useTranslations("Checkout");
+  const tc = useTranslations("Cart");
   const locale = useLocale();
   const router = useRouter();
   const hydrated = useCartHydrated();
@@ -306,10 +318,19 @@ export function CheckoutForm(props: CheckoutFormProps) {
 
   if (cart.lines.length === 0) {
     return (
-      <div className="flex flex-col items-center gap-4 rounded-2xl border border-dashed p-10 text-center">
-        <p className="font-display text-2xl">{t("emptyTitle")}</p>
+      <div className="flex flex-col items-center gap-5 rounded-3xl border bg-card px-6 py-14 text-center shadow-soft">
+        <span className="grid size-16 place-items-center rounded-full bg-accent text-primary">
+          <ShoppingBag aria-hidden className="size-7" />
+        </span>
+        <div className="space-y-2">
+          <p className="font-display text-display-md">{t("emptyTitle")}</p>
+          <p className="mx-auto max-w-sm text-pretty text-muted-foreground">{tc("emptyBody")}</p>
+        </div>
         <Button asChild size="lg">
-          <Link href="/menu">{t("editOrder")}</Link>
+          <Link href="/menu" transitionTypes={LAMP}>
+            {tc("browseMenu")}
+            <ArrowRight aria-hidden className="size-4" />
+          </Link>
         </Button>
       </div>
     );

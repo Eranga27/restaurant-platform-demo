@@ -39,7 +39,7 @@ Replace `mark.svg`, the square mark used in the header and as the app icon, copy
 
 The home page hero, story and About page are written for Kithul & Co. Edit the `Home` and `About` sections and their Sinhala and Tamil versions (reviewed by a native speaker). `npm test` fails if a Sinhala or Tamil message is missing or loses a placeholder; `node scripts/check-translations.mjs <si|ta> <batch.json>` checks and merges a batch of flat `"Namespace.key": "text"` translations.
 
-The splash screen's welcome is `Splash.greeting` in each language file. The lotus ornament, footer border and splash petals take the brand's `accent` (turmeric by default), `primary` and `secondary` colours, so they follow a new palette with no extra work.
+The splash screen's welcome is `Splash.greeting` in each language file. The splash pours a drop into the brand's own mark (`logo.mark`), so it shows the new logo with no extra work; its colours come from the theme (`highlight` for the drop, `foreground` for the screen). The drop lands a little below the mark's middle, where the Kithul mark's drop is round: for a mark shaped differently, change `--land` on `.site-splash` in `src/app/globals.css`. The lotus ornament and footer border take the brand's `accent` (turmeric by default), `primary` and `secondary` colours, so they follow a new palette too.
 
 ## 5. Menu, branches and offers
 

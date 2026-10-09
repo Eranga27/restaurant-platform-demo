@@ -11,6 +11,7 @@ import { getBrand } from "@/lib/data/brand";
 import { getBranches, localize } from "@/lib/data/catalogue";
 import { earliestEventDate, eventsEnabled } from "@/lib/events/service";
 import { formatLKR } from "@/lib/money";
+import { siteMedia } from "@/config/media";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +52,12 @@ export default async function EventsPage({ params }: PageProps<"/[locale]/events
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-14 px-4 pt-14 pb-24 sm:px-6 lg:px-8 lg:pt-24">
-      <PageHeader title={t("title")} intro={t("intro")} className="pb-0 lg:pb-0" />
+      <PageHeader
+        title={t("title")}
+        intro={t("intro")}
+        image={{ src: siteMedia.events }}
+        className="pb-0 lg:pb-0"
+      />
 
       <section aria-labelledby="packages-title" className="space-y-4">
         <h2 id="packages-title" className="font-display text-2xl text-primary">
@@ -62,7 +68,7 @@ export default async function EventsPage({ params }: PageProps<"/[locale]/events
             <li
               key={p.id}
               data-reveal
-              className="space-y-2 rounded-2xl border bg-card p-5 shadow-soft"
+              className="space-y-2 rounded-2xl border bg-card p-5 shadow-soft transition-[translate,box-shadow,border-color] duration-500 ease-out-soft hover:-translate-y-1 hover:border-foreground/20 hover:shadow-lifted"
             >
               <h3 className="font-display text-lg">{p.name}</h3>
               <p className="text-sm text-muted-foreground">{p.description}</p>

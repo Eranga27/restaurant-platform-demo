@@ -84,8 +84,14 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const average = reviews.length ? reviews.reduce((n, r) => n + r.rating, 0) / reviews.length : 0;
   const rating = reviews.length ? average.toFixed(1) : null;
   // "Most ordered", then the main categories that have enough dishes with photos.
+  // Photographed bestsellers first: a tab of food reads better than placeholders.
+  const pictured = signatures.filter((i) => i.imageUrl);
   const tabs = [
-    { key: "popular", label: t("tabPopular"), items: signatures },
+    {
+      key: "popular",
+      label: t("tabPopular"),
+      items: pictured.length >= MIN_TAB_DISHES ? pictured : signatures,
+    },
     ...menu.categories
       .map((c) => ({
         key: c.slug,
@@ -112,42 +118,45 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <section
         id="bestsellers"
         aria-labelledby="bestsellers-title"
-        className="mx-auto w-full max-w-7xl scroll-mt-24 px-4 py-20 sm:px-6 lg:px-8 lg:py-28"
+        className="sheet scroll-mt-24 bg-background"
       >
-        <div className="mb-10 flex flex-wrap items-end justify-between gap-6 lg:mb-14">
-          <div className="max-w-2xl space-y-4">
-            <Eyebrow className="text-primary">{t("bestsellersLabel")}</Eyebrow>
-            <h2 id="bestsellers-title" data-reveal="words" className="text-display-xl text-balance">
-              <SplitWords markup={t.markup("signatureTitle", em)} />
-            </h2>
-            <p className="text-lg text-muted-foreground">{t("signatureSubtitle")}</p>
+        <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+          <div className="mb-10 flex flex-wrap items-end justify-between gap-6 lg:mb-14">
+            <div className="max-w-2xl space-y-4">
+              <Eyebrow className="text-primary">{t("bestsellersLabel")}</Eyebrow>
+              <h2
+                id="bestsellers-title"
+                data-reveal="words"
+                className="text-display-xl text-balance"
+              >
+                <SplitWords markup={t.markup("signatureTitle", em)} />
+              </h2>
+              <p className="text-lg text-muted-foreground">{t("signatureSubtitle")}</p>
+            </div>
+            <Button asChild variant="outline" size="lg">
+              <Link href="/menu" transitionTypes={CURTAIN}>
+                {t("viewFullMenu")}
+                <ArrowRight aria-hidden className="size-4" />
+              </Link>
+            </Button>
           </div>
-          <Button asChild variant="outline" size="lg" className="group">
-            <Link href="/menu" transitionTypes={CURTAIN}>
-              {t("viewFullMenu")}
-              <ArrowRight
-                aria-hidden
-                className="size-4 transition-transform group-hover:translate-x-0.5"
-              />
-            </Link>
-          </Button>
-        </div>
-        <div data-reveal>
-          <DishTabs
-            label={t("tabsLabel")}
-            tabs={tabs.map((tab) => ({
-              key: tab.key,
-              label: tab.label,
-              panel: <DishGrid items={tab.items} />,
-            }))}
-          />
+          <div data-reveal>
+            <DishTabs
+              label={t("tabsLabel")}
+              tabs={tabs.map((tab) => ({
+                key: tab.key,
+                label: tab.label,
+                panel: <DishGrid items={tab.items} />,
+              }))}
+            />
+          </div>
         </div>
       </section>
 
-      <section id="why" aria-labelledby="why-title" className="scroll-mt-24 surface-ink">
+      <section id="why" aria-labelledby="why-title" className="sheet scroll-mt-24 surface-ink">
         <div className="mx-auto grid w-full max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 md:grid-cols-2 lg:gap-20 lg:px-8 lg:py-28">
           <div
-            data-reveal="zoom"
+            data-reveal="image"
             className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-white/5 md:aspect-[4/5]"
           >
             <div className="parallax absolute inset-x-0 -inset-y-[8%]">
@@ -187,7 +196,8 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             </ol>
             <Link
               href="/about"
-              className="inline-flex items-center gap-1.5 font-medium text-highlight underline-offset-4 hover:underline"
+              transitionTypes={CURTAIN}
+              className="inline-flex items-center gap-1.5 link-sweep pb-0.5 font-medium text-highlight"
             >
               {t("storyCta")}
               <ArrowUpRight aria-hidden className="size-4" />
@@ -200,7 +210,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         <section
           id="offers"
           aria-labelledby="offers-title"
-          className="relative scroll-mt-24 overflow-hidden surface-lacquer"
+          className="sheet scroll-mt-24 overflow-hidden surface-lacquer"
         >
           <Kolam
             size={7}
@@ -216,19 +226,17 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
                 <li
                   key={promo.id}
                   data-reveal
-                  className="flex flex-col gap-4 rounded-2xl border border-[var(--border)] bg-black/10 p-6 backdrop-blur-sm"
+                  className="offer-card flex flex-col gap-4 rounded-2xl border border-[var(--border)] bg-black/10 p-6 backdrop-blur-sm transition-[translate,background-color,border-color] duration-500 ease-out-soft hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--highlight)_45%,transparent)] hover:bg-black/15"
                 >
                   <h3 className="font-display text-display-md">{promo.title}</h3>
                   {promo.body && <p className="text-pretty opacity-85">{promo.body}</p>}
                   {promo.ctaHref && promo.ctaLabel && (
-                    <Link
-                      href={promo.ctaHref}
-                      transitionTypes={LAMP}
-                      className="mt-auto inline-flex items-center gap-2 self-start rounded-full bg-highlight px-5 py-2.5 text-sm font-semibold text-highlight-foreground transition-colors hover:bg-highlight/90"
-                    >
-                      {promo.ctaLabel}
-                      <ArrowRight aria-hidden className="size-4" />
-                    </Link>
+                    <Button asChild variant="highlight" className="mt-auto self-start">
+                      <Link href={promo.ctaHref} transitionTypes={LAMP}>
+                        {promo.ctaLabel}
+                        <ArrowRight aria-hidden className="size-4" />
+                      </Link>
+                    </Button>
                   )}
                 </li>
               ))}
@@ -240,7 +248,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <section
         id="events"
         aria-labelledby="events-title"
-        className="relative isolate scroll-mt-24 overflow-hidden surface-ink"
+        className="sheet isolate scroll-mt-24 overflow-hidden surface-ink"
       >
         <div className="parallax absolute inset-x-0 -inset-y-[12%] -z-10">
           <Image src={siteMedia.events} alt="" fill sizes="100vw" className="object-cover" />
@@ -272,13 +280,10 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
                 ))}
               </ul>
             </div>
-            <Button
-              asChild
-              size="lg"
-              className="bg-highlight text-highlight-foreground hover:bg-highlight/90"
-            >
+            <Button asChild size="lg" variant="highlight">
               <Link href="/events" transitionTypes={CURTAIN}>
                 {t("eventsCta")}
+                <ArrowRight aria-hidden className="size-4" />
               </Link>
             </Button>
           </div>
@@ -288,47 +293,50 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <section
         id="branches"
         aria-labelledby="branches-title"
-        className="mx-auto w-full max-w-7xl scroll-mt-24 px-4 py-20 sm:px-6 lg:px-8 lg:py-28"
+        className="sheet scroll-mt-24 bg-background"
       >
-        <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
-          <div className="max-w-2xl space-y-4">
-            <Eyebrow className="text-primary">{t("branchesLabel")}</Eyebrow>
-            <h2 id="branches-title" data-reveal="words" className="text-display-xl text-balance">
-              <SplitWords markup={t.markup("branchesTitle", em)} />
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              {t("branchesSubtitle", { count: branches.length })}
-            </p>
+        <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
+          <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
+            <div className="max-w-2xl space-y-4">
+              <Eyebrow className="text-primary">{t("branchesLabel")}</Eyebrow>
+              <h2 id="branches-title" data-reveal="words" className="text-display-xl text-balance">
+                <SplitWords markup={t.markup("branchesTitle", em)} />
+              </h2>
+              <p className="text-lg text-muted-foreground">
+                {t("branchesSubtitle", { count: branches.length })}
+              </p>
+            </div>
+            <Link
+              href="/branches"
+              transitionTypes={CURTAIN}
+              className="inline-flex items-center gap-1.5 link-sweep pb-0.5 font-medium"
+            >
+              {t("allBranches")}
+              <ArrowUpRight aria-hidden className="size-4" />
+            </Link>
           </div>
-          <Link
-            href="/branches"
-            className="inline-flex items-center gap-1.5 font-medium underline-offset-4 hover:underline"
-          >
-            {t("allBranches")}
-            <ArrowUpRight aria-hidden className="size-4" />
-          </Link>
+          <BranchesMap
+            branches={branches.map((b) => ({
+              id: b.id,
+              name: b.name,
+              addressLine: b.addressLine,
+              city: b.city,
+              lat: b.lat,
+              lng: b.lng,
+              phone: b.phone,
+              openingHours: b.openingHours,
+            }))}
+          />
         </div>
-        <BranchesMap
-          branches={branches.map((b) => ({
-            id: b.id,
-            name: b.name,
-            addressLine: b.addressLine,
-            city: b.city,
-            lat: b.lat,
-            lng: b.lng,
-            phone: b.phone,
-            openingHours: b.openingHours,
-          }))}
-        />
       </section>
 
       {reviews.length > 0 && (
         <section
           id="guests"
           aria-labelledby="guests-title"
-          className="scroll-mt-24 bg-secondary text-secondary-foreground"
+          className="sheet scroll-mt-24 surface-leaf"
         >
-          <div className="mx-auto w-full max-w-7xl px-4 py-20 [--em-color:var(--highlight)] sm:px-6 lg:px-8 lg:py-28">
+          <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28 lg:pb-36">
             <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
               <div className="space-y-4">
                 <Eyebrow className="opacity-90">{t("guestsLabel")}</Eyebrow>
@@ -363,10 +371,7 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       )}
 
       <StickyOrderBar watch="welcome" label={t("quickOrder")}>
-        <Button
-          asChild
-          className="h-11 flex-1 bg-highlight text-highlight-foreground hover:bg-highlight/90"
-        >
+        <Button asChild variant="highlight" className="h-11 flex-1">
           <Link href="/menu" transitionTypes={LAMP}>
             {nav("orderNow")}
           </Link>
