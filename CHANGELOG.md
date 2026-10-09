@@ -11,9 +11,15 @@ All notable changes to this project are documented here. The format is based on 
 - A new home page: a turning sticker in the hero, two lacquer bands crossing (dishes in English, Sinhala and Tamil), bestsellers as plates on coloured discs that slide sideways as you scroll, a story that lights up word by word, offers as stickers, events in an arch, and guests' words on a moving wall.
 - Section links open the next page in strips, like blinds.
 - On large screens the logo sits in the middle of the header.
+- Every page now opens with a poster top in a lacquer colour, running under the header, with a photo in an arch or on a plate and a turning sticker; the main pages add a lacquer band of their own words.
+- The menu shows each dish as a tile: the photo on a coloured plate with a price sticker, two to a row on phones and four on large screens; categories are numbered chapters.
+- Branches as coloured tickets, the About page's values as tilted cards, event menus as stickers with a price tag, the main phone number in big type on the Contact page, numbered FAQ questions.
+- The brand name across the footer, the Explore menu and the 404 page use the poster type.
 
 ### Fixed
 
+- The menu page scrolled itself down a little on arrival (most on phones), as the category tabs centred the first one. Now only the row of tabs moves.
+- In Tamil (and Sinhala on small laptops) the header ran past the edge of the screen. It now keeps fewer items beside the logo in those languages, and the logo stays on one line.
 - On a slow phone or connection, the splash played before the screen was drawn, so people saw only its end. It now waits for the page to appear and the headline type to arrive, with the logo breathing meanwhile, then plays from the start.
 
 ## [2.2.0] - Site uplift

@@ -48,12 +48,13 @@ export async function SiteHeader({
       style={{ viewTransitionName: "site-header" }}
       className="site-header sticky top-0 z-40 border-b border-[var(--hdr-border)] bg-[var(--hdr-bg)] text-[var(--hdr-fg)] backdrop-blur-md transition-[background-color,color,border-color] duration-500"
     >
-      {/* Phones and tablets: logo, then actions. Large screens: pages, the logo in the middle, actions. */}
+      {/* Phones and tablets: logo, then actions. Large screens: pages, the logo in the middle,
+          actions; fewer of them in Sinhala and Tamil, whose labels run longer (globals.css). */}
       <div className="mx-auto grid h-18 w-full max-w-7xl grid-cols-[1fr_auto] items-center gap-4 px-4 sm:px-6 lg:grid-cols-[1fr_auto_1fr] lg:gap-8 lg:px-8">
         <Logo brand={brand} className="order-first lg:order-none lg:col-start-2 lg:row-start-1" />
         <nav
           aria-label={t("mainNavigation")}
-          className="hidden lg:col-start-1 lg:row-start-1 lg:block"
+          className="hdr-pages hidden lg:col-start-1 lg:row-start-1 lg:block"
         >
           <NavLinks
             items={items
@@ -68,11 +69,11 @@ export async function SiteHeader({
         </nav>
         <div className="flex items-center gap-1.5 justify-self-end sm:gap-2 lg:col-start-3 lg:row-start-1">
           <LanguageSwitcher />
-          <AccountMenu className="hidden xl:flex" />
+          <AccountMenu className="hdr-account hidden xl:flex" />
           <Button
             asChild
             variant="outline"
-            className="hidden border-[var(--hdr-border-strong)] bg-transparent text-current hover:bg-[var(--hdr-hover)] hover:text-current xl:inline-flex"
+            className="hdr-book hidden border-[var(--hdr-border-strong)] bg-transparent text-current hover:bg-[var(--hdr-hover)] hover:text-current xl:inline-flex"
           >
             <Link href="/reservations" transitionTypes={CURTAIN}>
               {t("bookTable")}

@@ -67,44 +67,46 @@ export default async function CheckoutPage({ params }: PageProps<"/[locale]/chec
   }
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
-      <PageHeader title={t("title")} />
-      <CheckoutForm
-        branches={branches.map((b) => ({
-          id: b.id,
-          name: b.name,
-          addressLine: b.addressLine,
-          city: b.city,
-          lat: b.lat,
-          lng: b.lng,
-          deliveryRadiusKm: b.deliveryRadiusKm,
-          openingHours: b.openingHours,
-          isAcceptingOrders: b.isAcceptingOrders,
-        }))}
-        districts={districts}
-        features={{ delivery: brand.features.delivery, pickup: brand.features.pickup }}
-        payments={{ online: onlinePaymentsEnabled(), cash: brand.features.cashOnDelivery }}
-        charges={{
-          serviceChargePercent: brand.charges.serviceChargeBps / 100,
-          vatPercent: brand.charges.vatBps / 100,
-          minimumOrderCents: brand.charges.minimumOrderCents,
-        }}
-        initialContact={{ name: user?.name ?? "", phone, email: user?.email ?? "" }}
-        signedIn={user !== null}
-        account={{
-          addresses,
-          loyalty:
-            user && brand.features.loyalty
-              ? {
-                  balance: points,
-                  pointValueCents: brand.loyalty.pointValueCents,
-                  pointPerCents: brand.loyalty.pointPerCents,
-                  maxRedeemBps: brand.loyalty.maxRedeemBps,
-                }
-              : null,
-        }}
-        nonce={nonce}
-      />
-    </div>
+    <>
+      <PageHeader tone="ink" compact title={t("title")} />
+      <div className="mx-auto w-full max-w-6xl px-4 pt-12 pb-24 sm:px-6 lg:pt-16">
+        <CheckoutForm
+          branches={branches.map((b) => ({
+            id: b.id,
+            name: b.name,
+            addressLine: b.addressLine,
+            city: b.city,
+            lat: b.lat,
+            lng: b.lng,
+            deliveryRadiusKm: b.deliveryRadiusKm,
+            openingHours: b.openingHours,
+            isAcceptingOrders: b.isAcceptingOrders,
+          }))}
+          districts={districts}
+          features={{ delivery: brand.features.delivery, pickup: brand.features.pickup }}
+          payments={{ online: onlinePaymentsEnabled(), cash: brand.features.cashOnDelivery }}
+          charges={{
+            serviceChargePercent: brand.charges.serviceChargeBps / 100,
+            vatPercent: brand.charges.vatBps / 100,
+            minimumOrderCents: brand.charges.minimumOrderCents,
+          }}
+          initialContact={{ name: user?.name ?? "", phone, email: user?.email ?? "" }}
+          signedIn={user !== null}
+          account={{
+            addresses,
+            loyalty:
+              user && brand.features.loyalty
+                ? {
+                    balance: points,
+                    pointValueCents: brand.loyalty.pointValueCents,
+                    pointPerCents: brand.loyalty.pointPerCents,
+                    maxRedeemBps: brand.loyalty.maxRedeemBps,
+                  }
+                : null,
+          }}
+          nonce={nonce}
+        />
+      </div>
+    </>
   );
 }

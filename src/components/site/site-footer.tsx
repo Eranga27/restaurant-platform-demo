@@ -175,7 +175,7 @@ export async function SiteFooter({ brand, branches }: { brand: Brand; branches: 
       </div>
 
       <div className="relative mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <Wordmark text={brand.name} className="wordmark-rise text-background/95" />
+        <Wordmark poster text={brand.name} className="wordmark-rise text-highlight" />
       </div>
 
       <div className="relative border-t border-[var(--border)]">

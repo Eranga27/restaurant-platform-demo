@@ -16,12 +16,12 @@ export async function LegalPage({ title, document }: { title: string; document: 
   return (
     <>
       <Splash />
-      <article className="mx-auto w-full max-w-3xl px-4 pt-10 pb-20 sm:px-6 lg:pt-14">
-        <header className="mb-8 space-y-3">
-          <PageHeader title={title} className="pb-0 lg:pb-0" />
-          <p className="text-sm text-muted-foreground">{t("updated", { date: updated })}</p>
-        </header>
-
+      <PageHeader tone="ink" compact title={title}>
+        <p className="intro-fade text-sm opacity-80 [--d:450ms]">
+          {t("updated", { date: updated })}
+        </p>
+      </PageHeader>
+      <article className="mx-auto w-full max-w-3xl px-4 pt-12 pb-24 sm:px-6 lg:pt-16">
         {publicEnv.demoMode && (
           <p className="mb-8 flex gap-3 rounded-xl border border-info/30 bg-info/5 p-4 text-sm text-info">
             <Info aria-hidden className="mt-0.5 size-4 shrink-0" />

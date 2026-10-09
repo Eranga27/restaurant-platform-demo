@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 
 import { InquiryForm } from "@/components/events/inquiry-form";
 import { PageHeader } from "@/components/site/page-header";
+import { SplitWords } from "@/components/site/split-words";
 import { UnavailableNotice } from "@/components/site/unavailable-notice";
 import type { Locale } from "@/i18n/routing";
 import { contactPrefill } from "@/lib/auth/prefill";
@@ -14,6 +15,17 @@ import { formatLKR } from "@/lib/money";
 import { siteMedia } from "@/config/media";
 
 export const dynamic = "force-dynamic";
+
+/** The kinds of event, for the band under the poster. */
+const EVENT_TYPES = ["birthday", "office", "dana", "wedding", "homecoming"] as const;
+
+/** Set menus as stickers, each on a lacquer colour. */
+const PACKAGE_TONES = [
+  "bg-highlight text-highlight-foreground",
+  "bg-secondary text-secondary-foreground",
+  "bg-primary text-primary-foreground",
+  "bg-foreground text-background",
+] as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const [t, brand] = await Promise.all([getTranslations("Metadata"), getBrand()]);
@@ -51,59 +63,66 @@ export default async function EventsPage({ params }: PageProps<"/[locale]/events
   }));
 
   return (
-    <div className="mx-auto w-full max-w-6xl space-y-14 px-4 pt-14 pb-24 sm:px-6 lg:px-8 lg:pt-24">
+    <>
       <PageHeader
+        tone="ink"
         title={t("title")}
         intro={t("intro")}
         image={{ src: siteMedia.events }}
-        className="pb-0 lg:pb-0"
+        band={EVENT_TYPES.map((type) => t(`types.${type}`))}
       />
-
-      <section aria-labelledby="packages-title" className="space-y-4">
-        <h2 id="packages-title" className="font-display text-2xl text-primary">
-          {t("packagesTitle")}
-        </h2>
-        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {packages.map((p) => (
-            <li
-              key={p.id}
-              data-reveal
-              className="space-y-2 rounded-2xl border bg-card p-5 shadow-soft transition-[translate,box-shadow,border-color] duration-500 ease-out-soft hover:-translate-y-1 hover:border-foreground/20 hover:shadow-lifted"
-            >
-              <h3 className="font-display text-lg">{p.name}</h3>
-              <p className="text-sm text-muted-foreground">{p.description}</p>
-              <p className="text-sm font-semibold text-secondary">{p.price}</p>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      {enabled ? (
-        <section aria-labelledby="enquiry-title" className="space-y-4">
-          <h2 id="enquiry-title" className="font-display text-2xl text-primary">
-            {t("formTitle")}
+      <div className="mx-auto w-full max-w-6xl space-y-20 px-4 pt-24 pb-28 sm:px-6 lg:space-y-28 lg:px-8 lg:pt-32">
+        <section aria-labelledby="packages-title">
+          <h2 id="packages-title" data-reveal="words" className="text-display-xl text-balance">
+            <SplitWords markup={t("packagesTitle").replace(/[<>]/g, "")} />
           </h2>
-          <InquiryForm
-            branches={branches.map((b) => ({ id: b.id, name: b.name }))}
-            packages={packages.map((p) => ({ id: p.id, name: p.name }))}
-            rules={{
-              minGuests: brand.events.minGuests,
-              maxGuests: brand.events.maxGuests,
-              minNoticeDays: brand.events.minNoticeDays,
-              earliestDate: earliestEventDate(brand.events.minNoticeDays),
-            }}
-            initialContact={contact}
-            nonce={nonce}
-          />
+          <ul className="mt-10 grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
+            {packages.map((p, i) => (
+              <li
+                key={p.id}
+                data-reveal
+                className={`offer-card relative flex flex-col gap-3 rounded-[1.75rem] p-6 pb-16 shadow-soft ${PACKAGE_TONES[i % PACKAGE_TONES.length]}`}
+              >
+                <span aria-hidden className="font-poster text-5xl leading-none tabular-nums">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <h3 className="font-display text-xl leading-snug">{p.name}</h3>
+                <p className="text-sm text-pretty opacity-85">{p.description}</p>
+                <p className="absolute -bottom-3 left-5 -rotate-3 rounded-full bg-background px-4 py-2 text-sm font-semibold text-foreground shadow-soft ring-1 ring-border/70">
+                  {p.price}
+                </p>
+              </li>
+            ))}
+          </ul>
         </section>
-      ) : (
-        <UnavailableNotice
-          embedded
-          title={t("unavailableTitle")}
-          body={t("unavailableBody")}
-          linkLabel={nav("branches")}
-        />
-      )}
-    </div>
+
+        {enabled ? (
+          <section aria-labelledby="enquiry-title" className="space-y-8">
+            <h2 id="enquiry-title" data-reveal="words" className="text-display-xl text-balance">
+              <SplitWords markup={t("formTitle").replace(/[<>]/g, "")} />
+            </h2>
+            <InquiryForm
+              branches={branches.map((b) => ({ id: b.id, name: b.name }))}
+              packages={packages.map((p) => ({ id: p.id, name: p.name }))}
+              rules={{
+                minGuests: brand.events.minGuests,
+                maxGuests: brand.events.maxGuests,
+                minNoticeDays: brand.events.minNoticeDays,
+                earliestDate: earliestEventDate(brand.events.minNoticeDays),
+              }}
+              initialContact={contact}
+              nonce={nonce}
+            />
+          </section>
+        ) : (
+          <UnavailableNotice
+            embedded
+            title={t("unavailableTitle")}
+            body={t("unavailableBody")}
+            linkLabel={nav("branches")}
+          />
+        )}
+      </div>
+    </>
   );
 }

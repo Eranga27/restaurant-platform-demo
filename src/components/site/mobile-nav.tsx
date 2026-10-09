@@ -45,7 +45,7 @@ export function MobileNav({
         </span>
         <span
           aria-hidden
-          className="hidden font-mono text-[0.7rem] tracking-[0.2em] uppercase sm:inline lg:hidden xl:inline"
+          className="hdr-explore-label hidden font-mono text-[0.7rem] tracking-[0.2em] uppercase sm:inline lg:hidden xl:inline"
         >
           {t("menuButton")}
         </span>

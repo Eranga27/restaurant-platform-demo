@@ -14,9 +14,18 @@ const FONT_SIZE = 170;
  * name fits the width exactly without stretching. Decorative: the name is
  * said elsewhere on the page.
  */
-export function Wordmark({ text, className }: { text: string; className?: string }) {
+export function Wordmark({
+  text,
+  poster = false,
+  className,
+}: {
+  text: string;
+  /** Set in the poster face, condensed and in capitals, instead of the serif. */
+  poster?: boolean;
+  className?: string;
+}) {
   const ref = useRef<SVGTextElement>(null);
-  // A first guess for this serif (about 0.42 of the size per character), refined after load.
+  // A first guess (about 0.42 of the size per character), refined after load.
   const [width, setWidth] = useState(() => Math.round(text.length * FONT_SIZE * 0.42));
 
   useEffect(() => {
@@ -43,9 +52,19 @@ export function Wordmark({ text, className }: { text: string; className?: string
         x="0"
         y={BASELINE}
         fill="currentColor"
-        style={{ fontFamily: "var(--font-display)", fontSize: FONT_SIZE, letterSpacing: "-0.02em" }}
+        style={
+          poster
+            ? {
+                fontFamily: "var(--font-poster)",
+                fontSize: FONT_SIZE,
+                fontWeight: 800,
+                fontStretch: "75%",
+                letterSpacing: "-0.005em",
+              }
+            : { fontFamily: "var(--font-display)", fontSize: FONT_SIZE, letterSpacing: "-0.02em" }
+        }
       >
-        {text}
+        {poster ? text.toLocaleUpperCase() : text}
       </text>
     </svg>
   );

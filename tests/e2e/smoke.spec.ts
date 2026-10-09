@@ -55,6 +55,14 @@ test.describe("public site", () => {
     expect(errors).toEqual([]);
   });
 
+  test("the menu stays at the top on arrival", async ({ page }) => {
+    await page.goto("/menu");
+    await expect(page.getByRole("navigation", { name: "Menu categories" })).toBeAttached();
+    // The category tabs centre the current one; that must never scroll the page itself.
+    await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  });
+
   test("menu search and dietary filters narrow the list", async ({ page }) => {
     await page.goto("/menu");
     await page.getByLabel("Search the menu").fill("hopper");
@@ -73,6 +81,22 @@ test.describe("public site", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "ශ්‍රී ලාංකේය ගෙදර කෑම, උණු උණුවේ ඔබේ දොරකඩටම.",
     );
+  });
+
+  test("the header fits the screen in every language, from phones to laptops", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "one run covers every width");
+    for (const width of [390, 768, 1024, 1280, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const locale of ["en", "si", "ta"]) {
+        await page.goto(`/${locale}/branches`);
+        const overflow = await page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        );
+        expect(overflow, `${locale} at ${width}px`).toBeLessThanOrEqual(0);
+      }
+    }
   });
 
   test("branches page shows every branch and its hours", async ({ page }) => {

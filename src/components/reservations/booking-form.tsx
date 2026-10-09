@@ -487,7 +487,7 @@ function Section({ n, title, children }: { n: number; title: string; children: R
   return (
     <section className="space-y-5 border-t pt-6">
       <h2 className="flex items-baseline gap-3 font-display text-2xl">
-        <span aria-hidden className="text-base text-primary italic tabular-nums">
+        <span aria-hidden className="font-poster text-2xl leading-none text-primary tabular-nums">
           {String(n).padStart(2, "0")}
         </span>
         {title}

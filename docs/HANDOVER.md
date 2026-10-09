@@ -145,7 +145,7 @@ Environment variables are listed, by name, in `.env.example` and the README.
 
 - **Colours:** Kandyan lacquer red, saffron, curry leaf, coconut milk and kithul treacle. Three surfaces: cream, dark (`surface-ink`) and red (`surface-lacquer`).
 - **Type:** Fraunces for headlines (with italic accent words), DM Sans for text and small labels, Geist Mono only for figures in the staff screens.
-- **Redesign in progress** (branch `feat/redesign`, D105 to D111, "lacquer pop"): poster headlines in Bricolage Grotesque (condensed, heavy, capitals) with Fraunces italic accents; the home page rebuilt (crossed lacquer bands, plates gallery, story scrub, review wall); blinds between pages; a centred-logo header.
+- **Redesign in progress** (branch `feat/redesign`, D105 to D115, "lacquer pop"): poster headlines in Bricolage Grotesque (condensed, heavy, capitals) with Fraunces italic accents; the home page rebuilt (crossed lacquer bands, plates gallery, story scrub, review wall); blinds between pages; a centred-logo header; every content page opens with a poster top (D113); the menu as dish tiles (D114); branches, about, events, contact, FAQ and the footer in the same style (D115).
 - **Splash:** "kottu chop" (D106): dish names chopped to the kottu griddle's beat, the counter to 100, the name, then the panel falls apart in strips (about 3.8 s). It replaced "the first drop" (D96).
 - **Home page:** the offer on the first screen with a live open badge and a chef's pick, then dish tabs, why us, offers, events, branches and guests. A sticky order bar on phones.
 - **Menu:** a toolbar card, category pills with counts, and dish cards in a grid.

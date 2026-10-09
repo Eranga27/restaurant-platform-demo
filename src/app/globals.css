@@ -690,6 +690,29 @@ html {
   box-shadow: none;
   animation: none;
 }
+/*
+ * Sinhala and Tamil labels run longer than English, so beside the centred logo
+ * the header keeps fewer items (docs/DECISIONS.md D116): "Book a table", "Sign
+ * in" and Explore's label stay in the Explore menu, and below extra-large
+ * screens the pages move there too.
+ */
+@media (min-width: 64rem) {
+  :root:is(:lang(si), :lang(ta)) .site-header :is(.hdr-book, .hdr-account, .hdr-explore-label) {
+    display: none;
+  }
+}
+@media (min-width: 64rem) and (max-width: 79.99rem) {
+  :root:is(:lang(si), :lang(ta)) .site-header .hdr-pages {
+    display: none;
+  }
+}
+/* Over a lacquer-red page top the red "Order now" would vanish: it turns saffron there. */
+:root[data-header-tone="light"]:has(.masthead[data-tone="lacquer"])
+  .site-header
+  [data-slot="button"][data-variant="default"] {
+  background-color: var(--highlight);
+  color: var(--highlight-foreground);
+}
 
 /*
  * Scroll-linked depth, where the browser supports scroll-driven animations
@@ -1249,6 +1272,25 @@ html {
   translate: 0 -5%;
   rotate: 2deg;
 }
+/* One band over the seam under a page's poster top (src/components/site/page-header.tsx). */
+.band-seam {
+  position: relative;
+  z-index: 3;
+  height: clamp(4rem, 2.5rem + 3.4vw, 6rem);
+  margin-top: calc(clamp(4rem, 2.5rem + 3.4vw, 6rem) / -2);
+  margin-bottom: calc(clamp(4rem, 2.5rem + 3.4vw, 6rem) / -2);
+  overflow-x: clip;
+  pointer-events: none;
+}
+.band-seam > .lacquer-band {
+  position: absolute;
+  top: 50%;
+  left: -5vw;
+  width: 110vw;
+  translate: 0 -50%;
+  rotate: -1.6deg;
+  box-shadow: 0 10px 30px rgb(31 20 16 / 0.18);
+}
 
 /*
  * Plates (src/components/home/plates.tsx): bestsellers on lacquer discs. On
@@ -1414,6 +1456,94 @@ html {
   to {
     translate: calc(-1 * var(--travel, 0px)) 0;
   }
+}
+
+/*
+ * Dishes on the menu as tiles (src/components/menu/menu-item-card.tsx): the
+ * photo on a plate of a lacquer colour over a wash of the same, a price
+ * sticker on the plate's edge and a flag for signature or sold-out dishes.
+ */
+.dish-tile {
+  --wash: var(--highlight);
+  transition:
+    translate 500ms var(--ease-out-soft),
+    box-shadow 500ms var(--ease-out-soft);
+}
+.dish-tile[data-tone="secondary"] {
+  --wash: var(--secondary);
+}
+.dish-tile[data-tone="primary"] {
+  --wash: var(--primary);
+}
+.dish-tile-wash {
+  background: color-mix(in srgb, var(--wash) 13%, var(--card));
+}
+.dish-tile-plate {
+  border-radius: 999px;
+  background: var(--wash);
+  transition:
+    rotate 700ms var(--ease-out-soft),
+    scale 700ms var(--ease-out-soft);
+}
+.dish-tile-photo {
+  position: absolute;
+  inset: 9%;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--muted);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--background) 92%, transparent),
+    0 14px 30px rgb(31 20 16 / 0.3);
+}
+.dish-tile[data-unavailable] .dish-tile-photo {
+  opacity: 0.7;
+  filter: grayscale(0.6);
+}
+.dish-tile-price {
+  position: absolute;
+  right: -4%;
+  bottom: 3%;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: clamp(0.95rem, 0.8rem + 0.4vw, 1.2rem);
+  line-height: 1;
+  rotate: -8deg;
+  box-shadow: var(--shadow-soft);
+}
+.dish-tile-flag {
+  position: absolute;
+  top: 3%;
+  left: -4%;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  rotate: -10deg;
+  box-shadow:
+    0 0 0 2px var(--background),
+    var(--shadow-soft);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .dish-tile:not([data-unavailable]):hover {
+    translate: 0 -4px;
+    box-shadow: var(--shadow-lifted);
+  }
+  .dish-tile:not([data-unavailable]):hover .dish-tile-plate {
+    rotate: -6deg;
+    scale: 1.03;
+  }
+}
+
+/* A big category number drawn in outline, like a sign painter's (the menu's chapters). */
+.outline-number {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--primary);
+  paint-order: stroke fill;
 }
 
 /* A round sticker turning slowly (src/components/home/spin-sticker.tsx). */

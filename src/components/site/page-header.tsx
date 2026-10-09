@@ -1,6 +1,10 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 
+import { HeaderTone } from "@/components/home/header-tone";
+import { LacquerBand } from "@/components/home/lacquer-band";
+import { SpinSticker } from "@/components/home/spin-sticker";
+import { getBrand } from "@/lib/data/brand";
 import { cn } from "@/lib/utils";
 
 import { Eyebrow } from "./eyebrow";
@@ -16,71 +20,131 @@ function accentLastWord(title: string): string {
     : `${escaped.slice(0, at + 1)}<em>${escaped.slice(at + 1)}</em>`;
 }
 
+const SURFACES = {
+  lacquer: "surface-lacquer",
+  leaf: "surface-leaf",
+  ink: "surface-ink",
+} as const;
+
+export type PageTone = keyof typeof SURFACES;
+
 /**
- * The top of a content page: a short label, a large title whose last word is
- * set in italic, rising word by word on arrival, and an intro. A faint kolam
- * sits behind it. With `image`, a photograph stands beside it on large screens
- * (below it on phones) and is wiped in on arrival (globals.css, .intro-image).
+ * The top of a content page, a poster in one of the lacquer colours
+ * (docs/DECISIONS.md D113): it runs under the header, which turns clear with
+ * light text over it, like the home page's video. A short label, a big poster
+ * title whose last word is the italic accent, rising word by word on arrival,
+ * and an intro. With `image`, a photo stands beside it in a Kandyan arch or on
+ * a plate, the turning sticker on its edge. With `band`, a lacquer band of
+ * those words is laid over the seam with the page below. `compact` is a
+ * shorter poster, for pages people come to for a task (checkout, policies).
  */
-export function PageHeader({
+export async function PageHeader({
+  tone = "lacquer",
   eyebrow,
   title,
   intro,
   image,
+  band,
+  compact = false,
   children,
   className,
 }: {
+  tone?: PageTone;
   eyebrow?: string;
   title: string;
   intro?: ReactNode;
-  /** A photo for the page, shown with the title. Decorative unless `alt` says otherwise. */
-  image?: { src: string; alt?: string };
+  /** A photo for the page. Decorative unless `alt` says otherwise. */
+  image?: { src: string; alt?: string; shape?: "arch" | "plate" };
+  /** Words for a band across the bottom (decorative, hidden from screen readers). */
+  band?: string[];
+  compact?: boolean;
   children?: ReactNode;
   className?: string;
 }) {
-  const text = (
-    <div className="relative max-w-4xl space-y-6">
-      {eyebrow && (
-        <Eyebrow className="intro-fade text-muted-foreground [--d:0ms]">{eyebrow}</Eyebrow>
-      )}
-      <h1 className="intro-words text-display-2xl text-balance">
-        <SplitWords markup={accentLastWord(title)} />
-      </h1>
-      {intro && (
-        <div className="intro-fade max-w-2xl text-lg text-pretty text-muted-foreground [--d:450ms]">
-          {intro}
-        </div>
-      )}
-      {children}
-    </div>
-  );
+  const brand = await getBrand();
+  const plate = image?.shape === "plate";
 
   return (
-    <div
-      className={cn(
-        "relative pb-10 lg:pb-14",
-        image &&
-          "grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,25rem)] lg:items-center lg:gap-16",
-        className,
-      )}
-    >
-      <Kolam
-        size={7}
-        className="pointer-events-none absolute -top-16 right-0 hidden w-[22rem] text-highlight opacity-[0.08] sm:block lg:-top-24"
-      />
-      {text}
-      {image && (
-        <div className="intro-image relative aspect-[16/10] overflow-hidden rounded-[1.75rem] bg-muted shadow-lifted [--d:250ms] lg:aspect-[4/5]">
-          <Image
-            src={image.src}
-            alt={image.alt ?? ""}
-            fill
-            preload
-            sizes="(min-width: 1024px) 25rem, 100vw"
-            className="object-cover"
-          />
+    <>
+      <div
+        data-tone={tone}
+        className={cn(
+          "masthead relative isolate -mt-18 overflow-hidden",
+          SURFACES[tone],
+          className,
+        )}
+      >
+        <HeaderTone />
+        <Kolam
+          size={9}
+          className="pointer-events-none absolute -top-32 -right-32 -z-10 w-[36rem] text-highlight opacity-[0.09]"
+        />
+        <div
+          className={cn(
+            "mx-auto grid w-full max-w-7xl gap-12 px-4 sm:px-6 lg:px-8",
+            compact ? "pt-32 pb-14 lg:pt-36 lg:pb-16" : "pt-32 pb-16 lg:pt-36 lg:pb-20",
+            band && (compact ? "pb-20 lg:pb-24" : "pb-24 lg:pb-28"),
+            image &&
+              "lg:grid-cols-[minmax(0,1fr)_minmax(0,20rem)] lg:items-center lg:gap-16 xl:grid-cols-[minmax(0,1fr)_minmax(0,23rem)]",
+          )}
+        >
+          <div className="max-w-5xl space-y-6">
+            {eyebrow && <Eyebrow className="intro-fade [--d:0ms]">{eyebrow}</Eyebrow>}
+            <h1
+              className={cn(
+                "intro-words text-balance",
+                compact ? "text-display-2xl" : "text-display-3xl",
+              )}
+            >
+              <SplitWords markup={accentLastWord(title)} />
+            </h1>
+            {intro && (
+              <div className="intro-fade max-w-2xl text-lg text-pretty opacity-90 [--d:450ms]">
+                {intro}
+              </div>
+            )}
+            {children}
+          </div>
+          {image && (
+            <div className="relative mr-2 ml-auto w-full max-w-[14rem] sm:max-w-xs lg:mx-0 lg:max-w-none">
+              <div
+                className={cn(
+                  "intro-image relative overflow-hidden bg-white/5 shadow-lifted [--d:250ms]",
+                  plate
+                    ? "aspect-square rounded-full ring-[10px] ring-[color-mix(in_srgb,var(--background)_14%,transparent)]"
+                    : "arch aspect-[4/5]",
+                )}
+              >
+                <Image
+                  src={image.src}
+                  alt={image.alt ?? ""}
+                  fill
+                  preload
+                  sizes="(min-width: 1280px) 23rem, 20rem"
+                  className="object-cover"
+                />
+              </div>
+              <div
+                className={cn(
+                  "intro-fade absolute w-24 [--d:700ms] sm:w-28 lg:w-36",
+                  plate ? "-right-2 -bottom-2" : "-bottom-8 -left-8 lg:-left-14",
+                )}
+              >
+                <SpinSticker
+                  id="masthead-sticker"
+                  text={`${brand.tagline} ◆ ${brand.name} ◆ `}
+                  mark={brand.logo.mark}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+      {band && band.length > 0 && (
+        <div className="band-seam">
+          <LacquerBand words={band} tone={tone === "lacquer" ? "saffron" : "lacquer"} />
         </div>
       )}
-    </div>
+    </>
   );
 }
