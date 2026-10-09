@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [3.0.0] - Lacquer pop
+
 ### Changed
 
 - The start of the redesign, "lacquer pop": big headlines in a condensed, heavy poster type with italic accents.

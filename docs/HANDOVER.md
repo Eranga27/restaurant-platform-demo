@@ -1,6 +1,6 @@
 # Handover
 
-Status and working notes for whoever picks this project up next, person or Claude session. Last updated 9 October 2026, at v2.2.0.
+Status and working notes for whoever picks this project up next, person or Claude session. Last updated 9 October 2026, at v3.0.0.
 
 **New Claude session: read this file first.** Then read `AGENTS.md` (project conventions), `docs/PLAN.md` (the original plan) and `docs/DECISIONS.md` (D1 to D94 and B1 to B7; these override the plan). Check facts against the repository: this file describes the state on the date above.
 
@@ -17,24 +17,25 @@ A white-label online ordering platform for Sri Lankan restaurants, built as a sa
 
 Everything planned is built, merged, tagged and live. There are no open pull requests and no work in progress.
 
-| Version | What                                                                  | PR     |
-| ------- | --------------------------------------------------------------------- | ------ |
-| v0.1.0  | Phase 0: setup, CI, security headers, brand config, styleguide        | #1     |
-| v0.2.0  | Phase 1: public site, menu, branches, i18n scaffolding, SEO           | #2, #7 |
-| v0.3.0  | Phase 2: cart, checkout, pricing engine, cash on delivery, tracking   | #8, #9 |
-| v0.4.0  | Phase 3: PayHere payments, webhook, retries, refund policy            | #10    |
-| v0.5.0  | Phase 4: branch dashboard, live order board, alerts, print tickets    | #11    |
-| v0.6.0  | Phase 5: table bookings, events and catering, quotes, deposits        | #12    |
-| v0.7.0  | Phase 6: admin panel, two-step sign-in (TOTP), reports, audit log     | #13    |
-| v0.8.0  | Phase 7: accounts, reorder, loyalty, reviews, PWA, Sinhala and Tamil  | #14    |
-| v0.9.0  | Phase 8: UI/UX polish (splash, scroll reveals, page transitions)      | #15    |
-| v1.0.0  | Phase 9: hardening, accessibility, `/demo` tour, launch docs          | #16    |
-| v1.1.0  | Phase 10: editorial redesign (chapters, map, printed menu)            | #17    |
-| v1.2.0  | Home hero video with a curtain transition                             | #18    |
-| v1.3.0  | Restaurant feel: Sri Lankan palette, lamp splash, offer-first home    | #20    |
-| v2.0.0  | V2: staged splash, live hero, dish tabs, card menu, phone order bar   | #21    |
-| v2.1.0  | Preloader "the first drop": kithul treacle poured into the logo       | #24    |
-| v2.2.0  | Site uplift: sheet sections, button sweeps, page photos, booking card | #24    |
+| Version | What                                                                                           | PR     |
+| ------- | ---------------------------------------------------------------------------------------------- | ------ |
+| v0.1.0  | Phase 0: setup, CI, security headers, brand config, styleguide                                 | #1     |
+| v0.2.0  | Phase 1: public site, menu, branches, i18n scaffolding, SEO                                    | #2, #7 |
+| v0.3.0  | Phase 2: cart, checkout, pricing engine, cash on delivery, tracking                            | #8, #9 |
+| v0.4.0  | Phase 3: PayHere payments, webhook, retries, refund policy                                     | #10    |
+| v0.5.0  | Phase 4: branch dashboard, live order board, alerts, print tickets                             | #11    |
+| v0.6.0  | Phase 5: table bookings, events and catering, quotes, deposits                                 | #12    |
+| v0.7.0  | Phase 6: admin panel, two-step sign-in (TOTP), reports, audit log                              | #13    |
+| v0.8.0  | Phase 7: accounts, reorder, loyalty, reviews, PWA, Sinhala and Tamil                           | #14    |
+| v0.9.0  | Phase 8: UI/UX polish (splash, scroll reveals, page transitions)                               | #15    |
+| v1.0.0  | Phase 9: hardening, accessibility, `/demo` tour, launch docs                                   | #16    |
+| v1.1.0  | Phase 10: editorial redesign (chapters, map, printed menu)                                     | #17    |
+| v1.2.0  | Home hero video with a curtain transition                                                      | #18    |
+| v1.3.0  | Restaurant feel: Sri Lankan palette, lamp splash, offer-first home                             | #20    |
+| v2.0.0  | V2: staged splash, live hero, dish tabs, card menu, phone order bar                            | #21    |
+| v2.1.0  | Preloader "the first drop": kithul treacle poured into the logo                                | #24    |
+| v2.2.0  | Site uplift: sheet sections, button sweeps, page photos, booking card                          | #24    |
+| v3.0.0  | Redesign "lacquer pop": poster type, kottu chop splash, new home, poster page tops, menu tiles | #25    |
 
 The roadmap in `docs/PLAN.md` lists eight phases; the owner later added UI/UX polish before v1.0 (D48), and after it the design overhaul, the hero video and the restaurant-feel redesign (D81 to D87). `CHANGELOG.md` has the details of each release.
 
@@ -145,12 +146,12 @@ Environment variables are listed, by name, in `.env.example` and the README.
 
 - **Colours:** Kandyan lacquer red, saffron, curry leaf, coconut milk and kithul treacle. Three surfaces: cream, dark (`surface-ink`) and red (`surface-lacquer`).
 - **Type:** Fraunces for headlines (with italic accent words), DM Sans for text and small labels, Geist Mono only for figures in the staff screens.
-- **Redesign in progress** (branch `feat/redesign`, D105 to D115, "lacquer pop"): poster headlines in Bricolage Grotesque (condensed, heavy, capitals) with Fraunces italic accents; the home page rebuilt (crossed lacquer bands, plates gallery, story scrub, review wall); blinds between pages; a centred-logo header; every content page opens with a poster top (D113); the menu as dish tiles (D114); branches, about, events, contact, FAQ and the footer in the same style (D115).
+- **Redesign "lacquer pop"** (v3.0.0, D105 to D116): poster headlines in Bricolage Grotesque (condensed, heavy, capitals) with Fraunces italic accents; crossed lacquer bands, plates and stickers; blinds between pages; a centred-logo header (fewer items in Sinhala and Tamil, D116).
 - **Splash:** "kottu chop" (D106): dish names chopped to the kottu griddle's beat, the counter to 100, the name, then the panel falls apart in strips (about 3.8 s). It replaced "the first drop" (D96).
-- **Home page:** the offer on the first screen with a live open badge and a chef's pick, then dish tabs, why us, offers, events, branches and guests. A sticky order bar on phones.
-- **Menu:** a toolbar card, category pills with counts, and dish cards in a grid.
+- **Home page:** the kitchen video and poster headline with a turning sticker, two lacquer bands crossing, bestsellers as plates sliding sideways as you scroll, the story lighting up word by word beside a turning plate, offers as stickers, events in an arch, branches, guests' words on a moving wall. A sticky order bar on phones.
+- **Menu:** a poster top with a signature dish on a plate, a toolbar card, category tabs with counts, categories as numbered chapters, and dishes as tiles on coloured plates with price stickers (D114).
 - **Hero:** the kitchen video with the headline, the two buttons and the reasons to order over it (`hero-scene.tsx` and `hero.tsx`). The video loads after the page, over a still of its first frame. It has a pause button. With reduced motion, data saver or 2G, only the still shows.
-- **Sections and pages** (D98 to D104): home sections are rounded sheets laid over each other; inner pages share a header with a faint kolam and, on some, a photo; booking has a sticky summary card; tabs have a sliding pill; adding a dish flies its photo to the cart; buttons sweep colour on hover.
+- **Sections and pages** (D98 to D104, D113, D115): every content page opens with a poster top in a lacquer colour running under the header (`PageHeader`: `tone`, `image`, `band`, `compact`); home sections are rounded sheets laid over each other; booking has a sticky summary card; tabs have a sliding pill; adding a dish flies its photo to the cart; buttons sweep colour on hover.
 - **Motion:** everything respects `prefers-reduced-motion`.
 
 ## 7. Checking your work
