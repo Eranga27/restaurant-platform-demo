@@ -4,6 +4,10 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+### Changed
+
+- A new splash, "the first drop": a thread of golden kithul treacle runs down the dark screen and swells into a drop, which falls into the logo. The logo blooms as rings ripple out, "Kithul & Co." rises letter by letter with the three-language welcome while a counter runs to 100, and the page opens through the logo. About 3.75 s, once per tab.
+
 ## [2.0.0] - V2
 
 ### Added

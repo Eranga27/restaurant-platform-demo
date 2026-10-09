@@ -143,7 +143,7 @@ Environment variables are listed, by name, in `.env.example` and the README.
 
 - **Colours:** Kandyan lacquer red, saffron, curry leaf, coconut milk and kithul treacle. Three surfaces: cream, dark (`surface-ink`) and red (`surface-lacquer`).
 - **Type:** Fraunces for headlines (with italic accent words), DM Sans for text and small labels, Geist Mono only for figures in the staff screens.
-- **Splash:** an oil lamp (magul pahana) lights on lacquer red, a loading line fills, then a circle opens from the flame into the page (about 3.6 s).
+- **Splash:** "the first drop" (D96, D97): a thread of kithul treacle swells into a drop that falls into the logo, the name rises letter by letter while a counter runs to 100, then the page opens through the logo (about 3.75 s).
 - **Home page:** the offer on the first screen with a live open badge and a chef's pick, then dish tabs, why us, offers, events, branches and guests. A sticky order bar on phones.
 - **Menu:** a toolbar card, category pills with counts, and dish cards in a grid.
 - **Hero:** the kitchen video with the headline, the two buttons and the reasons to order over it (`hero-scene.tsx` and `hero.tsx`). The video loads after the page, over a still of its first frame. It has a pause button. With reduced motion, data saver or 2G, only the still shows.

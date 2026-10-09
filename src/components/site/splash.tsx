@@ -20,7 +20,7 @@ export async function Splash() {
     <>
       {/* eslint-disable-next-line react/no-danger -- a fixed string, nothing from data */}
       <script dangerouslySetInnerHTML={{ __html: SKIP_IF_SEEN }} />
-      <SiteSplash name={brand.name} greeting={t("greeting")} />
+      <SiteSplash name={brand.name} greeting={t("greeting")} mark={brand.logo.mark} />
     </>
   );
 }

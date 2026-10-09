@@ -309,8 +309,8 @@ body::after {
   --duration-base: 250ms;
   --duration-reveal: 700ms;
   /* When the splash screen is up, the hero's entrance waits for it. */
-  --splash-hold: 2800ms;
-  --splash-fade: 800ms;
+  --splash-hold: 3000ms;
+  --splash-fade: 750ms;
 }
 
 html {
@@ -549,86 +549,159 @@ html {
 }
 
 /*
- * Splash screen on a full page load (src/components/site/site-splash.tsx): a
- * magul pahana, the oil lamp lit to open anything auspicious, is drawn in
- * saffron and its flame lights. Then its glow blooms and opens a circle from
- * the flame that grows until the lacquer panel is gone: the lamp lights the
- * room. Browsers that can't animate the circle fade the panel instead.
- * Timed in CSS, so it leaves even if JavaScript never runs.
+ * Splash screen on a full page load (src/components/site/site-splash.tsx),
+ * "the first drop": a thread of kithul treacle runs down the dark screen and
+ * swells into a drop (the SVG "goo" filter gives it a liquid neck). The drop
+ * falls and lands in the brand's mark, which blooms as rings ripple out; the
+ * name rises letter by letter with the welcome, while a counter runs to 100.
+ * Then the page opens through the mark: it grows past the screen while a
+ * circle opens from its middle. Browsers that can't animate the circle fade
+ * the panel instead. Timed in CSS, so it leaves even if JavaScript never runs.
+ *
+ * Beats: thread 0 to 0.45 s, drop swells 0.3 to 1.15 s, falls 1.15 to 1.53 s,
+ * mark and rings from 1.5 s, name from 1.65 s, welcome from 2.05 s, counter
+ * 0.1 to 2.9 s, page from --splash-hold (3 s) for --splash-fade (0.75 s).
  */
 @property --splash-hole {
   syntax: "<length-percentage>";
   inherits: false;
   initial-value: 0%;
 }
+@property --splash-count {
+  syntax: "<integer>";
+  inherits: false;
+  initial-value: 0;
+}
 .site-splash {
   position: fixed;
   inset: 0;
   z-index: 100;
-  display: grid;
-  place-items: center;
-  background: var(--primary);
-  color: var(--primary-foreground);
-  /* Where the flame sits: the middle of the screen, a little above the name. */
-  --flame-at: 50% calc(50% - 5.5rem);
+  overflow: hidden;
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--highlight) 9%, var(--foreground)) 0%,
+    var(--foreground) 55%
+  );
+  color: var(--background);
+  --mark: 7rem;
+  /* Where the drop lands: the round of the drop in the mark, a little below its middle. */
+  --land: calc(var(--mark) * 0.1);
   mask: radial-gradient(
-    circle at var(--flame-at),
-    transparent var(--splash-hole),
-    #000 calc(var(--splash-hole) + 1px)
+    circle at 50% 50%,
+    transparent calc(var(--splash-hole) - 1px),
+    #000 var(--splash-hole)
   );
   animation: splash-out var(--splash-fade) cubic-bezier(0.55, 0, 0.75, 0.2) var(--splash-hold)
     forwards;
 }
 @media (min-width: 64rem) {
   .site-splash {
-    --flame-at: 50% calc(50% - 6.75rem);
+    --mark: 8rem;
   }
 }
 .site-splash .splash-content {
+  position: absolute;
+  inset: 0;
   animation: splash-content-out 380ms ease-in var(--splash-hold) forwards;
 }
-.site-splash .lamp-line {
-  stroke-dasharray: 1;
-  animation: lamp-draw 800ms var(--ease-out-soft) both;
-  animation-delay: calc(150ms + var(--i) * 120ms);
-}
-.site-splash .lamp-flame {
-  transform-box: fill-box;
-  transform-origin: 50% 100%;
+
+/* The mark lands in the middle of the screen, then carries the page in. */
+.site-splash .splash-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--mark);
+  height: var(--mark);
+  translate: -50% -50%;
+  scale: 0;
   animation:
-    flame-light 500ms var(--ease-out-soft) 900ms both,
-    flame-flicker 1.4s ease-in-out 1400ms infinite alternate;
+    mark-in 650ms cubic-bezier(0.34, 1.56, 0.64, 1) 1500ms forwards,
+    mark-through var(--splash-fade) cubic-bezier(0.55, 0, 0.75, 0.2) var(--splash-hold) forwards;
 }
-.site-splash .lamp-glow {
+
+/* The pour, drawn 1:1 in CSS pixels so its vh offsets line up with the screen. */
+.site-splash .splash-pour {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 160px;
+  height: 160px;
+  translate: -50% -50%;
+  overflow: visible;
+}
+.site-splash .pour-stream {
+  translate: 0 -56vh;
+  animation:
+    stream-in 450ms var(--ease-out-soft) forwards,
+    stream-out 360ms cubic-bezier(0.5, 0, 0.9, 0.5) 1150ms forwards;
+}
+.site-splash .pour-fall {
+  translate: 0 calc(-24vh + 4px);
+  animation: drop-fall 380ms cubic-bezier(0.55, 0, 0.95, 0.45) 1150ms forwards;
+}
+.site-splash .pour-drop {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  scale: 0.15;
+  animation:
+    drop-swell 850ms var(--ease-in-out-soft) 300ms forwards,
+    drop-land 260ms ease-out 1530ms forwards;
+}
+.site-splash .pour-ring {
+  fill: none;
+  stroke: var(--highlight);
+  stroke-width: 1.2;
   transform-box: fill-box;
   transform-origin: center;
-  animation:
-    glow-in 1000ms var(--ease-out-soft) 1000ms both,
-    glow-bloom 500ms ease-in calc(var(--splash-hold) - 150ms) forwards;
+  translate: 0 var(--land);
+  opacity: 0;
+  animation: ring 1100ms cubic-bezier(0.2, 0.7, 0.3, 1) calc(1530ms + var(--ring, 0) * 170ms)
+    forwards;
+}
+
+/* The name and the welcome sit under the mark. */
+.site-splash .splash-words {
+  position: absolute;
+  inset: calc(50% + var(--mark) / 2 + 1.75rem) 1rem auto;
+  text-align: center;
 }
 .site-splash .splash-name {
-  animation: splash-words-in 800ms var(--ease-out-soft) 1300ms both;
+  line-height: 1.15;
+}
+/* Each word is a window the letters rise into; the padding leaves room for marks above and below the line. */
+.site-splash .splash-name .word {
+  display: inline-block;
+  overflow: clip;
+  padding-block: 0.15em;
+  margin-block: -0.15em;
+  vertical-align: top;
+}
+.site-splash .splash-name .ch {
+  display: inline-block;
+  translate: 0 110%;
+  animation: splash-letter 650ms var(--ease-out-soft) calc(1650ms + var(--i) * 32ms) forwards;
 }
 .site-splash .splash-greeting {
-  animation: splash-words-in 700ms var(--ease-out-soft) 1700ms both;
+  opacity: 0;
+  animation: splash-words-in 600ms var(--ease-out-soft) 2050ms forwards;
 }
-/* Fills while the page gets ready, so the wait reads as loading. */
-.site-splash .splash-line {
-  display: block;
-  width: 8rem;
-  height: 1px;
-  margin-inline: auto;
-  background: color-mix(in srgb, var(--highlight) 25%, transparent);
-  animation: splash-words-in 500ms ease-out 1500ms both;
+
+/* Counts up while the page gets ready, so the wait reads as loading. */
+.site-splash .splash-count {
+  position: absolute;
+  right: 1.5rem;
+  bottom: max(1.25rem, env(safe-area-inset-bottom));
+  font-size: 0.8125rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+  color: color-mix(in srgb, var(--highlight) 80%, transparent);
+  counter-reset: splash var(--splash-count);
+  animation: splash-count 2800ms linear 100ms forwards;
 }
-.site-splash .splash-line::after {
-  content: "";
-  display: block;
-  height: 100%;
-  background: var(--highlight);
-  transform-origin: left;
-  animation: splash-fill 1300ms var(--ease-in-out-soft) 1500ms both;
+.site-splash .splash-count::before {
+  content: counter(splash, decimal-leading-zero);
 }
+
 [data-splash="seen"] .site-splash {
   display: none;
 }
@@ -648,60 +721,92 @@ html {
     visibility: hidden;
   }
 }
-@keyframes splash-fill {
-  from {
-    scale: 0 1;
-  }
-}
-@keyframes glow-bloom {
-  to {
-    opacity: 1;
-    scale: 3.2;
-  }
-}
 @keyframes splash-content-out {
   to {
     opacity: 0;
-    translate: 0 -2.5rem;
+    translate: 0 -1.5rem;
   }
 }
-@keyframes lamp-draw {
+@keyframes stream-in {
+  to {
+    translate: 0 -24vh;
+  }
+}
+@keyframes stream-out {
   from {
-    stroke-dashoffset: 1;
+    translate: 0 -24vh;
   }
   to {
-    stroke-dashoffset: 0;
+    translate: 0 -62vh;
   }
 }
-@keyframes flame-light {
+@keyframes drop-swell {
+  75% {
+    scale: 1 1.04;
+  }
+  to {
+    scale: 0.94 1.16;
+  }
+}
+@keyframes drop-fall {
+  to {
+    translate: 0 calc(var(--land) - 22px);
+  }
+}
+/* Squashes on landing, then shrinks away (never faded: a transparent shape under the filter leaves a dark box). */
+@keyframes drop-land {
   from {
-    opacity: 0;
-    scale: 0.2 0.1;
+    scale: 0.94 1.16;
+  }
+  40% {
+    scale: 1.35 0.62;
+  }
+  to {
+    scale: 0;
+    visibility: hidden;
   }
 }
-@keyframes flame-flicker {
-  0% {
-    scale: 1 1;
-    rotate: -1.5deg;
-  }
-  50% {
-    scale: 0.94 1.06;
-  }
-  100% {
-    scale: 1.03 0.97;
-    rotate: 1.5deg;
-  }
-}
-@keyframes glow-in {
+@keyframes ring {
   from {
+    opacity: 0.9;
+    scale: 0.5;
+  }
+  to {
     opacity: 0;
-    scale: 0.4;
+    scale: 3.4;
+  }
+}
+@keyframes mark-in {
+  to {
+    scale: 1;
+  }
+}
+@keyframes mark-through {
+  from {
+    scale: 1;
+  }
+  to {
+    scale: 22;
+  }
+}
+@keyframes splash-letter {
+  to {
+    translate: 0 0;
   }
 }
 @keyframes splash-words-in {
   from {
     opacity: 0;
-    translate: 0 1rem;
+    translate: 0 0.75rem;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+@keyframes splash-count {
+  to {
+    --splash-count: 100;
   }
 }
 
