@@ -888,7 +888,8 @@
     "call": "Need to order now? Call {phone}."
   },
   "Splash": {
-    "greeting": "Welcome · ආයුබෝවන් · வணக்கம்"
+    "greeting": "Welcome · ආයුබෝවන් · வணக்கம்",
+    "words": "Kottu|Hoppers|Sambol|Lamprais"
   },
   "ErrorPage": {
     "title": "Something went wrong",

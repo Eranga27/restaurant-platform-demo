@@ -1,4 +1,5 @@
 import {
+  Bricolage_Grotesque,
   DM_Sans,
   Fraunces,
   Geist_Mono,
@@ -24,6 +25,18 @@ export const displayFont = Fraunces({
   variable: "--font-display-latin",
   display: "swap",
   preload: false,
+});
+
+/**
+ * Posters: big headlines, set condensed and heavy (the width axis goes down to
+ * 75%), the voice of the redesign. Accent words stay in the display serif's
+ * italic. Preloaded: it sets the first screen.
+ */
+export const posterFont = Bricolage_Grotesque({
+  subsets: ["latin"],
+  axes: ["wdth"],
+  variable: "--font-poster-latin",
+  display: "swap",
 });
 
 /** Body and UI text: a friendly, very readable sans. */
@@ -57,6 +70,13 @@ export const tamilFont = Noto_Sans_Tamil({
   preload: false,
 });
 
-export const fontVariables = [displayFont, bodyFont, monoFont, sinhalaFont, tamilFont]
+export const fontVariables = [
+  posterFont,
+  displayFont,
+  bodyFont,
+  monoFont,
+  sinhalaFont,
+  tamilFont,
+]
   .map((font) => font.variable)
   .join(" ");

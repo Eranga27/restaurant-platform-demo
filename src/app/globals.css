@@ -141,6 +141,9 @@
   --font-display:
     var(--font-display-latin), var(--font-sinhala), var(--font-tamil), Georgia, ui-serif, serif;
   --font-heading: var(--font-display);
+  --font-poster:
+    var(--font-poster-latin), var(--font-sinhala), var(--font-tamil), ui-sans-serif, system-ui,
+    sans-serif;
   --font-mono:
     var(--font-mono-latin), var(--font-sinhala), var(--font-tamil), ui-monospace, SFMono-Regular,
     Menlo, monospace;
@@ -228,6 +231,42 @@
   ::selection {
     background-color: color-mix(in srgb, var(--highlight) 45%, transparent);
   }
+}
+
+/*
+ * Posters (the redesign's voice, docs/DECISIONS.md D105): on the public site,
+ * big headlines are set condensed, heavy and in capitals; their accent words
+ * stay in the display serif's italic, in lower case. Smaller headings (dish
+ * names, card titles) keep the serif. Unlayered, so it wins over the
+ * font-display utility some of these headings carry.
+ */
+body:has(.site-header)
+  :is(h1, h2):is(
+    [class*="text-display-xl"],
+    [class*="text-display-2xl"],
+    [class*="text-display-3xl"]
+  ),
+.font-poster {
+  font-family: var(--font-poster);
+  font-weight: 800;
+  font-stretch: 75%;
+  letter-spacing: -0.005em;
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+body:has(.site-header)
+  :is(h1, h2):is(
+    [class*="text-display-xl"],
+    [class*="text-display-2xl"],
+    [class*="text-display-3xl"]
+  )
+  em,
+.font-poster em {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-stretch: normal;
+  letter-spacing: -0.02em;
+  text-transform: none;
 }
 
 /*
@@ -520,7 +559,7 @@ body::after {
   --duration-base: 250ms;
   --duration-reveal: 700ms;
   /* When the splash screen is up, the hero's entrance waits for it. */
-  --splash-hold: 3000ms;
+  --splash-hold: 2980ms;
   --splash-fade: 750ms;
 }
 
@@ -802,23 +841,17 @@ html {
 
 /*
  * Splash screen on a full page load (src/components/site/site-splash.tsx),
- * "the first drop": a thread of kithul treacle runs down the dark screen and
- * swells into a drop (the SVG "goo" filter gives it a liquid neck). The drop
- * falls and lands in the brand's mark, which blooms as rings ripple out; the
- * name rises letter by letter with the welcome, while a counter runs to 100.
- * Then the page opens through the mark: it grows past the screen while a
- * circle opens from its middle. Browsers that can't animate the circle fade
- * the panel instead. Timed in CSS, so it leaves even if JavaScript never runs.
+ * "kottu chop" (docs/DECISIONS.md D106): to the beat of the kottu griddle,
+ * dish names land on lacquer red one after another, each cut in two by a
+ * saffron blade, while a counter runs to 100. The brand's name lands last.
+ * Then the panel falls apart in seven strips, red over saffron, alternate
+ * strips dropping and rising, and the page shows through. Timed in CSS, so it
+ * leaves even if JavaScript never runs.
  *
- * Beats: thread 0 to 0.45 s, drop swells 0.3 to 1.15 s, falls 1.15 to 1.53 s,
- * mark and rings from 1.5 s, name from 1.65 s, welcome from 2.05 s, counter
- * 0.1 to 2.9 s, page from --splash-hold (3 s) for --splash-fade (0.75 s).
+ * Beats: a word every 420 ms from 0.22 s (the blade at +0.28 s, the halves fly
+ * apart at +0.33 s), the name after the last word, the counter 0.1 to 2.8 s,
+ * the page from --splash-hold (2.98 s); the last strip is gone by about 3.8 s.
  */
-@property --splash-hole {
-  syntax: "<length-percentage>";
-  inherits: false;
-  initial-value: 0%;
-}
 @property --splash-count {
   syntax: "<integer>";
   inherits: false;
@@ -829,129 +862,138 @@ html {
   inset: 0;
   z-index: 100;
   overflow: hidden;
-  background: radial-gradient(
-    circle at 50% 50%,
-    color-mix(in srgb, var(--highlight) 9%, var(--foreground)) 0%,
-    var(--foreground) 55%
-  );
-  color: var(--background);
-  --mark: 7rem;
-  /* Where the drop lands: the round of the drop in the mark, a little below its middle. */
-  --land: calc(var(--mark) * 0.1);
-  mask: radial-gradient(
-    circle at 50% 50%,
-    transparent calc(var(--splash-hole) - 1px),
-    #000 var(--splash-hole)
-  );
-  animation: splash-out var(--splash-fade) cubic-bezier(0.55, 0, 0.75, 0.2) var(--splash-hold)
-    forwards;
+  color: var(--primary-foreground);
+  /* Out of the way of clicks once the strips have gone, even before JavaScript removes it. */
+  animation: splash-gone 0s linear calc(var(--splash-hold) + 900ms) forwards;
 }
-@media (min-width: 64rem) {
-  .site-splash {
-    --mark: 8rem;
-  }
-}
-.site-splash .splash-content {
+
+/* The panel: seven strips of lacquer red over seven of saffron. */
+.chop-strips {
   position: absolute;
   inset: 0;
-  animation: splash-content-out 380ms ease-in var(--splash-hold) forwards;
+  display: flex;
+}
+.chop-strips > i {
+  flex: 1;
+  margin-right: -1px;
+  background: var(--strip);
+  animation: strip-fall 520ms cubic-bezier(0.65, 0, 0.85, 0.3)
+    calc(var(--splash-hold) + var(--s) * 32ms + var(--lag, 0ms)) forwards;
+}
+.chop-strips > i:nth-child(even) {
+  animation-name: strip-rise;
+}
+.chop-under {
+  --strip: var(--highlight);
+  --lag: 110ms;
+}
+.chop-over {
+  --strip: var(--primary);
 }
 
-/* The mark lands in the middle of the screen, then carries the page in. */
-.site-splash .splash-mark {
+.chop-stage {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: var(--mark);
-  height: var(--mark);
-  translate: -50% -50%;
-  scale: 0;
-  animation:
-    mark-in 650ms cubic-bezier(0.34, 1.56, 0.64, 1) 1500ms forwards,
-    mark-through var(--splash-fade) cubic-bezier(0.55, 0, 0.75, 0.2) var(--splash-hold) forwards;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  animation: chop-stage-out 260ms ease-in var(--splash-hold) forwards;
 }
-
-/* The pour, drawn 1:1 in CSS pixels so its vh offsets line up with the screen. */
-.site-splash .splash-pour {
+.chop-mark {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 160px;
-  height: 160px;
-  translate: -50% -50%;
-  overflow: visible;
+  top: 1.5rem;
+  left: 1.5rem;
+  width: 3.25rem;
+  height: 3.25rem;
+  animation: chop-fade-in 500ms var(--ease-out-soft) 150ms both;
 }
-.site-splash .pour-stream {
-  translate: 0 -56vh;
-  animation:
-    stream-in 450ms var(--ease-out-soft) forwards,
-    stream-out 360ms cubic-bezier(0.5, 0, 0.9, 0.5) 1150ms forwards;
-}
-.site-splash .pour-fall {
-  translate: 0 calc(-24vh + 4px);
-  animation: drop-fall 380ms cubic-bezier(0.55, 0, 0.95, 0.45) 1150ms forwards;
-}
-.site-splash .pour-drop {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  scale: 0.15;
-  animation:
-    drop-swell 850ms var(--ease-in-out-soft) 300ms forwards,
-    drop-land 260ms ease-out 1530ms forwards;
-}
-.site-splash .pour-ring {
-  fill: none;
-  stroke: var(--highlight);
-  stroke-width: 1.2;
-  transform-box: fill-box;
-  transform-origin: center;
-  translate: 0 var(--land);
-  opacity: 0;
-  animation: ring 1100ms cubic-bezier(0.2, 0.7, 0.3, 1) calc(1530ms + var(--ring, 0) * 170ms)
-    forwards;
-}
-
-/* The name and the welcome sit under the mark. */
-.site-splash .splash-words {
-  position: absolute;
-  inset: calc(50% + var(--mark) / 2 + 1.75rem) 1rem auto;
+.chop-words {
+  position: relative;
+  width: 100%;
+  height: 1em;
+  font-size: clamp(4.5rem, 1rem + 17vw, 17rem);
+  line-height: 0.86;
   text-align: center;
 }
-.site-splash .splash-name {
-  line-height: 1.15;
-}
-/* Each word is a window the letters rise into; the padding leaves room for marks above and below the line. */
-.site-splash .splash-name .word {
-  display: inline-block;
-  overflow: clip;
-  padding-block: 0.15em;
-  margin-block: -0.15em;
-  vertical-align: top;
-}
-.site-splash .splash-name .ch {
-  display: inline-block;
-  translate: 0 110%;
-  animation: splash-letter 650ms var(--ease-out-soft) calc(1650ms + var(--i) * 32ms) forwards;
-}
-.site-splash .splash-greeting {
+.chop-word {
+  position: absolute;
+  inset: 0;
   opacity: 0;
-  animation: splash-words-in 600ms var(--ease-out-soft) 2050ms forwards;
+  rotate: var(--r, 0deg);
+  animation: chop-word-in 300ms cubic-bezier(0.34, 1.4, 0.64, 1) var(--at) both;
 }
-
-/* Counts up while the page gets ready, so the wait reads as loading. */
-.site-splash .splash-count {
+.chop-half {
+  position: absolute;
+  inset: 0;
+  white-space: nowrap;
+}
+.chop-top {
+  clip-path: inset(0 0 48% 0);
+}
+.chop-bottom {
+  clip-path: inset(52% 0 0 0);
+}
+.chop-cut .chop-top {
+  animation: chop-cut-top 260ms cubic-bezier(0.4, 0, 0.9, 0.5) calc(var(--at) + 330ms) forwards;
+}
+.chop-cut .chop-bottom {
+  animation: chop-cut-bottom 260ms cubic-bezier(0.4, 0, 0.9, 0.5) calc(var(--at) + 330ms) forwards;
+}
+/* The blade: a saffron slash across the word, just before it falls apart. */
+.chop-blade {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(110vw, 70rem);
+  height: 0.35rem;
+  margin: -0.175rem 0 0 calc(min(110vw, 70rem) / -2);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--highlight) 20%,
+    var(--primary-foreground) 50%,
+    var(--highlight) 80%,
+    transparent
+  );
+  rotate: -7deg;
+  transform-origin: left center;
+  scale: 0 1;
+  opacity: 0;
+  animation: chop-blade 220ms cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--at) + 280ms) both;
+}
+/* The name is a little smaller than the dishes: it can be long. */
+.chop-name {
+  font-size: 0.8em;
+  line-height: 1.075;
+}
+.chop-greeting {
+  position: absolute;
+  right: 0;
+  bottom: max(1.75rem, env(safe-area-inset-bottom));
+  left: 0;
+  font-size: 0.875rem;
+  letter-spacing: 0.18em;
+  text-align: center;
+  color: var(--highlight);
+  animation: chop-fade-in 600ms var(--ease-out-soft) 2100ms both;
+}
+.chop-count {
   position: absolute;
   right: 1.5rem;
   bottom: max(1.25rem, env(safe-area-inset-bottom));
-  font-size: 0.8125rem;
+  font-size: 3.25rem;
+  line-height: 1;
+  color: var(--highlight);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.12em;
-  color: color-mix(in srgb, var(--highlight) 80%, transparent);
   counter-reset: splash var(--splash-count);
-  animation: splash-count 2800ms linear 100ms forwards;
+  animation: splash-count 2700ms linear 100ms forwards;
 }
-.site-splash .splash-count::before {
+.chop-count::before {
   content: counter(splash, decimal-leading-zero);
+}
+@media (max-width: 40rem) {
+  .chop-greeting {
+    bottom: 5.5rem;
+  }
 }
 
 [data-splash="seen"] .site-splash {
@@ -963,102 +1005,79 @@ html {
   }
 }
 
-@keyframes splash-out {
-  70% {
+@keyframes chop-word-in {
+  from {
+    opacity: 0;
+    scale: 0.55;
+  }
+  to {
     opacity: 1;
-  }
-  to {
-    --splash-hole: 150%;
-    opacity: 0;
-    visibility: hidden;
+    scale: 1;
   }
 }
-@keyframes splash-content-out {
-  to {
-    opacity: 0;
-    translate: 0 -1.5rem;
-  }
-}
-@keyframes stream-in {
-  to {
-    translate: 0 -24vh;
-  }
-}
-@keyframes stream-out {
-  from {
-    translate: 0 -24vh;
-  }
-  to {
-    translate: 0 -62vh;
-  }
-}
-@keyframes drop-swell {
-  75% {
-    scale: 1 1.04;
-  }
-  to {
-    scale: 0.94 1.16;
-  }
-}
-@keyframes drop-fall {
-  to {
-    translate: 0 calc(var(--land) - 22px);
-  }
-}
-/* Squashes on landing, then shrinks away (never faded: a transparent shape under the filter leaves a dark box). */
-@keyframes drop-land {
-  from {
-    scale: 0.94 1.16;
-  }
+@keyframes chop-cut-top {
   40% {
-    scale: 1.35 0.62;
-  }
-  to {
-    scale: 0;
-    visibility: hidden;
-  }
-}
-@keyframes ring {
-  from {
-    opacity: 0.9;
-    scale: 0.5;
-  }
-  to {
-    opacity: 0;
-    scale: 3.4;
-  }
-}
-@keyframes mark-in {
-  to {
-    scale: 1;
-  }
-}
-@keyframes mark-through {
-  from {
-    scale: 1;
-  }
-  to {
-    scale: 22;
-  }
-}
-@keyframes splash-letter {
-  to {
-    translate: 0 0;
-  }
-}
-@keyframes splash-words-in {
-  from {
-    opacity: 0;
-    translate: 0 0.75rem;
-  }
-  to {
     opacity: 1;
-    translate: 0 0;
+  }
+  to {
+    translate: -22% -55%;
+    rotate: -7deg;
+    opacity: 0;
+  }
+}
+@keyframes chop-cut-bottom {
+  40% {
+    opacity: 1;
+  }
+  to {
+    translate: 22% 55%;
+    rotate: 6deg;
+    opacity: 0;
+  }
+}
+@keyframes chop-blade {
+  0% {
+    opacity: 1;
+    scale: 0 1;
+  }
+  60% {
+    opacity: 1;
+    scale: 1 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 1 1;
+  }
+}
+@keyframes strip-fall {
+  to {
+    translate: 0 105%;
+  }
+}
+@keyframes strip-rise {
+  to {
+    translate: 0 -105%;
+  }
+}
+@keyframes chop-stage-out {
+  to {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+@keyframes chop-fade-in {
+  from {
+    opacity: 0;
   }
 }
 @keyframes splash-count {
   to {
     --splash-count: 100;
+  }
+}
+@keyframes splash-gone {
+  to {
+    visibility: hidden;
   }
 }
 
