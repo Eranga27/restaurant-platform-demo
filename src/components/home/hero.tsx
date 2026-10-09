@@ -111,7 +111,7 @@ export async function Hero({
           </p>
           <h1
             id="welcome-title"
-            className="intro-words mt-5 max-w-[14ch] font-display text-display-3xl text-balance"
+            className="intro-words mt-5 max-w-[14ch] font-display text-display-3xl text-balance [text-shadow:0_2px_28px_rgb(0_0_0/0.3)]"
           >
             <SplitWords markup={t.markup("heroTitle", { em: (c) => `<em>${c}</em>` })} />
           </h1>
@@ -119,24 +119,17 @@ export async function Hero({
             {t("heroSubtitle")}
           </p>
           <div className="intro-fade mt-8 flex flex-wrap gap-3 [--d:550ms]">
-            <Button
-              asChild
-              size="lg"
-              className="group bg-highlight text-highlight-foreground hover:bg-highlight/90"
-            >
+            <Button asChild size="lg" variant="highlight">
               <Link href="/menu" transitionTypes={LAMP}>
                 {nav("orderNow")}
-                <ArrowRight
-                  aria-hidden
-                  className="size-4 transition-transform group-hover:translate-x-0.5"
-                />
+                <ArrowRight aria-hidden className="size-4" />
               </Link>
             </Button>
             <Button
               asChild
               size="lg"
               variant="outline"
-              className="border-current/40 bg-transparent text-current hover:bg-white/10 hover:text-current"
+              className="border-current/40 bg-transparent text-current"
             >
               <Link href="/reservations" transitionTypes={CURTAIN}>
                 {nav("bookTable")}

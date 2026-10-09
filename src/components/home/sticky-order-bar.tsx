@@ -27,12 +27,17 @@ export function StickyOrderBar({
   useEffect(() => {
     const hero = document.getElementById(watch);
     const footer = document.querySelector("footer");
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.target === hero) setHeroGone(!entry.isIntersecting);
-        else setFooterShown(entry.isIntersecting);
-      }
-    });
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.target === hero) setHeroGone(!entry.isIntersecting);
+          else setFooterShown(entry.isIntersecting);
+        }
+      },
+      // The top fifth of the screen doesn't count: the header sits there, and the
+      // first section lays its rounded top over the hero's last few pixels.
+      { rootMargin: "-20% 0px 0px 0px" },
+    );
     if (hero) observer.observe(hero);
     if (footer) observer.observe(footer);
     return () => observer.disconnect();

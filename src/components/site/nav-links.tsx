@@ -4,7 +4,8 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 import { CURTAIN } from "@/lib/transitions";
 
-export type NavItem = { href: string; label: string };
+/** `className` goes on the item's list entry, e.g. to hide it where the header has a button for it. */
+export type NavItem = { href: string; label: string; className?: string };
 
 export function NavLinks({
   items,
@@ -23,7 +24,7 @@ export function NavLinks({
       {items.map((item) => {
         const current = pathname === item.href || pathname.startsWith(`${item.href}/`);
         return (
-          <li key={item.href}>
+          <li key={item.href} className={item.className}>
             <Link
               href={item.href}
               transitionTypes={CURTAIN}

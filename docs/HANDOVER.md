@@ -147,6 +147,7 @@ Environment variables are listed, by name, in `.env.example` and the README.
 - **Home page:** the offer on the first screen with a live open badge and a chef's pick, then dish tabs, why us, offers, events, branches and guests. A sticky order bar on phones.
 - **Menu:** a toolbar card, category pills with counts, and dish cards in a grid.
 - **Hero:** the kitchen video with the headline, the two buttons and the reasons to order over it (`hero-scene.tsx` and `hero.tsx`). The video loads after the page, over a still of its first frame. It has a pause button. With reduced motion, data saver or 2G, only the still shows.
+- **Sections and pages** (D98 to D104): home sections are rounded sheets laid over each other; inner pages share a header with a faint kolam and, on some, a photo; booking has a sticky summary card; tabs have a sliding pill; adding a dish flies its photo to the cart; buttons sweep colour on hover.
 - **Motion:** everything respects `prefers-reduced-motion`.
 
 ## 7. Checking your work

@@ -5,7 +5,10 @@ import { useEffect, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
 
-/** Sticky category tabs, each with its number of dishes, that follow the scroll position. */
+/**
+ * Sticky category tabs, each with its number of dishes, that follow the scroll
+ * position. A red pill slides to the current one (globals.css, .tab-pill).
+ */
 export function CategoryNav({
   categories,
 }: {
@@ -41,6 +44,34 @@ export function CategoryNav({
     el?.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
   }, [active]);
 
+  // Move the pill to the active tab, and again whenever the row changes size.
+  useEffect(() => {
+    const row = listRef.current;
+    const marker = row?.querySelector<HTMLElement>(".tab-pill");
+    if (!row || !marker) return;
+    const place = () => {
+      const link = row.querySelector<HTMLElement>(`[data-slug="${active}"] > a`);
+      if (!link) return;
+      marker.style.setProperty("--x", `${link.offsetLeft}px`);
+      marker.style.setProperty("--y", `${link.offsetTop}px`);
+      marker.style.setProperty("--w", `${link.offsetWidth}px`);
+      marker.style.setProperty("--h", `${link.offsetHeight}px`);
+      // The first placement jumps there; after that the pill slides.
+      if (!row.dataset.pill) {
+        row.dataset.pill = "placed";
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            row.dataset.pill = "ready";
+          }),
+        );
+      }
+    };
+    place();
+    const resize = new ResizeObserver(place);
+    resize.observe(row);
+    return () => resize.disconnect();
+  }, [active]);
+
   return (
     <nav
       aria-label={t("categories")}
@@ -48,15 +79,16 @@ export function CategoryNav({
     >
       <ul
         ref={listRef}
-        className="flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 py-3 sm:px-6 lg:px-8"
+        className="relative flex [scrollbar-width:none] gap-2 overflow-x-auto px-4 py-3 [--pill-bg:var(--primary)] sm:px-6 lg:px-8"
       >
+        <li aria-hidden className="tab-pill" />
         {categories.map((c) => (
           <li key={c.slug} data-slug={c.slug} className="shrink-0">
             <a
               href={`#${c.slug}`}
               aria-current={active === c.slug ? "true" : undefined}
               className={cn(
-                "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-medium whitespace-nowrap transition-[background-color,color,border-color,scale] duration-200 active:scale-[0.97]",
+                "relative inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm font-medium whitespace-nowrap transition-[background-color,color,border-color,scale] duration-300 active:scale-[0.97]",
                 active === c.slug
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-card text-foreground/80 hover:border-foreground/30 hover:text-foreground",

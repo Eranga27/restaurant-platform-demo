@@ -2,7 +2,7 @@
 
 import { Minus, Plus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { DietaryBadge } from "@/components/site/dietary-badge";
@@ -22,6 +22,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/lib/cart/store";
+import { flyToCart } from "@/lib/fly-to-cart";
 import type { MenuItemView, MenuOptionView } from "@/lib/data/catalogue";
 import { formatLKR } from "@/lib/money";
 import {
@@ -77,6 +78,7 @@ function ItemSheetBody({
   const dietary = useTranslations("Dietary");
   const spice = useTranslations("Spice");
   const instructionsId = useId();
+  const photo = useRef<HTMLDivElement>(null);
 
   const [selection, setSelection] = useState<Selection>(() => defaultSelection(item));
   const [spiceLevel, setSpiceLevel] = useState<SpiceLevel>("medium");
@@ -125,6 +127,8 @@ function ItemSheetBody({
       details,
       unitPriceCents: unitPrice,
     });
+    // Before the dialog closes, while the photo is still on screen.
+    flyToCart(photo.current);
     onClose();
     toast.success(t("added", { name: item.name }), {
       action: { label: t("viewOrder"), onClick: () => useCart.getState().setOpen(true) },
@@ -133,7 +137,7 @@ function ItemSheetBody({
 
   return (
     <>
-      <div className="relative aspect-[16/10] shrink-0 bg-muted">
+      <div ref={photo} className="relative aspect-[16/10] shrink-0 bg-muted">
         <DishImage src={item.imageUrl} alt={item.name} sizes="(min-width: 640px) 512px, 100vw" />
         <DialogClose asChild>
           <Button

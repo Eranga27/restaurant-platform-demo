@@ -41,7 +41,7 @@ export function MobileNavSheet({
         side="right"
         closeLabel={t("closeMenu")}
         data-lenis-prevent
-        className="w-full max-w-none gap-0 overflow-y-auto border-none surface-ink data-[side=right]:w-full sm:max-w-none data-[side=right]:sm:max-w-none"
+        className="w-full max-w-none gap-0 overflow-y-auto border-none surface-ink bg-foreground text-background data-[side=right]:w-full sm:max-w-none data-[side=right]:sm:max-w-none"
       >
         <SheetTitle className="sr-only">{brandName}</SheetTitle>
         <SheetDescription className="sr-only">{t("mainNavigation")}</SheetDescription>
@@ -55,14 +55,15 @@ export function MobileNavSheet({
               {all.map((item, i) => {
                 const current = pathname === item.href || pathname.startsWith(`${item.href}/`);
                 return (
-                  <li key={item.href}>
+                  <li key={item.href} className="overflow-clip">
                     <Link
                       href={item.href}
                       transitionTypes={CURTAIN}
                       onClick={() => onOpenChange(false)}
                       aria-current={current ? "page" : undefined}
+                      style={{ "--i": i } as React.CSSProperties}
                       className={cn(
-                        "group flex items-baseline gap-5 py-1 font-display text-[clamp(2.5rem,1.5rem+5vw,5.5rem)] leading-[1.05] transition-colors hover:text-highlight",
+                        "nav-sheet-link group flex items-baseline gap-5 py-1 font-display text-[clamp(2.5rem,1.5rem+5vw,5.5rem)] leading-[1.05] transition-colors hover:text-highlight",
                         current && "text-highlight",
                       )}
                     >
@@ -78,7 +79,7 @@ export function MobileNavSheet({
               })}
             </ol>
           </nav>
-          <div className="mt-auto grid gap-6 border-t border-[var(--border)] pt-8 font-mono text-xs tracking-[0.12em] uppercase sm:grid-cols-[1fr_auto]">
+          <div className="nav-sheet-foot mt-auto grid gap-6 border-t border-[var(--border)] pt-8 font-mono text-xs tracking-[0.12em] uppercase sm:grid-cols-[1fr_auto]">
             <ul className="flex flex-wrap gap-x-8 gap-y-3">
               {phones.map((b) => (
                 <li key={b.name}>

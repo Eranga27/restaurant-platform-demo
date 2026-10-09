@@ -192,6 +192,12 @@ export function HeroScene({
           aria-hidden
           className="absolute inset-0 hidden bg-[linear-gradient(90deg,color-mix(in_srgb,var(--foreground)_55%,transparent)_0%,transparent_60%)] md:block"
         />
+        {/* Phones: the headline fills the screen's width, so the flame can pass right behind
+            it; a steady shade there keeps it readable on every frame of the loop. */}
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-[linear-gradient(180deg,transparent_10%,color-mix(in_srgb,var(--foreground)_56%,transparent)_27%,color-mix(in_srgb,var(--foreground)_62%,transparent)_62%,transparent_100%)] md:hidden"
+        />
       </div>
 
       {children}
@@ -201,7 +207,7 @@ export function HeroScene({
           type="button"
           onClick={toggle}
           aria-label={state === "playing" ? labels.pause : labels.play}
-          className="absolute right-4 bottom-4 grid size-11 place-items-center rounded-full border border-current/35 bg-black/20 backdrop-blur-sm transition-colors hover:bg-white/15 sm:right-6 lg:right-8 lg:bottom-8"
+          className="absolute right-4 bottom-12 grid size-11 place-items-center rounded-full border border-current/35 bg-black/20 backdrop-blur-sm transition-colors hover:bg-white/15 sm:right-6 lg:right-8 lg:bottom-16"
         >
           {state === "playing" ? (
             <Pause aria-hidden className="size-4" fill="currentColor" />

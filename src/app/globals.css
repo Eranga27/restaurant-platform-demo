@@ -193,6 +193,8 @@
   html {
     -webkit-tap-highlight-color: transparent;
     text-size-adjust: 100%;
+    /* Native radios, checkboxes and date pickers in the brand red, not the browser's blue. */
+    accent-color: var(--primary);
   }
 
   body {
@@ -238,6 +240,37 @@
   --em-color: var(--highlight);
   --muted-foreground: color-mix(in srgb, var(--background) 72%, var(--foreground));
   --border: color-mix(in srgb, var(--background) 16%, var(--foreground));
+  /* Outline buttons fill with paper on hover (see "Interaction" below). */
+  --btn-fill: var(--background);
+  --btn-fill-ink: var(--foreground);
+}
+
+/* Curry-leaf sections (guest reviews): the brand green with paper text. */
+@utility surface-leaf {
+  background-color: var(--secondary);
+  color: var(--secondary-foreground);
+  --em-color: var(--highlight);
+  --muted-foreground: color-mix(in srgb, var(--secondary-foreground) 78%, var(--secondary));
+  --border: color-mix(in srgb, var(--secondary-foreground) 20%, var(--secondary));
+  --btn-fill: var(--secondary-foreground);
+  --btn-fill-ink: var(--secondary);
+}
+
+/*
+ * A link in running text: its underline draws in from the left on hover and
+ * slips away to the right when the pointer leaves.
+ */
+@utility link-sweep {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+  background-size: 0% 1px;
+  transition: background-size 500ms var(--ease-out-soft);
+  &:hover,
+  &:focus-visible {
+    background-position: 0 100%;
+    background-size: 100% 1px;
+  }
 }
 
 /* SplitWords: each word in its own clipping box (room for descenders and italics). */
@@ -285,6 +318,184 @@ body:has(.site-header) {
   --em-color: var(--highlight);
   --muted-foreground: color-mix(in srgb, var(--primary-foreground) 80%, var(--primary));
   --border: color-mix(in srgb, var(--primary-foreground) 22%, var(--primary));
+  --btn-fill: var(--primary-foreground);
+  --btn-fill-ink: var(--primary);
+}
+
+/* ---------------------------------------------------------------------------
+ * Interaction on the public site (docs/DECISIONS.md D98). Buttons: a colour
+ * sweeps up from the bottom on hover (pointer devices only, so a tap never
+ * leaves one filled) and a trailing arrow steps forward; they press in when
+ * tapped (button.tsx). Icon buttons keep the plain hover, so badges on them
+ * aren't clipped. The staff screens keep the plain shadcn behaviour.
+ * ------------------------------------------------------------------------- */
+:root {
+  /* What an outline button fills with on hover, and its text colour then. */
+  --btn-fill: var(--foreground);
+  --btn-fill-ink: var(--background);
+}
+@layer components {
+  body:has(.site-header)
+    [data-slot="button"]:is(
+      [data-variant="default"],
+      [data-variant="outline"],
+      [data-variant="highlight"]
+    ):not([data-size^="icon"]) {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    --btn-sweep: color-mix(in srgb, var(--primary) 70%, var(--foreground));
+  }
+  /* As specific as the rule above, and after it, so each variant keeps its own sweep. */
+  body:has(.site-header) [data-slot="button"][data-variant="highlight"]:not([data-size^="icon"]) {
+    --btn-sweep: color-mix(in srgb, var(--highlight) 76%, white);
+  }
+  body:has(.site-header) [data-slot="button"][data-variant="outline"]:not([data-size^="icon"]) {
+    --btn-sweep: var(--btn-fill);
+  }
+  /* Arrows in buttons and links step forward on hover. */
+  body:has(.site-header) :is(a, button) > svg:is(.lucide-arrow-right, .lucide-arrow-up-right) {
+    transition: translate 350ms var(--ease-out-soft);
+  }
+}
+@media (hover: hover) {
+  body:has(.site-header)
+    [data-slot="button"]:is(
+      [data-variant="default"],
+      [data-variant="outline"],
+      [data-variant="highlight"]
+    ):not([data-size^="icon"])::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: var(--btn-sweep);
+    translate: 0 102%;
+    transition: translate 500ms var(--ease-out-soft);
+  }
+  body:has(.site-header)
+    [data-slot="button"]:is(
+      [data-variant="default"],
+      [data-variant="outline"],
+      [data-variant="highlight"]
+    ):not([data-size^="icon"]):hover::before {
+    translate: 0 0;
+  }
+  /* Unlayered on purpose: wins over the hover:text-* utilities buttons carry. */
+  body:has(.site-header)
+    [data-slot="button"][data-variant="outline"]:not([data-size^="icon"]):hover {
+    color: var(--btn-fill-ink);
+    border-color: var(--btn-fill);
+  }
+  body:has(.site-header) :is(a, button):hover > svg.lucide-arrow-right {
+    translate: 0.2rem 0;
+  }
+  body:has(.site-header) :is(a, button):hover > svg.lucide-arrow-up-right {
+    translate: 0.15rem -0.15rem;
+  }
+}
+
+/*
+ * Form fields on the public site: at least 44 px tall (touch targets), a
+ * darker edge on hover, and a soft glow around the focus ring. Unlayered so it
+ * also lifts fields that set a smaller height; shapes are left to each field.
+ */
+body:has(.site-header) :is([data-slot="input"], [data-slot="select-trigger"], select) {
+  min-height: 2.75rem;
+}
+body:has(.site-header)
+  :is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"]) {
+  transition:
+    border-color 200ms ease,
+    box-shadow 300ms var(--ease-out-soft),
+    background-color 200ms ease;
+}
+@media (hover: hover) {
+  body:has(.site-header)
+    :is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"]):hover:not(
+      :focus-visible,
+      [aria-invalid="true"],
+      :disabled
+    ) {
+    border-color: color-mix(in srgb, var(--foreground) 55%, var(--input));
+  }
+}
+body:has(.site-header)
+  :is([data-slot="input"], [data-slot="textarea"], [data-slot="select-trigger"]):focus-visible:not(
+    [aria-invalid="true"]
+  ) {
+  border-color: var(--ring);
+  box-shadow:
+    0 0 0 1px var(--ring),
+    0 0 0 5px color-mix(in srgb, var(--ring) 18%, transparent);
+}
+
+/*
+ * Home sections as sheets: each lays its rounded top over the end of the one
+ * before. On large screens, where scroll-driven animations are supported, a
+ * sheet also widens to the screen's edges as it comes up.
+ */
+.sheet {
+  position: relative;
+  margin-top: -2rem;
+  border-radius: 2rem 2rem 0 0;
+}
+@media (min-width: 64rem) {
+  .sheet {
+    margin-top: -2.5rem;
+    border-radius: 2.5rem 2.5rem 0 0;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (min-width: 64rem) {
+    .sheet {
+      animation: sheet-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 55%;
+    }
+  }
+}
+/*
+ * The brand name across the bottom of the footer rises out of its own
+ * baseline as the footer scrolls up, following the scroll.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .wordmark-rise {
+      animation: wordmark-rise linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 100%;
+    }
+  }
+}
+@keyframes wordmark-rise {
+  from {
+    translate: 0 55%;
+    clip-path: inset(0 0 55% 0);
+  }
+  to {
+    translate: 0 0;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* After a page of sheets, the footer lays over the last one the same way. */
+body:has(.sheet) .site-footer {
+  margin-top: -2rem;
+}
+@media (min-width: 64rem) {
+  body:has(.sheet) .site-footer {
+    margin-top: -2.5rem;
+  }
+}
+@keyframes sheet-rise {
+  from {
+    clip-path: inset(0 3.5% 0 3.5% round 2.5rem 2.5rem 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0 round 2.5rem 2.5rem 0 0);
+  }
 }
 
 /* A faint paper grain over the whole site. Decorative; ignored by pointers. */
@@ -334,6 +545,22 @@ html {
     translate: none;
     scale: 0.96;
   }
+  /* Photos: wiped in from the bottom while the picture settles from a slight zoom. */
+  [data-reveal="image"][data-reveal-state="hidden"] {
+    opacity: 1;
+    translate: none;
+    clip-path: inset(100% 0 0 0);
+  }
+  [data-reveal="image"][data-reveal-state="hidden"] :is(img, video) {
+    scale: 1.14;
+  }
+  [data-reveal="image"][data-reveal-state="shown"] {
+    clip-path: inset(0 0 0 0);
+    transition: clip-path 1100ms cubic-bezier(0.77, 0, 0.18, 1) var(--reveal-delay, 0ms);
+  }
+  [data-reveal="image"][data-reveal-state="shown"] :is(img, video) {
+    transition: scale 1500ms var(--ease-out-soft) var(--reveal-delay, 0ms);
+  }
   [data-reveal-state="shown"] {
     transition:
       opacity var(--duration-reveal) var(--ease-out-soft) var(--reveal-delay, 0ms),
@@ -364,8 +591,31 @@ html {
     animation: intro-fade 900ms var(--ease-out-soft) both;
     animation-delay: calc(var(--intro-start, 0ms) + var(--d, 350ms));
   }
-  :root:not([data-splash="seen"]):has(.site-splash) :is(.intro-words, .intro-fade) {
+  /* A page's photo: wiped in from the bottom on arrival while it settles from a slight zoom. */
+  .intro-image {
+    animation: intro-wipe 1200ms cubic-bezier(0.77, 0, 0.18, 1) both;
+    animation-delay: calc(var(--intro-start, 0ms) + var(--d, 200ms));
+  }
+  .intro-image img {
+    animation: intro-settle 1800ms var(--ease-out-soft) both;
+    animation-delay: calc(var(--intro-start, 0ms) + var(--d, 200ms));
+  }
+  :root:not([data-splash="seen"]):has(.site-splash) :is(.intro-words, .intro-fade, .intro-image) {
     --intro-start: calc(var(--splash-hold) + 150ms);
+  }
+}
+
+@keyframes intro-wipe {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes intro-settle {
+  from {
+    scale: 1.16;
   }
 }
 
@@ -383,13 +633,15 @@ html {
 
 /* Header tones (src/components/site/site-header.tsx). */
 .site-header {
-  --hdr-bg: color-mix(in srgb, var(--background) 84%, transparent);
+  --hdr-bg: color-mix(in srgb, var(--background) 93%, transparent);
   --hdr-fg: var(--foreground);
   --hdr-border: color-mix(in srgb, var(--foreground) 10%, transparent);
   --hdr-border-strong: color-mix(in srgb, var(--foreground) 24%, transparent);
   --hdr-hover: color-mix(in srgb, var(--foreground) 6%, transparent);
 }
 :root[data-header-tone="light"] .site-header {
+  --btn-fill: var(--background);
+  --btn-fill-ink: var(--foreground);
   --hdr-bg: transparent;
   --hdr-fg: var(--background);
   --hdr-border: transparent;
@@ -847,6 +1099,88 @@ html {
     animation: dish-in 450ms var(--ease-out-soft) both;
     animation-delay: calc(var(--n, 0) * 40ms);
   }
+}
+/*
+ * The full-screen menu (mobile-nav-sheet.tsx): as it opens, its pages rise
+ * one after another out of their own lines, then the phone numbers fade in.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .nav-sheet-link {
+    animation: nav-sheet-rise 800ms var(--ease-out-soft) both;
+    animation-delay: calc(140ms + var(--i, 0) * 55ms);
+  }
+  .nav-sheet-foot {
+    animation: intro-fade 700ms var(--ease-out-soft) 560ms both;
+  }
+}
+@keyframes nav-sheet-rise {
+  from {
+    translate: 0 105%;
+  }
+}
+
+/* A story's opening letter, set large in the display face (Latin script only: Sinhala and Tamil letters carry vowel signs). */
+:lang(en) .drop-cap::first-letter {
+  float: left;
+  margin: 0.08em 0.1em 0 0;
+  font-family: var(--font-display);
+  font-size: 3.9em;
+  line-height: 0.8;
+  color: var(--primary);
+}
+
+/* The mark standing in for the 0 of a 404: it bobs gently, like a drop about to fall. */
+@media (prefers-reduced-motion: no-preference) {
+  .lost-mark {
+    animation: lost-bob 3.2s ease-in-out infinite;
+  }
+}
+@keyframes lost-bob {
+  50% {
+    translate: 0 -0.08em;
+    rotate: -4deg;
+  }
+}
+
+/* A value that just changed (the booking summary): it rises into place. */
+@media (prefers-reduced-motion: no-preference) {
+  .summary-swap {
+    animation: summary-swap 450ms var(--ease-out-soft) both;
+  }
+}
+@keyframes summary-swap {
+  from {
+    opacity: 0;
+    translate: 0 0.4rem;
+  }
+}
+
+/* The pill behind the selected tab, sliding from tab to tab once it has been placed. */
+.tab-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--w, 0);
+  height: var(--h, 0);
+  translate: var(--x, 0) var(--y, 0);
+  border-radius: 999px;
+  background: var(--pill-bg, var(--foreground));
+  opacity: 0;
+  pointer-events: none;
+}
+:is([data-pill="placed"], [data-pill="ready"]) > .tab-pill {
+  opacity: 1;
+}
+[data-pill="ready"] > .tab-pill {
+  transition:
+    translate 500ms var(--ease-out-soft),
+    width 500ms var(--ease-out-soft),
+    height 500ms var(--ease-out-soft);
+}
+:is([data-pill="placed"], [data-pill="ready"]) > [role="tab"][aria-selected="true"],
+:is([data-pill="placed"], [data-pill="ready"]) > li > a[aria-current="true"] {
+  border-color: transparent;
+  background-color: transparent;
 }
 @keyframes dish-in {
   from {
