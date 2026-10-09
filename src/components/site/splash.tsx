@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import { posterFont } from "@/config/fonts";
+import { scriptString } from "@/lib/inline-script";
 import { SPLASH_SEEN_KEY } from "@/lib/splash";
 import { getBrand } from "@/lib/data/brand";
 
@@ -18,8 +19,9 @@ import { SiteSplash } from "./site-splash";
  * held, and the splash runs as soon as it's styled.
  */
 function startScript(fontFamily: string): string {
-  const font = JSON.stringify(`800 1em ${fontFamily}`);
-  return `try{var d=document.documentElement;if(sessionStorage.getItem(${JSON.stringify(SPLASH_SEEN_KEY)})){d.dataset.splash="seen"}else{d.dataset.splash="wait";var go=function(){if(d.dataset.splash==="wait")d.dataset.splash="play"};var painted=function(f){requestAnimationFrame(function(){requestAnimationFrame(f)})};painted(function(){setTimeout(go,2500)});var f=document.fonts&&document.fonts.load?document.fonts.load(${font}):Promise.resolve();f.then(function(){painted(go)},function(){painted(go)})}}catch(e){}`;
+  const font = scriptString(`800 1em ${fontFamily}`);
+  const key = scriptString(SPLASH_SEEN_KEY);
+  return `try{var d=document.documentElement;if(sessionStorage.getItem(${key})){d.dataset.splash="seen"}else{d.dataset.splash="wait";var go=function(){if(d.dataset.splash==="wait")d.dataset.splash="play"};var painted=function(f){requestAnimationFrame(function(){requestAnimationFrame(f)})};painted(function(){setTimeout(go,2500)});var f=document.fonts&&document.fonts.load?document.fonts.load(${font}):Promise.resolve();f.then(function(){painted(go)},function(){painted(go)})}}catch(e){}`;
 }
 
 /**
