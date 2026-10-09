@@ -237,23 +237,25 @@ test.describe("installable app", () => {
 });
 
 test.describe("home page", () => {
-  test("dish tabs switch by click and by arrow keys", async ({ page }) => {
+  test("bestsellers are plates that open the dish on the menu", async ({ page }) => {
     await page.goto("/");
-    const tabs = page.getByRole("tablist", { name: "Dishes by category" });
-    const first = tabs.getByRole("tab", { name: "Most ordered" });
-    await expect(first).toHaveAttribute("aria-selected", "true");
-    await expect(
-      page.getByRole("tabpanel").getByRole("heading", { name: "Chicken kottu" }),
-    ).toBeVisible();
+    const plates = page.locator("#bestsellers").getByRole("listitem");
+    expect(await plates.count()).toBeGreaterThanOrEqual(3);
+    const kottu = page
+      .locator("#bestsellers")
+      .getByRole("link")
+      .filter({ has: page.getByRole("heading", { name: "Chicken kottu" }) });
+    await expect(kottu).toHaveAttribute("href", "/menu?item=chicken-kottu");
+  });
 
-    await tabs.getByRole("tab", { name: "Rice & Curry" }).click();
-    await expect(
-      page.getByRole("tabpanel").getByRole("heading", { name: "Fish rice & curry" }),
-    ).toBeVisible();
-
-    await page.keyboard.press("ArrowLeft");
-    await expect(first).toBeFocused();
-    await expect(first).toHaveAttribute("aria-selected", "true");
+  test("a keyboard user tabbing through the plates always sees the focused one", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const links = page.locator("#bestsellers li a");
+    const last = links.last();
+    await last.focus();
+    await expect(last).toBeInViewport();
   });
 
   test("on a phone, the order bar comes in once the hero has gone", async ({ page, isMobile }) => {

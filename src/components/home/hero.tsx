@@ -15,6 +15,7 @@ import { DishImage } from "@/components/site/dish-image";
 import { CURTAIN, LAMP } from "@/lib/transitions";
 import { HeroScene } from "./hero-scene";
 import { OpenNowBadge } from "./open-now-badge";
+import { SpinSticker } from "./spin-sticker";
 
 /** The video's first frame, cut for the screen like the video itself. */
 function VideoPoster({ video, alt }: { video: HeroVideo; alt: string }) {
@@ -177,6 +178,12 @@ export async function Hero({
           </Link>
         )}
       </section>
+      <SpinSticker
+        id="hero-sticker"
+        text={`${brand.tagline} ◆ ${branchNames.join(" ◆ ")} ◆ `}
+        mark={brand.logo.mark}
+        className="intro-fade absolute top-32 right-[max(2rem,calc((100vw-80rem)/2+2rem))] hidden w-36 [--d:900ms] lg:block xl:w-40"
+      />
     </HeroScene>
   );
 }

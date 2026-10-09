@@ -48,9 +48,13 @@ export async function SiteHeader({
       style={{ viewTransitionName: "site-header" }}
       className="site-header sticky top-0 z-40 border-b border-[var(--hdr-border)] bg-[var(--hdr-bg)] text-[var(--hdr-fg)] backdrop-blur-md transition-[background-color,color,border-color] duration-500"
     >
-      <div className="mx-auto flex h-18 w-full max-w-7xl items-center gap-4 px-4 sm:px-6 lg:gap-8 lg:px-8">
-        <Logo brand={brand} />
-        <nav aria-label={t("mainNavigation")} className="hidden lg:block">
+      {/* Phones and tablets: logo, then actions. Large screens: pages, the logo in the middle, actions. */}
+      <div className="mx-auto grid h-18 w-full max-w-7xl grid-cols-[1fr_auto] items-center gap-4 px-4 sm:px-6 lg:grid-cols-[1fr_auto_1fr] lg:gap-8 lg:px-8">
+        <Logo brand={brand} className="order-first lg:order-none lg:col-start-2 lg:row-start-1" />
+        <nav
+          aria-label={t("mainNavigation")}
+          className="hidden lg:col-start-1 lg:row-start-1 lg:block"
+        >
           <NavLinks
             items={items
               .slice(0, 5)
@@ -62,7 +66,7 @@ export async function SiteHeader({
             linkClassName="relative py-2 text-current opacity-85 hover:opacity-100 aria-[current=page]:opacity-100 after:absolute after:inset-x-0 after:bottom-0.5 after:h-px after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-500 after:ease-out-soft hover:after:scale-x-100 aria-[current=page]:after:scale-x-100"
           />
         </nav>
-        <div className="ml-auto flex items-center gap-1.5 sm:gap-2">
+        <div className="flex items-center gap-1.5 justify-self-end sm:gap-2 lg:col-start-3 lg:row-start-1">
           <LanguageSwitcher />
           <AccountMenu className="hidden xl:flex" />
           <Button

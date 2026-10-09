@@ -773,8 +773,21 @@ html {
 ::view-transition-old(.page-lamp) {
   animation: vt-recede 720ms ease-in both;
 }
+/*
+ * Between the site's sections, the new page opens in seven blinds, like the
+ * strips the splash falls apart into (D108). Browsers that can't animate the
+ * mask's custom property show the page at once, after the old one recedes.
+ */
+@property --blind {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
 ::view-transition-new(.page-curtain) {
-  animation: vt-curtain 640ms cubic-bezier(0.76, 0, 0.24, 1) both;
+  mask-image: linear-gradient(90deg, #000 var(--blind), transparent var(--blind));
+  mask-size: calc(100% / 7 + 1px) 100%;
+  mask-repeat: repeat-x;
+  animation: vt-blinds 700ms cubic-bezier(0.76, 0, 0.24, 1) both;
 }
 ::view-transition-old(.page-curtain) {
   animation: vt-recede 640ms ease-in both;
@@ -794,13 +807,12 @@ html {
     clip-path: circle(150vmax at var(--vt-x, 50%) var(--vt-y, 50%));
   }
 }
-/* In screen heights: the page itself can be much taller than the screen. */
-@keyframes vt-curtain {
+@keyframes vt-blinds {
   from {
-    clip-path: inset(100vh 0 0 0 round 2.5rem 2.5rem 0 0);
+    --blind: 0%;
   }
   to {
-    clip-path: inset(0 0 0 0 round 0);
+    --blind: 100%;
   }
 }
 @keyframes vt-recede {
@@ -1109,71 +1121,6 @@ html {
     opacity 250ms ease-in 200ms;
 }
 
-/*
- * Dish tabs (src/components/home/dish-tabs.tsx): the panel that comes in
- * crossfades, its cards rising one after another (40ms apart).
- */
-@media (prefers-reduced-motion: no-preference) {
-  .dish-panel:not([hidden]) > ul > li {
-    animation: dish-in 450ms var(--ease-out-soft) both;
-    animation-delay: calc(var(--n, 0) * 40ms);
-  }
-}
-/*
- * The full-screen menu (mobile-nav-sheet.tsx): as it opens, its pages rise
- * one after another out of their own lines, then the phone numbers fade in.
- */
-@media (prefers-reduced-motion: no-preference) {
-  .nav-sheet-link {
-    animation: nav-sheet-rise 800ms var(--ease-out-soft) both;
-    animation-delay: calc(140ms + var(--i, 0) * 55ms);
-  }
-  .nav-sheet-foot {
-    animation: intro-fade 700ms var(--ease-out-soft) 560ms both;
-  }
-}
-@keyframes nav-sheet-rise {
-  from {
-    translate: 0 105%;
-  }
-}
-
-/* A story's opening letter, set large in the display face (Latin script only: Sinhala and Tamil letters carry vowel signs). */
-:lang(en) .drop-cap::first-letter {
-  float: left;
-  margin: 0.08em 0.1em 0 0;
-  font-family: var(--font-display);
-  font-size: 3.9em;
-  line-height: 0.8;
-  color: var(--primary);
-}
-
-/* The mark standing in for the 0 of a 404: it bobs gently, like a drop about to fall. */
-@media (prefers-reduced-motion: no-preference) {
-  .lost-mark {
-    animation: lost-bob 3.2s ease-in-out infinite;
-  }
-}
-@keyframes lost-bob {
-  50% {
-    translate: 0 -0.08em;
-    rotate: -4deg;
-  }
-}
-
-/* A value that just changed (the booking summary): it rises into place. */
-@media (prefers-reduced-motion: no-preference) {
-  .summary-swap {
-    animation: summary-swap 450ms var(--ease-out-soft) both;
-  }
-}
-@keyframes summary-swap {
-  from {
-    opacity: 0;
-    translate: 0 0.4rem;
-  }
-}
-
 /* The pill behind the selected tab, sliding from tab to tab once it has been placed. */
 .tab-pill {
   position: absolute;
@@ -1201,62 +1148,408 @@ html {
   border-color: transparent;
   background-color: transparent;
 }
-@keyframes dish-in {
-  from {
-    opacity: 0;
-    translate: 0 0.75rem;
+
+/* ---------------------------------------------------------------------------
+ * Redesign: the home page ("lacquer pop", docs/DECISIONS.md D107 to D112).
+ * ------------------------------------------------------------------------- */
+
+/*
+ * Lacquer bands (src/components/home/lacquer-band.tsx): poster words sliding
+ * sideways without end, a lacquer diamond between them. Two cross under the
+ * hero, laid at opposite angles.
+ */
+.lacquer-band {
+  overflow: hidden;
+  padding-block: 0.85rem;
+  font-size: clamp(1.6rem, 0.9rem + 2.8vw, 3.25rem);
+  line-height: 1;
+  white-space: nowrap;
+}
+.lacquer-band[data-tone="saffron"] {
+  --diamond: var(--primary);
+  background: var(--highlight);
+  color: var(--highlight-foreground);
+}
+.lacquer-band[data-tone="lacquer"] {
+  --diamond: var(--highlight);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.lacquer-band-track {
+  display: flex;
+  width: max-content;
+  animation: band-slide 48s linear infinite;
+}
+.lacquer-band[data-reverse] .lacquer-band-track {
+  animation-direction: reverse;
+}
+.lacquer-band-run {
+  display: flex;
+  align-items: center;
+}
+.lacquer-band-run li {
+  display: flex;
+  align-items: center;
+  gap: 1.1em;
+  padding-right: 1.1em;
+}
+.lacquer-band-diamond {
+  width: 0.32em;
+  height: 0.32em;
+  rotate: 45deg;
+  background: var(--diamond);
+}
+@keyframes band-slide {
+  to {
+    translate: -50% 0;
   }
+}
+/* Two bands crossing, laid over the seam between the hero and the next section. */
+.band-cross {
+  position: relative;
+  z-index: 3;
+  height: clamp(6rem, 4rem + 6vw, 9.5rem);
+  margin-block: calc(clamp(6rem, 4rem + 6vw, 9.5rem) / -2);
+  overflow-x: clip;
+  pointer-events: none;
+}
+.band-cross > .lacquer-band {
+  position: absolute;
+  top: 50%;
+  left: -5vw;
+  width: 110vw;
+  box-shadow: 0 10px 30px rgb(31 20 16 / 0.18);
+}
+.band-cross > .lacquer-band:first-child {
+  translate: 0 -95%;
+  rotate: -2.6deg;
+}
+.band-cross > .lacquer-band:last-child {
+  translate: 0 -5%;
+  rotate: 2deg;
 }
 
 /*
- * Steam off a hot plate (src/components/site/dish-card.tsx): three soft wisps
- * rise while the card is hovered. Decorative, and still for reduced motion.
+ * Plates (src/components/home/plates.tsx): bestsellers on lacquer discs. On
+ * large screens with scroll-driven animations the section is pinned while the
+ * row slides sideways (--travel, measured by plate-track.tsx); elsewhere the
+ * row scrolls sideways by hand and snaps to each plate.
  */
-.steam {
-  position: absolute;
-  bottom: 38%;
-  left: 50%;
-  display: flex;
-  gap: 0.9rem;
-  translate: -50% 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 500ms var(--ease-out-soft);
+/* Room at the top for the bands laid over the seam above. */
+.plates {
+  padding-block: clamp(6.5rem, 4rem + 6vw, 9rem) 4rem;
 }
-.steam > span {
-  width: 0.55rem;
-  height: 4rem;
+.plates-head {
+  margin-bottom: 2.5rem;
+}
+.plates-track {
+  display: flex;
+  gap: clamp(1.25rem, 0.5rem + 2vw, 2.5rem);
+  padding-inline: max(1rem, calc((100vw - 80rem) / 2 + 2rem));
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.plate {
+  flex: none;
+  width: clamp(16rem, 12rem + 14vw, 22rem);
+  scroll-snap-align: start;
+}
+.plate-link {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  border-radius: 1.5rem;
+}
+.plate[data-tone="highlight"] {
+  --disc: var(--highlight);
+  --rim: var(--highlight-foreground);
+}
+.plate[data-tone="secondary"] {
+  --disc: var(--secondary);
+  --rim: var(--secondary-foreground);
+}
+.plate[data-tone="primary"] {
+  --disc: var(--primary);
+  --rim: var(--primary-foreground);
+}
+.plate[data-tone="foreground"] {
+  --disc: var(--foreground);
+  --rim: var(--highlight);
+}
+.plate-disc {
+  position: relative;
+  aspect-ratio: 1;
   border-radius: 999px;
-  background: linear-gradient(to top, transparent, rgb(255 255 255 / 0.6), transparent);
-  filter: blur(6px);
-  animation: steam 2.6s ease-in-out infinite;
-  animation-delay: calc(var(--i) * 0.55s);
+  background: var(--disc);
+  transition:
+    rotate 700ms var(--ease-out-soft),
+    scale 700ms var(--ease-out-soft);
+}
+.plate-rim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: var(--rim);
+  font-family: var(--font-poster);
+  font-size: 15px;
+  font-weight: 800;
+  font-stretch: 75%;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.plate-photo {
+  position: absolute;
+  inset: 15%;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--muted);
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--background) 92%, transparent),
+    0 18px 40px rgb(31 20 16 / 0.35);
+}
+.plate-price {
+  position: absolute;
+  right: 2%;
+  bottom: 8%;
+  padding: 0.55rem 0.8rem;
+  border-radius: 999px;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 1.15rem;
+  line-height: 1;
+  rotate: -8deg;
+  box-shadow: var(--shadow-soft);
+}
+.plate-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-inline: 0.25rem;
+}
+.plate-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition:
+    background-color 300ms ease,
+    translate 300ms var(--ease-out-soft);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .plate-link:hover .plate-disc {
+    rotate: -6deg;
+    scale: 1.03;
+  }
+  .plate-link:hover .plate-rim {
+    animation: rim-turn 9s linear infinite;
+  }
+  .plate-link:hover .plate-add {
+    translate: 0.2rem 0;
+    background: color-mix(in srgb, var(--primary) 75%, var(--foreground));
+  }
+}
+@keyframes rim-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .plates {
+      height: calc(100vh + var(--travel, 0px));
+      padding-block: 0;
+      view-timeline: --plates block;
+    }
+    .plates-pin {
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100vh;
+      /* clip, not hidden: a hidden box can still be scrolled sideways by focus. */
+      overflow: clip;
+    }
+    .plates-track {
+      overflow: visible;
+      scroll-snap-type: none;
+      animation: plates-slide linear both;
+      animation-timeline: --plates;
+      animation-range: contain 0% contain 100%;
+    }
+  }
+}
+@keyframes plates-slide {
+  to {
+    translate: calc(-1 * var(--travel, 0px)) 0;
+  }
+}
+
+/* A round sticker turning slowly (src/components/home/spin-sticker.tsx). */
+.spin-sticker {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: var(--highlight);
+  color: var(--highlight-foreground);
+  box-shadow: 0 14px 40px rgb(31 20 16 / 0.35);
+}
+.spin-sticker-rim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  font-family: var(--font-poster);
+  font-size: 15px;
+  font-weight: 800;
+  font-stretch: 75%;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  animation: rim-turn 22s linear infinite;
+}
+.spin-sticker-mark {
+  position: absolute;
+  inset: 28%;
+  width: 44%;
+  height: 44%;
+}
+
+/*
+ * The kitchen's story (home "why"): the statement lights up word by word as it
+ * scrolls through the screen, and the plate beside it turns with the scroll.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scrub .w > span {
+      animation: word-light linear both;
+      animation-timeline: view();
+      animation-range: entry 60% cover 45%;
+    }
+    .turn-with-scroll {
+      animation: plate-turn linear both;
+      animation-timeline: view();
+    }
+  }
+}
+@keyframes word-light {
+  from {
+    opacity: 0.18;
+  }
+}
+@keyframes plate-turn {
+  from {
+    rotate: -40deg;
+  }
+  to {
+    rotate: 40deg;
+  }
+}
+
+/* Offers pinned up like stickers, each at its own slight angle; they straighten under the pointer. */
+.offer-card {
+  rotate: var(--tilt, 0deg);
+}
+.offer-card:nth-child(3n + 1) {
+  --tilt: -1.6deg;
+}
+.offer-card:nth-child(3n + 2) {
+  --tilt: 1.2deg;
+}
+.offer-card:nth-child(3n) {
+  --tilt: -0.8deg;
+}
+@media (hover: hover) {
+  .offer-card {
+    transition:
+      rotate 500ms var(--ease-out-soft),
+      translate 500ms var(--ease-out-soft),
+      background-color 500ms ease,
+      border-color 500ms ease;
+  }
+  .offer-card:hover {
+    rotate: 0deg;
+  }
+}
+
+/* A Kandyan arch: a photo framed with a round top, like a temple doorway. */
+.arch {
+  border-radius: 999px 999px 1.75rem 1.75rem / 42% 42% 1.75rem 1.75rem;
+}
+
+/*
+ * Guests' words (src/components/home/review-wall.tsx): two rows of tilted
+ * cards sliding past each other. They pause under the pointer, on focus, or
+ * with the button; still for reduced motion (the rows then scroll by hand).
+ */
+.review-wall {
+  position: relative;
+  display: grid;
+  gap: 1.5rem;
+  overflow-x: clip;
+  padding-block: 1rem;
+}
+.review-row {
+  display: flex;
+  width: max-content;
+  animation: band-slide 70s linear infinite;
+}
+.review-row[data-reverse] {
+  animation-direction: reverse;
+}
+.review-wall:is(:hover, :focus-within, [data-paused]) .review-row {
   animation-play-state: paused;
 }
-.group:hover .steam {
-  opacity: 1;
+.review-run {
+  display: flex;
+  gap: 1.5rem;
+  padding-right: 1.5rem;
 }
-.group:hover .steam > span {
-  animation-play-state: running;
+.review-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: clamp(17rem, 14rem + 10vw, 24rem);
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  background: color-mix(in srgb, var(--secondary-foreground) 8%, var(--secondary));
+  border: 1px solid var(--border);
+  rotate: var(--tilt, 0deg);
 }
-@keyframes steam {
-  0% {
-    opacity: 0;
-    translate: 0 1.5rem;
-    scale: 1 0.6;
-  }
-  40% {
-    opacity: 0.9;
-  }
-  100% {
-    opacity: 0;
-    translate: 0.5rem -3.5rem;
-    scale: 1.7 1.2;
-  }
+.review-wall-toggle {
+  position: absolute;
+  right: 0;
+  bottom: -3.25rem;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: background-color 200ms ease;
 }
+.review-wall-toggle:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .steam {
-    display: none;
+  .lacquer-band-track,
+  .review-row,
+  .spin-sticker-rim {
+    animation: none;
+  }
+  .review-wall {
+    overflow-x: auto;
   }
 }
 

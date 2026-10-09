@@ -4,11 +4,11 @@ import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
 import { BranchesMap } from "@/components/home/branches-map";
-import { DishTabs } from "@/components/home/dish-tabs";
 import { Hero } from "@/components/home/hero";
-import { ReviewCarousel } from "@/components/home/review-carousel";
+import { LacquerBand } from "@/components/home/lacquer-band";
+import { Plates } from "@/components/home/plates";
+import { ReviewWall } from "@/components/home/review-wall";
 import { StickyOrderBar } from "@/components/home/sticky-order-bar";
-import { DishCard } from "@/components/site/dish-card";
 import { Eyebrow } from "@/components/site/eyebrow";
 import { JsonLd } from "@/components/site/json-ld";
 import { Kolam } from "@/components/site/kolam";
@@ -17,6 +17,7 @@ import { SplitWords } from "@/components/site/split-words";
 import { StarRating } from "@/components/site/star-rating";
 import { Button } from "@/components/ui/button";
 import { siteMedia } from "@/config/media";
+import { loadMessages } from "@/i18n/messages";
 import { getPathname, Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getBrand } from "@/lib/data/brand";
@@ -26,7 +27,6 @@ import {
   getPromotions,
   getReviews,
   getSignatureItems,
-  type MenuItemView,
 } from "@/lib/data/catalogue";
 import { pageMetadata } from "@/lib/seo";
 import { restaurantJsonLd } from "@/lib/structured-data";
@@ -46,29 +46,19 @@ export async function generateMetadata({ params }: PageProps<"/[locale]">): Prom
 
 const em = { em: (chunks: string) => `<em>${chunks}</em>` };
 
-/** What sets the kitchen apart, in the order a guest would care about it. */
-const REASONS = ["Spices", "Coconut", "Delivery"] as const;
+/** What sets the kitchen apart, in the order a guest would care about it, each on a lacquer colour. */
+const REASONS = [
+  { key: "Spices", tone: "bg-highlight text-highlight-foreground" },
+  { key: "Coconut", tone: "bg-secondary text-secondary-foreground" },
+  { key: "Delivery", tone: "bg-primary text-primary-foreground" },
+] as const;
 
-/** Dishes per tab, and how many with photos a category needs to get a tab. */
-const TAB_DISHES = 6;
-const MIN_TAB_DISHES = 3;
-const MAX_CATEGORY_TABS = 4;
-
-function DishGrid({ items }: { items: MenuItemView[] }) {
-  return (
-    <ul className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-3 lg:gap-6">
-      {items.map((item, i) => (
-        <li key={item.id} style={{ "--n": i } as React.CSSProperties}>
-          <DishCard item={item} />
-        </li>
-      ))}
-    </ul>
-  );
-}
+/** Plates in the bestsellers row. */
+const PLATES = 9;
 
 export default async function HomePage({ params }: PageProps<"/[locale]">) {
   const locale = (await params).locale as Locale;
-  const [t, te, tc, nav, brand, branches, signatures, promotions, reviews, menu] =
+  const [t, te, tc, nav, brand, branches, signatures, promotions, reviews, menu, ...languages] =
     await Promise.all([
       getTranslations("Home"),
       getTranslations("Events"),
@@ -80,27 +70,26 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       getPromotions(locale),
       getReviews(locale),
       getMenu(locale),
+      loadMessages("en"),
+      loadMessages("si"),
+      loadMessages("ta"),
     ]);
   const average = reviews.length ? reviews.reduce((n, r) => n + r.rating, 0) / reviews.length : 0;
   const rating = reviews.length ? average.toFixed(1) : null;
-  // "Most ordered", then the main categories that have enough dishes with photos.
-  // Photographed bestsellers first: a tab of food reads better than placeholders.
+
+  // The plates: photographed bestsellers first, then more photographed dishes.
   const pictured = signatures.filter((i) => i.imageUrl);
-  const tabs = [
-    {
-      key: "popular",
-      label: t("tabPopular"),
-      items: pictured.length >= MIN_TAB_DISHES ? pictured : signatures,
-    },
-    ...menu.categories
-      .map((c) => ({
-        key: c.slug,
-        label: c.name,
-        items: c.items.filter((i) => i.imageUrl && !i.isAlcohol).slice(0, TAB_DISHES),
-      }))
-      .filter((tab) => tab.items.length >= MIN_TAB_DISHES)
-      .slice(0, MAX_CATEGORY_TABS),
-  ];
+  const more = menu.categories
+    .flatMap((c) => c.items)
+    .filter((i) => i.imageUrl && !i.isAlcohol && !pictured.some((p) => p.id === i.id));
+  const plates = [...pictured, ...more].slice(0, PLATES);
+  const categoryNames = Object.fromEntries(menu.categories.map((c) => [c.id, c.name]));
+
+  // The bands speak like a Sri Lankan street sign: each dish in English, Sinhala and Tamil.
+  const [en, si, ta] = languages.map((m) => m.Splash.words.split("|"));
+  const dishWords = en!.flatMap((word, i) =>
+    [word, si![i], ta![i]].filter((w): w is string => !!w),
+  );
 
   return (
     <>
@@ -115,94 +104,58 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
         pick={signatures.find((i) => i.imageUrl) ?? null}
       />
 
-      <section
-        id="bestsellers"
-        aria-labelledby="bestsellers-title"
-        className="sheet scroll-mt-24 bg-background"
-      >
-        <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <div className="mb-10 flex flex-wrap items-end justify-between gap-6 lg:mb-14">
-            <div className="max-w-2xl space-y-4">
-              <Eyebrow className="text-primary">{t("bestsellersLabel")}</Eyebrow>
-              <h2
-                id="bestsellers-title"
-                data-reveal="words"
-                className="text-display-xl text-balance"
-              >
-                <SplitWords markup={t.markup("signatureTitle", em)} />
-              </h2>
-              <p className="text-lg text-muted-foreground">{t("signatureSubtitle")}</p>
-            </div>
-            <Button asChild variant="outline" size="lg">
-              <Link href="/menu" transitionTypes={CURTAIN}>
-                {t("viewFullMenu")}
-                <ArrowRight aria-hidden className="size-4" />
-              </Link>
-            </Button>
-          </div>
-          <div data-reveal>
-            <DishTabs
-              label={t("tabsLabel")}
-              tabs={tabs.map((tab) => ({
-                key: tab.key,
-                label: tab.label,
-                panel: <DishGrid items={tab.items} />,
-              }))}
-            />
-          </div>
-        </div>
-      </section>
+      <div className="band-cross">
+        <LacquerBand words={dishWords} tone="saffron" />
+        <LacquerBand words={menu.categories.map((c) => c.name)} tone="lacquer" reverse />
+      </div>
+
+      <Plates items={plates} categoryNames={categoryNames} title={t.markup("signatureTitle", em)} />
 
       <section id="why" aria-labelledby="why-title" className="sheet scroll-mt-24 surface-ink">
-        <div className="mx-auto grid w-full max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 md:grid-cols-2 lg:gap-20 lg:px-8 lg:py-28">
-          <div
-            data-reveal="image"
-            className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-white/5 md:aspect-[4/5]"
-          >
-            <div className="parallax absolute inset-x-0 -inset-y-[8%]">
-              <Image
-                src={siteMedia.hero}
-                alt=""
-                fill
-                sizes="(min-width: 768px) 50vw, 100vw"
-                className="object-cover"
-              />
+        <div className="mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
+          <Eyebrow className="text-highlight">{t("whyLabel")}</Eyebrow>
+          <h2 id="why-title" className="scrub mt-6 max-w-5xl text-display-3xl text-balance">
+            <SplitWords markup={t.markup("whyTitle", em)} />
+          </h2>
+          <div className="mt-16 grid grid-cols-1 items-center gap-12 lg:mt-20 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20">
+            <div className="relative mx-auto aspect-square w-full max-w-[26rem]">
+              <div className="absolute -inset-4 rounded-full border border-dashed border-[color-mix(in_srgb,var(--highlight)_50%,transparent)]" />
+              <div className="turn-with-scroll absolute inset-0 overflow-hidden rounded-full shadow-lifted ring-8 ring-[color-mix(in_srgb,var(--background)_10%,transparent)]">
+                <Image
+                  src={siteMedia.hero}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 26rem, 80vw"
+                  className="object-cover"
+                />
+              </div>
             </div>
-          </div>
-          <div className="space-y-8">
-            <Eyebrow className="text-highlight">{t("whyLabel")}</Eyebrow>
-            <h2 id="why-title" data-reveal="words" className="text-display-xl text-balance">
-              <SplitWords markup={t.markup("whyTitle", em)} />
-            </h2>
-            <ol className="space-y-6">
-              {REASONS.map((reason, i) => (
+            <ol className="grid gap-4">
+              {REASONS.map(({ key, tone }, i) => (
                 <li
-                  key={reason}
+                  key={key}
                   data-reveal
-                  className="grid grid-cols-[2.5rem_1fr] gap-4 border-t border-[var(--border)] pt-6"
+                  className={`grid grid-cols-[auto_1fr] items-start gap-5 rounded-[1.75rem] p-6 sm:p-7 ${tone}`}
                 >
-                  <span
-                    aria-hidden
-                    className="font-display text-2xl text-highlight italic tabular-nums"
-                  >
-                    {i + 1}
+                  <span aria-hidden className="font-poster text-5xl leading-none tabular-nums">
+                    {String(i + 1).padStart(2, "0")}
                   </span>
                   <div className="space-y-1.5">
-                    <h3 className="font-display text-2xl">{t(`why${reason}Title`)}</h3>
-                    <p className="text-pretty opacity-80">{t(`why${reason}Body`)}</p>
+                    <h3 className="font-display text-2xl">{t(`why${key}Title`)}</h3>
+                    <p className="text-pretty opacity-90">{t(`why${key}Body`)}</p>
                   </div>
                 </li>
               ))}
             </ol>
-            <Link
-              href="/about"
-              transitionTypes={CURTAIN}
-              className="inline-flex items-center gap-1.5 link-sweep pb-0.5 font-medium text-highlight"
-            >
-              {t("storyCta")}
-              <ArrowUpRight aria-hidden className="size-4" />
-            </Link>
           </div>
+          <Link
+            href="/about"
+            transitionTypes={CURTAIN}
+            className="mt-12 inline-flex items-center gap-1.5 link-sweep pb-0.5 font-medium text-highlight"
+          >
+            {t("storyCta")}
+            <ArrowUpRight aria-hidden className="size-4" />
+          </Link>
         </div>
       </section>
 
@@ -216,17 +169,17 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
             size={7}
             className="pointer-events-none absolute -top-28 -right-28 w-[28rem] text-highlight opacity-15"
           />
-          <div className="relative mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
+          <div className="relative mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
             <Eyebrow className="opacity-90">{t("offersLabel")}</Eyebrow>
-            <h2 id="offers-title" data-reveal="words" className="mt-5 text-display-xl">
+            <h2 id="offers-title" data-reveal="words" className="mt-5 text-display-2xl">
               <SplitWords markup={t.markup("offersTitle", { ...em, name: brand.name })} />
             </h2>
-            <ul className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <ul className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
               {promotions.slice(0, 3).map((promo) => (
                 <li
                   key={promo.id}
                   data-reveal
-                  className="offer-card flex flex-col gap-4 rounded-2xl border border-[var(--border)] bg-black/10 p-6 backdrop-blur-sm transition-[translate,background-color,border-color] duration-500 ease-out-soft hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--highlight)_45%,transparent)] hover:bg-black/15"
+                  className="offer-card flex flex-col gap-4 rounded-[1.75rem] border border-[var(--border)] bg-black/10 p-7 backdrop-blur-sm hover:-translate-y-1 hover:border-[color-mix(in_srgb,var(--highlight)_45%,transparent)] hover:bg-black/15"
                 >
                   <h3 className="font-display text-display-md">{promo.title}</h3>
                   {promo.body && <p className="text-pretty opacity-85">{promo.body}</p>}
@@ -248,44 +201,45 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
       <section
         id="events"
         aria-labelledby="events-title"
-        className="sheet isolate scroll-mt-24 overflow-hidden surface-ink"
+        className="sheet scroll-mt-24 surface-ink"
       >
-        <div className="parallax absolute inset-x-0 -inset-y-[12%] -z-10">
-          <Image src={siteMedia.events} alt="" fill sizes="100vw" className="object-cover" />
-        </div>
-        <div
-          aria-hidden
-          className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,color-mix(in_srgb,var(--foreground)_92%,transparent)_0%,color-mix(in_srgb,var(--foreground)_70%,transparent)_100%)]"
-        />
-        <div className="mx-auto w-full max-w-7xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
-          <Eyebrow className="text-highlight">{t("eventsLabel")}</Eyebrow>
-          <h2
-            id="events-title"
-            data-reveal="words"
-            className="mt-5 max-w-3xl text-display-2xl text-balance"
-          >
-            <SplitWords markup={t.markup("eventsTitle", em)} />
-          </h2>
-          <div className="mt-10 grid gap-10 md:grid-cols-[minmax(0,32rem)_auto] md:items-end md:justify-between">
-            <div className="space-y-6">
-              <p className="text-lg text-pretty opacity-85">{t("eventsBody")}</p>
-              <ul className="flex flex-wrap gap-2">
-                {(["birthday", "office", "dana", "wedding", "homecoming"] as const).map((type) => (
-                  <li
-                    key={type}
-                    className="rounded-full border border-[var(--border)] px-3.5 py-1.5 text-sm"
-                  >
-                    {te(`types.${type}`)}
-                  </li>
-                ))}
-              </ul>
-            </div>
+        <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-20 lg:px-8 lg:py-32">
+          <div className="space-y-8">
+            <Eyebrow className="text-highlight">{t("eventsLabel")}</Eyebrow>
+            <h2 id="events-title" data-reveal="words" className="text-display-2xl text-balance">
+              <SplitWords markup={t.markup("eventsTitle", em)} />
+            </h2>
+            <p className="max-w-xl text-lg text-pretty opacity-85">{t("eventsBody")}</p>
+            <ul className="flex flex-wrap gap-2">
+              {(["birthday", "office", "dana", "wedding", "homecoming"] as const).map((type) => (
+                <li
+                  key={type}
+                  className="rounded-full border border-[var(--border)] px-3.5 py-1.5 text-sm"
+                >
+                  {te(`types.${type}`)}
+                </li>
+              ))}
+            </ul>
             <Button asChild size="lg" variant="highlight">
               <Link href="/events" transitionTypes={CURTAIN}>
                 {t("eventsCta")}
                 <ArrowRight aria-hidden className="size-4" />
               </Link>
             </Button>
+          </div>
+          <div
+            data-reveal="image"
+            className="arch relative mx-auto aspect-[4/5] w-full max-w-md overflow-hidden bg-white/5"
+          >
+            <div className="parallax absolute inset-x-0 -inset-y-[8%]">
+              <Image
+                src={siteMedia.events}
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 28rem, 90vw"
+                className="object-cover"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -336,16 +290,16 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
           aria-labelledby="guests-title"
           className="sheet scroll-mt-24 surface-leaf"
         >
-          <div className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-28 lg:pb-36">
-            <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
+          <div className="mx-auto w-full max-w-7xl px-4 pt-20 sm:px-6 lg:px-8 lg:pt-28">
+            <div className="flex flex-wrap items-end justify-between gap-6">
               <div className="space-y-4">
                 <Eyebrow className="opacity-90">{t("guestsLabel")}</Eyebrow>
-                <h2 id="guests-title" data-reveal="words" className="text-display-xl">
+                <h2 id="guests-title" data-reveal="words" className="text-display-2xl">
                   <SplitWords markup={t.markup("reviewsTitle", em)} />
                 </h2>
               </div>
               <div data-reveal className="flex items-center gap-4">
-                <span className="font-display text-display-xl leading-none">{rating}</span>
+                <span className="font-poster text-8xl leading-none">{rating}</span>
                 <span className="space-y-1">
                   <StarRating
                     rating={Math.round(average)}
@@ -357,8 +311,10 @@ export default async function HomePage({ params }: PageProps<"/[locale]">) {
                 </span>
               </div>
             </div>
-            <ReviewCarousel
-              reviews={reviews.slice(0, 6).map((r) => ({
+          </div>
+          <div className="mx-auto mt-12 max-w-[100rem] px-4 pb-32 sm:px-6 lg:mt-16 lg:px-8 lg:pb-40">
+            <ReviewWall
+              reviews={reviews.slice(0, 8).map((r) => ({
                 id: r.id,
                 body: r.body,
                 rating: r.rating,

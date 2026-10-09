@@ -70,13 +70,6 @@ export const tamilFont = Noto_Sans_Tamil({
   preload: false,
 });
 
-export const fontVariables = [
-  posterFont,
-  displayFont,
-  bodyFont,
-  monoFont,
-  sinhalaFont,
-  tamilFont,
-]
+export const fontVariables = [posterFont, displayFont, bodyFont, monoFont, sinhalaFont, tamilFont]
   .map((font) => font.variable)
   .join(" ");

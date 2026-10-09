@@ -136,7 +136,9 @@
     "chefsPick": "සූපවේදියාගේ තේරීම",
     "openNowCooking": "දැන් විවෘතයි · මුළුතැන්ගෙවල් {count}ක් උයනවා",
     "closedOpensAt": "දැන් වසා ඇත · {time}ට විවෘත වේ",
-    "quickOrder": "ඇණවුම් කරන්න හෝ වෙන් කරන්න"
+    "quickOrder": "ඇණවුම් කරන්න හෝ වෙන් කරන්න",
+    "pauseReviews": "අදහස් විරාම කරන්න",
+    "playReviews": "අදහස් ධාවනය කරන්න"
   },
   "Menu": {
     "title": "අපේ මෙනුව",

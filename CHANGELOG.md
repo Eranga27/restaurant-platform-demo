@@ -4,6 +4,14 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+### Changed
+
+- The start of the redesign, "lacquer pop": big headlines in a condensed, heavy poster type with italic accents.
+- A new splash, "kottu chop": dish names chopped to the beat of the kottu griddle, then the screen falls apart in strips.
+- A new home page: a turning sticker in the hero, two lacquer bands crossing (dishes in English, Sinhala and Tamil), bestsellers as plates on coloured discs that slide sideways as you scroll, a story that lights up word by word, offers as stickers, events in an arch, and guests' words on a moving wall.
+- Section links open the next page in strips, like blinds.
+- On large screens the logo sits in the middle of the header.
+
 ## [2.2.0] - Site uplift
 
 ### Added
