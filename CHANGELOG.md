@@ -12,6 +12,10 @@ All notable changes to this project are documented here. The format is based on 
 - Section links open the next page in strips, like blinds.
 - On large screens the logo sits in the middle of the header.
 
+### Fixed
+
+- On a slow phone or connection, the splash played before the screen was drawn, so people saw only its end. It now waits for the page to appear and the headline type to arrive, with the logo breathing meanwhile, then plays from the start.
+
 ## [2.2.0] - Site uplift
 
 ### Added

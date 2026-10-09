@@ -5,8 +5,8 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { SPLASH_SEEN_KEY } from "@/lib/splash";
 
-/** Milliseconds after page load to take the splash out of the page, once the page has opened. */
-const REMOVE_AFTER = 4500;
+/** Never keep the splash longer than this, whatever happens to its animations (ms). */
+const SAFETY = 15000;
 
 /** When the first dish word lands, and the beat between chops (ms). Kept in step with globals.css. */
 const FIRST_AT = 220;
@@ -26,7 +26,8 @@ const subscribe = () => () => {};
  * saffron, half of them dropping and half rising, and the page shows through.
  * Its timing is pure CSS (globals.css, .site-splash), so it leaves on its own
  * even before or without JavaScript; this component only takes it out of the
- * page afterwards, and renders nothing after a client navigation.
+ * page once its animations have finished, and renders nothing after a client
+ * navigation.
  */
 export function SiteSplash({
   name,
@@ -57,11 +58,27 @@ export function SiteSplash({
     } catch {
       // Storage blocked: the splash just shows on each full page load.
     }
-    // Already seen in this tab: the inline script hid it before it painted.
-    const seen = document.documentElement.dataset.splash === "seen";
-    const wait = seen ? 0 : Math.max(0, REMOVE_AFTER - performance.now());
-    const timer = setTimeout(() => setVisible(false), wait);
-    return () => clearTimeout(timer);
+    // Take it out once its own animations have finished: they may have started
+    // late (splash.tsx holds them until the page is painted), so a fixed time
+    // from page load could cut them short. Already seen in this tab, hidden by
+    // reduced motion, or not animated at all: there's nothing to wait for.
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      setVisible(false);
+    };
+    const panel = document.querySelector<HTMLElement>(".site-splash");
+    const animations =
+      document.documentElement.dataset.splash === "seen" || !panel?.getAnimations
+        ? []
+        : panel.getAnimations({ subtree: true });
+    const timer = setTimeout(finish, animations.length ? SAFETY : 0);
+    void Promise.all(animations.map((a) => a.finished)).then(finish, finish);
+    return () => {
+      done = true;
+      clearTimeout(timer);
+    };
   }, [visible]);
 
   if (!visible) return null;

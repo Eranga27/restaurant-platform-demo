@@ -916,7 +916,11 @@ html {
   left: 1.5rem;
   width: 3.25rem;
   height: 3.25rem;
-  animation: chop-fade-in 500ms var(--ease-out-soft) 150ms both;
+}
+/* While the page waits for its font (splash.tsx), the mark breathes, so the wait reads as loading. */
+:root[data-splash="wait"] .chop-mark {
+  animation: splash-breathe 1.4s ease-in-out infinite !important;
+  animation-play-state: running !important;
 }
 .chop-words {
   position: relative;
@@ -1011,6 +1015,17 @@ html {
 [data-splash="seen"] .site-splash {
   display: none;
 }
+/*
+ * Until the page has been painted and the poster font has arrived, every
+ * animation on the page waits (splash.tsx sets data-splash="wait", then
+ * "play"), so the splash and the hero's entrance start together, from the
+ * beginning, even on a slow phone (D112).
+ */
+:root[data-splash="wait"] *,
+:root[data-splash="wait"] *::before,
+:root[data-splash="wait"] *::after {
+  animation-play-state: paused !important;
+}
 @media (prefers-reduced-motion: reduce) {
   .site-splash {
     display: none;
@@ -1075,6 +1090,12 @@ html {
   to {
     opacity: 0;
     scale: 0.96;
+  }
+}
+@keyframes splash-breathe {
+  50% {
+    opacity: 0.55;
+    scale: 0.9;
   }
 }
 @keyframes chop-fade-in {

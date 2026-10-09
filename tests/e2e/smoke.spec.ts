@@ -277,7 +277,7 @@ test.describe("motion", () => {
     await page.goto("/");
     const splash = page.locator(".site-splash");
     await expect(splash).toBeVisible();
-    await expect(splash).toHaveCount(0, { timeout: 6_000 });
+    await expect(splash).toHaveCount(0, { timeout: 10_000 });
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
     await page.reload();
@@ -297,7 +297,7 @@ test.describe("motion", () => {
     const errors = trackErrors(page);
     await page.goto("/");
     // The splash covers the page on a first visit; it leaves by itself.
-    await expect(page.locator(".site-splash")).toHaveCount(0, { timeout: 6_000 });
+    await expect(page.locator(".site-splash")).toHaveCount(0, { timeout: 10_000 });
     const video = page.locator("video");
     await page.getByRole("button", { name: "Pause the video" }).click();
     await expect(page.getByRole("button", { name: "Play the video" })).toBeVisible();
