@@ -39,7 +39,7 @@ Replace `mark.svg`, the square mark used in the header and as the app icon, copy
 
 The home page hero, story and About page are written for Kithul & Co. Edit the `Home` and `About` sections and their Sinhala and Tamil versions (reviewed by a native speaker). `npm test` fails if a Sinhala or Tamil message is missing or loses a placeholder; `node scripts/check-translations.mjs <si|ta> <batch.json>` checks and merges a batch of flat `"Namespace.key": "text"` translations.
 
-The splash screen's welcome is `Splash.greeting` in each language file. The splash pours a drop into the brand's own mark (`logo.mark`), so it shows the new logo with no extra work; its colours come from the theme (`highlight` for the drop, `foreground` for the screen). The drop lands a little below the mark's middle, where the Kithul mark's drop is round: for a mark shaped differently, change `--land` on `.site-splash` in `src/app/globals.css`. The lotus ornament and footer border take the brand's `accent` (turmeric by default), `primary` and `secondary` colours, so they follow a new palette too.
+The splash screen's welcome is `Splash.greeting` in each language file, and the dishes it chops are `Splash.words` (separated by `|`); the home page's first band uses the same words in all three languages. The splash shows the brand's own mark (`logo.mark`) and takes its colours from the theme (`primary` for the panel, `highlight` for the blade and the second layer of strips). The lotus ornament and footer border take the brand's `accent` (turmeric by default), `primary` and `secondary` colours, so they follow a new palette too.
 
 ## 5. Menu, branches and offers
 
@@ -47,7 +47,7 @@ With a database, change these in the admin panel (`/admin`). The starting data l
 
 ## 6. Fonts: `src/config/fonts.ts`
 
-Fonts are bundled at build time, so this one needs a deploy. Swap the `next/font/google` imports for `displayFont` (headlines, with an italic for the accent words), `bodyFont` (text, and small labels and prices on the public site) and `monoFont` (figures in the staff screens), keeping the `variable` names. Pairings that suit the design:
+Fonts are bundled at build time, so this one needs a deploy. Swap the `next/font/google` imports for `posterFont` (the big headlines, set condensed, heavy and in capitals: pick a family with a width axis, or drop `font-stretch` from the poster rule in `globals.css`), `displayFont` (smaller headings and the italic accent words), `bodyFont` (text, and small labels and prices on the public site) and `monoFont` (figures in the staff screens), keeping the `variable` names. Pairings that suit the design (the default poster face is Bricolage Grotesque):
 
 | Feel                    | Display (with italic) | Body    | Labels        |
 | ----------------------- | --------------------- | ------- | ------------- |

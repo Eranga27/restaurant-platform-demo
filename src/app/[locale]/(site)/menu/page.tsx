@@ -9,7 +9,7 @@ import { Splash } from "@/components/site/splash";
 import { getPathname } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getBrand } from "@/lib/data/brand";
-import { getBranches, getMenu } from "@/lib/data/catalogue";
+import { getBranches, getMenu, getSignatureItems } from "@/lib/data/catalogue";
 import { pageMetadata } from "@/lib/seo";
 import { menuJsonLd } from "@/lib/structured-data";
 
@@ -29,24 +29,33 @@ export async function generateMetadata({ params }: PageProps<"/[locale]/menu">):
 
 export default async function MenuPage({ params }: PageProps<"/[locale]/menu">) {
   const locale = (await params).locale as Locale;
-  const [t, brand, menu, branches] = await Promise.all([
+  const [t, brand, menu, branches, signatures] = await Promise.all([
     getTranslations("Menu"),
     getBrand(),
     getMenu(locale),
     getBranches(locale),
+    getSignatureItems(locale),
   ]);
+  // The poster's plate: the first photographed signature dish, else any photographed dish.
+  const plate =
+    signatures.find((i) => i.imageUrl)?.imageUrl ??
+    menu.categories.flatMap((c) => c.items).find((i) => i.imageUrl)?.imageUrl ??
+    null;
 
   return (
     <>
       <Splash />
       <JsonLd data={menuJsonLd(brand, menu, getPathname({ locale, href: "/menu" }))} />
+      <PageHeader
+        tone="lacquer"
+        eyebrow={brand.tagline}
+        title={t("title")}
+        intro={t("subtitle", { serviceCharge: brand.charges.serviceChargeBps / 100 })}
+        image={plate ? { src: plate, shape: "plate" } : undefined}
+        band={menu.categories.map((c) => c.name)}
+      />
       {/* Extra room at the bottom on phones for the order bar. */}
-      <div className="mx-auto w-full max-w-7xl px-4 pt-14 pb-28 sm:px-6 md:pb-20 lg:px-8 lg:pt-24">
-        <PageHeader
-          eyebrow={brand.tagline}
-          title={t("title")}
-          intro={t("subtitle", { serviceCharge: brand.charges.serviceChargeBps / 100 })}
-        />
+      <div className="mx-auto w-full max-w-7xl px-4 pt-20 pb-28 sm:px-6 md:pb-24 lg:px-8 lg:pt-24">
         <MenuBrowser menu={menu} branches={branches.map((b) => ({ id: b.id, name: b.name }))} />
       </div>
       <CartBar />

@@ -63,14 +63,14 @@ export function MobileNavSheet({
                       aria-current={current ? "page" : undefined}
                       style={{ "--i": i } as React.CSSProperties}
                       className={cn(
-                        "nav-sheet-link group flex items-baseline gap-5 py-1 font-display text-[clamp(2.5rem,1.5rem+5vw,5.5rem)] leading-[1.05] transition-colors hover:text-highlight",
+                        "nav-sheet-link group flex items-baseline gap-5 py-1 font-poster text-[clamp(2.75rem,1.5rem+6vw,6.25rem)] leading-[0.95] transition-colors hover:text-highlight",
                         current && "text-highlight",
                       )}
                     >
                       <span className="w-8 font-mono text-xs tracking-[0.2em] tabular-nums opacity-50">
                         {String(i + 1).padStart(2, "0")}
                       </span>
-                      <span className="transition-[font-style] group-hover:italic">
+                      <span className="transition-[translate] duration-500 ease-out-soft group-hover:translate-x-3">
                         {item.label}
                       </span>
                     </Link>

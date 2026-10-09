@@ -107,7 +107,7 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
         <ItemQuerySync onChange={setOpenSlug} />
       </Suspense>
 
-      <div className="grid gap-4 rounded-3xl bg-card p-4 shadow-soft ring-1 ring-border/70 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-5">
+      <div className="grid gap-4 rounded-[2rem] bg-card p-4 shadow-lifted ring-1 ring-border/70 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end sm:p-6">
         <div className="space-y-2">
           <label htmlFor="menu-search" className="text-sm font-medium text-muted-foreground">
             {t("search")}
@@ -193,7 +193,7 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
           </Button>
         </div>
       ) : (
-        <div className="space-y-16 lg:space-y-20">
+        <div className="space-y-20 lg:space-y-28">
           {categories.map((category) => (
             <section
               key={category.id}
@@ -201,19 +201,43 @@ export function MenuBrowser({ menu, branches }: { menu: MenuView; branches: Menu
               aria-labelledby={`${category.slug}-title`}
               className="scroll-mt-40"
             >
-              <div data-reveal className="mb-6 max-w-2xl space-y-2">
-                <h2 id={`${category.slug}-title`} className="text-display-lg text-balance">
-                  {category.name}
-                </h2>
-                {category.description && (
-                  <p className="text-pretty text-muted-foreground">{category.description}</p>
-                )}
+              {/* A chapter of the menu: its number drawn in outline, the name as a poster. */}
+              <div
+                data-reveal
+                className="mb-8 flex items-start gap-4 border-b-2 border-foreground pb-5 sm:items-end sm:gap-6 lg:mb-10"
+              >
+                <span
+                  aria-hidden
+                  className="outline-number font-poster text-display-2xl leading-[0.8] tabular-nums"
+                >
+                  {String(menu.categories.findIndex((c) => c.id === category.id) + 1).padStart(
+                    2,
+                    "0",
+                  )}
+                </span>
+                <div className="min-w-0 flex-1 space-y-2">
+                  <h2 id={`${category.slug}-title`} className="text-display-xl text-balance">
+                    {category.name}
+                  </h2>
+                  {category.description && (
+                    <p className="max-w-2xl text-pretty text-muted-foreground">
+                      {category.description}
+                    </p>
+                  )}
+                </div>
+                <span
+                  aria-hidden
+                  className="hidden shrink-0 rounded-full bg-foreground px-3 py-1.5 font-poster text-lg leading-none text-background sm:block"
+                >
+                  {category.items.length}
+                </span>
               </div>
-              <ul className="grid gap-3 sm:gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {category.items.map((item) => (
+              <ul className="grid grid-cols-2 gap-3 sm:gap-5 md:grid-cols-3 xl:grid-cols-4">
+                {category.items.map((item, i) => (
                   <li key={item.id} data-reveal>
                     <MenuItemCard
                       item={item}
+                      index={i}
                       priceCents={fromPriceCents(item, overrides[item.id]?.priceCents)}
                       availability={availabilityOf(item)}
                       onOpen={() => open(item.slug)}

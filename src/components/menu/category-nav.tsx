@@ -38,10 +38,16 @@ export function CategoryNav({
     return () => observer.disconnect();
   }, [slugs]);
 
-  // Keep the active tab in view on small screens.
+  // Keep the active tab in view on small screens. Only the row scrolls: scrollIntoView would
+  // also move the page whenever the tabs are below the fold, as they are on arrival.
   useEffect(() => {
-    const el = listRef.current?.querySelector<HTMLElement>(`[data-slug="${active}"]`);
-    el?.scrollIntoView({ block: "nearest", inline: "center", behavior: "smooth" });
+    const row = listRef.current;
+    const el = row?.querySelector<HTMLElement>(`[data-slug="${active}"]`);
+    if (!row || !el) return;
+    row.scrollTo({
+      left: el.offsetLeft - (row.clientWidth - el.offsetWidth) / 2,
+      behavior: "smooth",
+    });
   }, [active]);
 
   // Move the pill to the active tab, and again whenever the row changes size.

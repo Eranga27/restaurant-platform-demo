@@ -141,6 +141,9 @@
   --font-display:
     var(--font-display-latin), var(--font-sinhala), var(--font-tamil), Georgia, ui-serif, serif;
   --font-heading: var(--font-display);
+  --font-poster:
+    var(--font-poster-latin), var(--font-sinhala), var(--font-tamil), ui-sans-serif, system-ui,
+    sans-serif;
   --font-mono:
     var(--font-mono-latin), var(--font-sinhala), var(--font-tamil), ui-monospace, SFMono-Regular,
     Menlo, monospace;
@@ -228,6 +231,42 @@
   ::selection {
     background-color: color-mix(in srgb, var(--highlight) 45%, transparent);
   }
+}
+
+/*
+ * Posters (the redesign's voice, docs/DECISIONS.md D105): on the public site,
+ * big headlines are set condensed, heavy and in capitals; their accent words
+ * stay in the display serif's italic, in lower case. Smaller headings (dish
+ * names, card titles) keep the serif. Unlayered, so it wins over the
+ * font-display utility some of these headings carry.
+ */
+body:has(.site-header)
+  :is(h1, h2):is(
+    [class*="text-display-xl"],
+    [class*="text-display-2xl"],
+    [class*="text-display-3xl"]
+  ),
+.font-poster {
+  font-family: var(--font-poster);
+  font-weight: 800;
+  font-stretch: 75%;
+  letter-spacing: -0.005em;
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+body:has(.site-header)
+  :is(h1, h2):is(
+    [class*="text-display-xl"],
+    [class*="text-display-2xl"],
+    [class*="text-display-3xl"]
+  )
+  em,
+.font-poster em {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-stretch: normal;
+  letter-spacing: -0.02em;
+  text-transform: none;
 }
 
 /*
@@ -520,7 +559,7 @@ body::after {
   --duration-base: 250ms;
   --duration-reveal: 700ms;
   /* When the splash screen is up, the hero's entrance waits for it. */
-  --splash-hold: 3000ms;
+  --splash-hold: 2980ms;
   --splash-fade: 750ms;
 }
 
@@ -651,6 +690,29 @@ html {
   box-shadow: none;
   animation: none;
 }
+/*
+ * Sinhala and Tamil labels run longer than English, so beside the centred logo
+ * the header keeps fewer items (docs/DECISIONS.md D116): "Book a table", "Sign
+ * in" and Explore's label stay in the Explore menu, and below extra-large
+ * screens the pages move there too.
+ */
+@media (min-width: 64rem) {
+  :root:is(:lang(si), :lang(ta)) .site-header :is(.hdr-book, .hdr-account, .hdr-explore-label) {
+    display: none;
+  }
+}
+@media (min-width: 64rem) and (max-width: 79.99rem) {
+  :root:is(:lang(si), :lang(ta)) .site-header .hdr-pages {
+    display: none;
+  }
+}
+/* Over a lacquer-red page top the red "Order now" would vanish: it turns saffron there. */
+:root[data-header-tone="light"]:has(.masthead[data-tone="lacquer"])
+  .site-header
+  [data-slot="button"][data-variant="default"] {
+  background-color: var(--highlight);
+  color: var(--highlight-foreground);
+}
 
 /*
  * Scroll-linked depth, where the browser supports scroll-driven animations
@@ -734,8 +796,21 @@ html {
 ::view-transition-old(.page-lamp) {
   animation: vt-recede 720ms ease-in both;
 }
+/*
+ * Between the site's sections, the new page opens in seven blinds, like the
+ * strips the splash falls apart into (D108). Browsers that can't animate the
+ * mask's custom property show the page at once, after the old one recedes.
+ */
+@property --blind {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
 ::view-transition-new(.page-curtain) {
-  animation: vt-curtain 640ms cubic-bezier(0.76, 0, 0.24, 1) both;
+  mask-image: linear-gradient(90deg, #000 var(--blind), transparent var(--blind));
+  mask-size: calc(100% / 7 + 1px) 100%;
+  mask-repeat: repeat-x;
+  animation: vt-blinds 700ms cubic-bezier(0.76, 0, 0.24, 1) both;
 }
 ::view-transition-old(.page-curtain) {
   animation: vt-recede 640ms ease-in both;
@@ -755,13 +830,12 @@ html {
     clip-path: circle(150vmax at var(--vt-x, 50%) var(--vt-y, 50%));
   }
 }
-/* In screen heights: the page itself can be much taller than the screen. */
-@keyframes vt-curtain {
+@keyframes vt-blinds {
   from {
-    clip-path: inset(100vh 0 0 0 round 2.5rem 2.5rem 0 0);
+    --blind: 0%;
   }
   to {
-    clip-path: inset(0 0 0 0 round 0);
+    --blind: 100%;
   }
 }
 @keyframes vt-recede {
@@ -802,23 +876,17 @@ html {
 
 /*
  * Splash screen on a full page load (src/components/site/site-splash.tsx),
- * "the first drop": a thread of kithul treacle runs down the dark screen and
- * swells into a drop (the SVG "goo" filter gives it a liquid neck). The drop
- * falls and lands in the brand's mark, which blooms as rings ripple out; the
- * name rises letter by letter with the welcome, while a counter runs to 100.
- * Then the page opens through the mark: it grows past the screen while a
- * circle opens from its middle. Browsers that can't animate the circle fade
- * the panel instead. Timed in CSS, so it leaves even if JavaScript never runs.
+ * "kottu chop" (docs/DECISIONS.md D106): to the beat of the kottu griddle,
+ * dish names land on lacquer red one after another, each cut in two by a
+ * saffron blade, while a counter runs to 100. The brand's name lands last.
+ * Then the panel falls apart in seven strips, red over saffron, alternate
+ * strips dropping and rising, and the page shows through. Timed in CSS, so it
+ * leaves even if JavaScript never runs.
  *
- * Beats: thread 0 to 0.45 s, drop swells 0.3 to 1.15 s, falls 1.15 to 1.53 s,
- * mark and rings from 1.5 s, name from 1.65 s, welcome from 2.05 s, counter
- * 0.1 to 2.9 s, page from --splash-hold (3 s) for --splash-fade (0.75 s).
+ * Beats: a word every 420 ms from 0.22 s (the blade at +0.28 s, the halves fly
+ * apart at +0.33 s), the name after the last word, the counter 0.1 to 2.8 s,
+ * the page from --splash-hold (2.98 s); the last strip is gone by about 3.8 s.
  */
-@property --splash-hole {
-  syntax: "<length-percentage>";
-  inherits: false;
-  initial-value: 0%;
-}
 @property --splash-count {
   syntax: "<integer>";
   inherits: false;
@@ -829,133 +897,157 @@ html {
   inset: 0;
   z-index: 100;
   overflow: hidden;
-  background: radial-gradient(
-    circle at 50% 50%,
-    color-mix(in srgb, var(--highlight) 9%, var(--foreground)) 0%,
-    var(--foreground) 55%
-  );
-  color: var(--background);
-  --mark: 7rem;
-  /* Where the drop lands: the round of the drop in the mark, a little below its middle. */
-  --land: calc(var(--mark) * 0.1);
-  mask: radial-gradient(
-    circle at 50% 50%,
-    transparent calc(var(--splash-hole) - 1px),
-    #000 var(--splash-hole)
-  );
-  animation: splash-out var(--splash-fade) cubic-bezier(0.55, 0, 0.75, 0.2) var(--splash-hold)
-    forwards;
+  color: var(--primary-foreground);
+  /* Out of the way of clicks once the strips have gone, even before JavaScript removes it. */
+  animation: splash-gone 0s linear calc(var(--splash-hold) + 900ms) forwards;
 }
-@media (min-width: 64rem) {
-  .site-splash {
-    --mark: 8rem;
-  }
-}
-.site-splash .splash-content {
+
+/* The panel: seven strips of lacquer red over seven of saffron. */
+.chop-strips {
   position: absolute;
   inset: 0;
-  animation: splash-content-out 380ms ease-in var(--splash-hold) forwards;
+  display: flex;
+}
+.chop-strips > i {
+  flex: 1;
+  margin-right: -1px;
+  background: var(--strip);
+  animation: strip-fall 520ms cubic-bezier(0.65, 0, 0.85, 0.3)
+    calc(var(--splash-hold) + var(--s) * 32ms + var(--lag, 0ms)) forwards;
+}
+.chop-strips > i:nth-child(even) {
+  animation-name: strip-rise;
+}
+.chop-under {
+  --strip: var(--highlight);
+  --lag: 110ms;
+}
+.chop-over {
+  --strip: var(--primary);
 }
 
-/* The mark lands in the middle of the screen, then carries the page in. */
-.site-splash .splash-mark {
+.chop-stage {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: var(--mark);
-  height: var(--mark);
-  translate: -50% -50%;
-  scale: 0;
-  animation:
-    mark-in 650ms cubic-bezier(0.34, 1.56, 0.64, 1) 1500ms forwards,
-    mark-through var(--splash-fade) cubic-bezier(0.55, 0, 0.75, 0.2) var(--splash-hold) forwards;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  animation: chop-stage-out 260ms ease-in var(--splash-hold) forwards;
 }
-
-/* The pour, drawn 1:1 in CSS pixels so its vh offsets line up with the screen. */
-.site-splash .splash-pour {
+.chop-mark {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 160px;
-  height: 160px;
-  translate: -50% -50%;
-  overflow: visible;
+  top: 1.5rem;
+  left: 1.5rem;
+  width: 3.25rem;
+  height: 3.25rem;
 }
-.site-splash .pour-stream {
-  translate: 0 -56vh;
-  animation:
-    stream-in 450ms var(--ease-out-soft) forwards,
-    stream-out 360ms cubic-bezier(0.5, 0, 0.9, 0.5) 1150ms forwards;
+/* While the page waits for its font (splash.tsx), the mark breathes, so the wait reads as loading. */
+:root[data-splash="wait"] .chop-mark {
+  animation: splash-breathe 1.4s ease-in-out infinite !important;
+  animation-play-state: running !important;
 }
-.site-splash .pour-fall {
-  translate: 0 calc(-24vh + 4px);
-  animation: drop-fall 380ms cubic-bezier(0.55, 0, 0.95, 0.45) 1150ms forwards;
-}
-.site-splash .pour-drop {
-  transform-box: fill-box;
-  transform-origin: 50% 0;
-  scale: 0.15;
-  animation:
-    drop-swell 850ms var(--ease-in-out-soft) 300ms forwards,
-    drop-land 260ms ease-out 1530ms forwards;
-}
-.site-splash .pour-ring {
-  fill: none;
-  stroke: var(--highlight);
-  stroke-width: 1.2;
-  transform-box: fill-box;
-  transform-origin: center;
-  translate: 0 var(--land);
-  opacity: 0;
-  animation: ring 1100ms cubic-bezier(0.2, 0.7, 0.3, 1) calc(1530ms + var(--ring, 0) * 170ms)
-    forwards;
-}
-
-/* The name and the welcome sit under the mark. */
-.site-splash .splash-words {
-  position: absolute;
-  inset: calc(50% + var(--mark) / 2 + 1.75rem) 1rem auto;
+.chop-words {
+  position: relative;
+  width: 100%;
+  height: 1em;
+  font-size: clamp(4.5rem, 1rem + 17vw, 17rem);
+  line-height: 0.86;
   text-align: center;
 }
-.site-splash .splash-name {
-  line-height: 1.15;
-}
-/* Each word is a window the letters rise into; the padding leaves room for marks above and below the line. */
-.site-splash .splash-name .word {
-  display: inline-block;
-  overflow: clip;
-  padding-block: 0.15em;
-  margin-block: -0.15em;
-  vertical-align: top;
-}
-.site-splash .splash-name .ch {
-  display: inline-block;
-  translate: 0 110%;
-  animation: splash-letter 650ms var(--ease-out-soft) calc(1650ms + var(--i) * 32ms) forwards;
-}
-.site-splash .splash-greeting {
+.chop-word {
+  position: absolute;
+  inset: 0;
   opacity: 0;
-  animation: splash-words-in 600ms var(--ease-out-soft) 2050ms forwards;
+  rotate: var(--r, 0deg);
+  animation: chop-word-in 300ms cubic-bezier(0.34, 1.4, 0.64, 1) var(--at) both;
 }
-
-/* Counts up while the page gets ready, so the wait reads as loading. */
-.site-splash .splash-count {
+.chop-half {
+  position: absolute;
+  inset: 0;
+  white-space: nowrap;
+}
+.chop-top {
+  clip-path: inset(0 0 48% 0);
+}
+.chop-bottom {
+  clip-path: inset(52% 0 0 0);
+}
+.chop-cut .chop-top {
+  animation: chop-cut-top 260ms cubic-bezier(0.4, 0, 0.9, 0.5) calc(var(--at) + 330ms) forwards;
+}
+.chop-cut .chop-bottom {
+  animation: chop-cut-bottom 260ms cubic-bezier(0.4, 0, 0.9, 0.5) calc(var(--at) + 330ms) forwards;
+}
+/* The blade: a saffron slash across the word, just before it falls apart. */
+.chop-blade {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(110vw, 70rem);
+  height: 0.35rem;
+  margin: -0.175rem 0 0 calc(min(110vw, 70rem) / -2);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--highlight) 20%,
+    var(--primary-foreground) 50%,
+    var(--highlight) 80%,
+    transparent
+  );
+  rotate: -7deg;
+  transform-origin: left center;
+  scale: 0 1;
+  opacity: 0;
+  animation: chop-blade 220ms cubic-bezier(0.2, 0.8, 0.2, 1) calc(var(--at) + 280ms) both;
+}
+/* The name is a little smaller than the dishes: it can be long. */
+.chop-name {
+  font-size: 0.8em;
+  line-height: 1.075;
+}
+.chop-greeting {
+  position: absolute;
+  right: 0;
+  bottom: max(1.75rem, env(safe-area-inset-bottom));
+  left: 0;
+  font-size: 0.875rem;
+  letter-spacing: 0.18em;
+  text-align: center;
+  color: var(--highlight);
+  animation: chop-fade-in 600ms var(--ease-out-soft) 2100ms both;
+}
+.chop-count {
   position: absolute;
   right: 1.5rem;
   bottom: max(1.25rem, env(safe-area-inset-bottom));
-  font-size: 0.8125rem;
+  font-size: 3.25rem;
+  line-height: 1;
+  color: var(--highlight);
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.12em;
-  color: color-mix(in srgb, var(--highlight) 80%, transparent);
   counter-reset: splash var(--splash-count);
-  animation: splash-count 2800ms linear 100ms forwards;
+  animation: splash-count 2700ms linear 100ms forwards;
 }
-.site-splash .splash-count::before {
+.chop-count::before {
   content: counter(splash, decimal-leading-zero);
+}
+@media (max-width: 40rem) {
+  .chop-greeting {
+    bottom: 5.5rem;
+  }
 }
 
 [data-splash="seen"] .site-splash {
   display: none;
+}
+/*
+ * Until the page has been painted and the poster font has arrived, every
+ * animation on the page waits (splash.tsx sets data-splash="wait", then
+ * "play"), so the splash and the hero's entrance start together, from the
+ * beginning, even on a slow phone (D112).
+ */
+:root[data-splash="wait"] *,
+:root[data-splash="wait"] *::before,
+:root[data-splash="wait"] *::after {
+  animation-play-state: paused !important;
 }
 @media (prefers-reduced-motion: reduce) {
   .site-splash {
@@ -963,102 +1055,85 @@ html {
   }
 }
 
-@keyframes splash-out {
-  70% {
+@keyframes chop-word-in {
+  from {
+    opacity: 0;
+    scale: 0.55;
+  }
+  to {
     opacity: 1;
-  }
-  to {
-    --splash-hole: 150%;
-    opacity: 0;
-    visibility: hidden;
+    scale: 1;
   }
 }
-@keyframes splash-content-out {
-  to {
-    opacity: 0;
-    translate: 0 -1.5rem;
-  }
-}
-@keyframes stream-in {
-  to {
-    translate: 0 -24vh;
-  }
-}
-@keyframes stream-out {
-  from {
-    translate: 0 -24vh;
-  }
-  to {
-    translate: 0 -62vh;
-  }
-}
-@keyframes drop-swell {
-  75% {
-    scale: 1 1.04;
-  }
-  to {
-    scale: 0.94 1.16;
-  }
-}
-@keyframes drop-fall {
-  to {
-    translate: 0 calc(var(--land) - 22px);
-  }
-}
-/* Squashes on landing, then shrinks away (never faded: a transparent shape under the filter leaves a dark box). */
-@keyframes drop-land {
-  from {
-    scale: 0.94 1.16;
-  }
+@keyframes chop-cut-top {
   40% {
-    scale: 1.35 0.62;
-  }
-  to {
-    scale: 0;
-    visibility: hidden;
-  }
-}
-@keyframes ring {
-  from {
-    opacity: 0.9;
-    scale: 0.5;
-  }
-  to {
-    opacity: 0;
-    scale: 3.4;
-  }
-}
-@keyframes mark-in {
-  to {
-    scale: 1;
-  }
-}
-@keyframes mark-through {
-  from {
-    scale: 1;
-  }
-  to {
-    scale: 22;
-  }
-}
-@keyframes splash-letter {
-  to {
-    translate: 0 0;
-  }
-}
-@keyframes splash-words-in {
-  from {
-    opacity: 0;
-    translate: 0 0.75rem;
-  }
-  to {
     opacity: 1;
-    translate: 0 0;
+  }
+  to {
+    translate: -22% -55%;
+    rotate: -7deg;
+    opacity: 0;
+  }
+}
+@keyframes chop-cut-bottom {
+  40% {
+    opacity: 1;
+  }
+  to {
+    translate: 22% 55%;
+    rotate: 6deg;
+    opacity: 0;
+  }
+}
+@keyframes chop-blade {
+  0% {
+    opacity: 1;
+    scale: 0 1;
+  }
+  60% {
+    opacity: 1;
+    scale: 1 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 1 1;
+  }
+}
+@keyframes strip-fall {
+  to {
+    translate: 0 105%;
+  }
+}
+@keyframes strip-rise {
+  to {
+    translate: 0 -105%;
+  }
+}
+@keyframes chop-stage-out {
+  to {
+    opacity: 0;
+    scale: 0.96;
+  }
+}
+@keyframes splash-breathe {
+  50% {
+    opacity: 0.55;
+    scale: 0.9;
+  }
+}
+@keyframes chop-fade-in {
+  from {
+    opacity: 0;
   }
 }
 @keyframes splash-count {
   to {
     --splash-count: 100;
+  }
+}
+@keyframes splash-gone {
+  to {
+    visibility: hidden;
   }
 }
 
@@ -1090,71 +1165,6 @@ html {
     opacity 250ms ease-in 200ms;
 }
 
-/*
- * Dish tabs (src/components/home/dish-tabs.tsx): the panel that comes in
- * crossfades, its cards rising one after another (40ms apart).
- */
-@media (prefers-reduced-motion: no-preference) {
-  .dish-panel:not([hidden]) > ul > li {
-    animation: dish-in 450ms var(--ease-out-soft) both;
-    animation-delay: calc(var(--n, 0) * 40ms);
-  }
-}
-/*
- * The full-screen menu (mobile-nav-sheet.tsx): as it opens, its pages rise
- * one after another out of their own lines, then the phone numbers fade in.
- */
-@media (prefers-reduced-motion: no-preference) {
-  .nav-sheet-link {
-    animation: nav-sheet-rise 800ms var(--ease-out-soft) both;
-    animation-delay: calc(140ms + var(--i, 0) * 55ms);
-  }
-  .nav-sheet-foot {
-    animation: intro-fade 700ms var(--ease-out-soft) 560ms both;
-  }
-}
-@keyframes nav-sheet-rise {
-  from {
-    translate: 0 105%;
-  }
-}
-
-/* A story's opening letter, set large in the display face (Latin script only: Sinhala and Tamil letters carry vowel signs). */
-:lang(en) .drop-cap::first-letter {
-  float: left;
-  margin: 0.08em 0.1em 0 0;
-  font-family: var(--font-display);
-  font-size: 3.9em;
-  line-height: 0.8;
-  color: var(--primary);
-}
-
-/* The mark standing in for the 0 of a 404: it bobs gently, like a drop about to fall. */
-@media (prefers-reduced-motion: no-preference) {
-  .lost-mark {
-    animation: lost-bob 3.2s ease-in-out infinite;
-  }
-}
-@keyframes lost-bob {
-  50% {
-    translate: 0 -0.08em;
-    rotate: -4deg;
-  }
-}
-
-/* A value that just changed (the booking summary): it rises into place. */
-@media (prefers-reduced-motion: no-preference) {
-  .summary-swap {
-    animation: summary-swap 450ms var(--ease-out-soft) both;
-  }
-}
-@keyframes summary-swap {
-  from {
-    opacity: 0;
-    translate: 0 0.4rem;
-  }
-}
-
 /* The pill behind the selected tab, sliding from tab to tab once it has been placed. */
 .tab-pill {
   position: absolute;
@@ -1182,62 +1192,515 @@ html {
   border-color: transparent;
   background-color: transparent;
 }
-@keyframes dish-in {
-  from {
-    opacity: 0;
-    translate: 0 0.75rem;
+
+/* ---------------------------------------------------------------------------
+ * Redesign: the home page ("lacquer pop", docs/DECISIONS.md D107 to D112).
+ * ------------------------------------------------------------------------- */
+
+/*
+ * Lacquer bands (src/components/home/lacquer-band.tsx): poster words sliding
+ * sideways without end, a lacquer diamond between them. Two cross under the
+ * hero, laid at opposite angles.
+ */
+.lacquer-band {
+  overflow: hidden;
+  padding-block: 0.85rem;
+  font-size: clamp(1.6rem, 0.9rem + 2.8vw, 3.25rem);
+  line-height: 1;
+  white-space: nowrap;
+}
+.lacquer-band[data-tone="saffron"] {
+  --diamond: var(--primary);
+  background: var(--highlight);
+  color: var(--highlight-foreground);
+}
+.lacquer-band[data-tone="lacquer"] {
+  --diamond: var(--highlight);
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.lacquer-band-track {
+  display: flex;
+  width: max-content;
+  animation: band-slide 48s linear infinite;
+}
+.lacquer-band[data-reverse] .lacquer-band-track {
+  animation-direction: reverse;
+}
+.lacquer-band-run {
+  display: flex;
+  align-items: center;
+}
+.lacquer-band-run li {
+  display: flex;
+  align-items: center;
+  gap: 1.1em;
+  padding-right: 1.1em;
+}
+.lacquer-band-diamond {
+  width: 0.32em;
+  height: 0.32em;
+  rotate: 45deg;
+  background: var(--diamond);
+}
+@keyframes band-slide {
+  to {
+    translate: -50% 0;
+  }
+}
+/* Two bands crossing, laid over the seam between the hero and the next section. */
+.band-cross {
+  position: relative;
+  z-index: 3;
+  height: clamp(6rem, 4rem + 6vw, 9.5rem);
+  margin-block: calc(clamp(6rem, 4rem + 6vw, 9.5rem) / -2);
+  overflow-x: clip;
+  pointer-events: none;
+}
+.band-cross > .lacquer-band {
+  position: absolute;
+  top: 50%;
+  left: -5vw;
+  width: 110vw;
+  box-shadow: 0 10px 30px rgb(31 20 16 / 0.18);
+}
+.band-cross > .lacquer-band:first-child {
+  translate: 0 -95%;
+  rotate: -2.6deg;
+}
+.band-cross > .lacquer-band:last-child {
+  translate: 0 -5%;
+  rotate: 2deg;
+}
+/* One band over the seam under a page's poster top (src/components/site/page-header.tsx). */
+.band-seam {
+  position: relative;
+  z-index: 3;
+  height: clamp(4rem, 2.5rem + 3.4vw, 6rem);
+  margin-top: calc(clamp(4rem, 2.5rem + 3.4vw, 6rem) / -2);
+  margin-bottom: calc(clamp(4rem, 2.5rem + 3.4vw, 6rem) / -2);
+  overflow-x: clip;
+  pointer-events: none;
+}
+.band-seam > .lacquer-band {
+  position: absolute;
+  top: 50%;
+  left: -5vw;
+  width: 110vw;
+  translate: 0 -50%;
+  rotate: -1.6deg;
+  box-shadow: 0 10px 30px rgb(31 20 16 / 0.18);
+}
+
+/*
+ * Plates (src/components/home/plates.tsx): bestsellers on lacquer discs. On
+ * large screens with scroll-driven animations the section is pinned while the
+ * row slides sideways (--travel, measured by plate-track.tsx); elsewhere the
+ * row scrolls sideways by hand and snaps to each plate.
+ */
+/* Room at the top for the bands laid over the seam above. */
+.plates {
+  padding-block: clamp(6.5rem, 4rem + 6vw, 9rem) 4rem;
+}
+.plates-head {
+  margin-bottom: 2.5rem;
+}
+.plates-track {
+  display: flex;
+  gap: clamp(1.25rem, 0.5rem + 2vw, 2.5rem);
+  padding-inline: max(1rem, calc((100vw - 80rem) / 2 + 2rem));
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.plate {
+  flex: none;
+  width: clamp(16rem, 12rem + 14vw, 22rem);
+  scroll-snap-align: start;
+}
+.plate-link {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  border-radius: 1.5rem;
+}
+.plate[data-tone="highlight"] {
+  --disc: var(--highlight);
+  --rim: var(--highlight-foreground);
+}
+.plate[data-tone="secondary"] {
+  --disc: var(--secondary);
+  --rim: var(--secondary-foreground);
+}
+.plate[data-tone="primary"] {
+  --disc: var(--primary);
+  --rim: var(--primary-foreground);
+}
+.plate[data-tone="foreground"] {
+  --disc: var(--foreground);
+  --rim: var(--highlight);
+}
+.plate-disc {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: var(--disc);
+  transition:
+    rotate 700ms var(--ease-out-soft),
+    scale 700ms var(--ease-out-soft);
+}
+.plate-rim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  fill: var(--rim);
+  font-family: var(--font-poster);
+  font-size: 15px;
+  font-weight: 800;
+  font-stretch: 75%;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.plate-photo {
+  position: absolute;
+  inset: 15%;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--muted);
+  box-shadow:
+    0 0 0 6px color-mix(in srgb, var(--background) 92%, transparent),
+    0 18px 40px rgb(31 20 16 / 0.35);
+}
+.plate-price {
+  position: absolute;
+  right: 2%;
+  bottom: 8%;
+  padding: 0.55rem 0.8rem;
+  border-radius: 999px;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: 1.15rem;
+  line-height: 1;
+  rotate: -8deg;
+  box-shadow: var(--shadow-soft);
+}
+.plate-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-inline: 0.25rem;
+}
+.plate-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition:
+    background-color 300ms ease,
+    translate 300ms var(--ease-out-soft);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .plate-link:hover .plate-disc {
+    rotate: -6deg;
+    scale: 1.03;
+  }
+  .plate-link:hover .plate-rim {
+    animation: rim-turn 9s linear infinite;
+  }
+  .plate-link:hover .plate-add {
+    translate: 0.2rem 0;
+    background: color-mix(in srgb, var(--primary) 75%, var(--foreground));
+  }
+}
+@keyframes rim-turn {
+  to {
+    rotate: 360deg;
+  }
+}
+@supports (animation-timeline: view()) {
+  @media (min-width: 64rem) and (prefers-reduced-motion: no-preference) {
+    .plates {
+      height: calc(100vh + var(--travel, 0px));
+      padding-block: 0;
+      view-timeline: --plates block;
+    }
+    .plates-pin {
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100vh;
+      /* clip, not hidden: a hidden box can still be scrolled sideways by focus. */
+      overflow: clip;
+    }
+    .plates-track {
+      overflow: visible;
+      scroll-snap-type: none;
+      animation: plates-slide linear both;
+      animation-timeline: --plates;
+      animation-range: contain 0% contain 100%;
+    }
+  }
+}
+@keyframes plates-slide {
+  to {
+    translate: calc(-1 * var(--travel, 0px)) 0;
   }
 }
 
 /*
- * Steam off a hot plate (src/components/site/dish-card.tsx): three soft wisps
- * rise while the card is hovered. Decorative, and still for reduced motion.
+ * Dishes on the menu as tiles (src/components/menu/menu-item-card.tsx): the
+ * photo on a plate of a lacquer colour over a wash of the same, a price
+ * sticker on the plate's edge and a flag for signature or sold-out dishes.
  */
-.steam {
-  position: absolute;
-  bottom: 38%;
-  left: 50%;
-  display: flex;
-  gap: 0.9rem;
-  translate: -50% 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 500ms var(--ease-out-soft);
+.dish-tile {
+  --wash: var(--highlight);
+  transition:
+    translate 500ms var(--ease-out-soft),
+    box-shadow 500ms var(--ease-out-soft);
 }
-.steam > span {
-  width: 0.55rem;
-  height: 4rem;
+.dish-tile[data-tone="secondary"] {
+  --wash: var(--secondary);
+}
+.dish-tile[data-tone="primary"] {
+  --wash: var(--primary);
+}
+.dish-tile-wash {
+  background: color-mix(in srgb, var(--wash) 13%, var(--card));
+}
+.dish-tile-plate {
   border-radius: 999px;
-  background: linear-gradient(to top, transparent, rgb(255 255 255 / 0.6), transparent);
-  filter: blur(6px);
-  animation: steam 2.6s ease-in-out infinite;
-  animation-delay: calc(var(--i) * 0.55s);
+  background: var(--wash);
+  transition:
+    rotate 700ms var(--ease-out-soft),
+    scale 700ms var(--ease-out-soft);
+}
+.dish-tile-photo {
+  position: absolute;
+  inset: 9%;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--muted);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--background) 92%, transparent),
+    0 14px 30px rgb(31 20 16 / 0.3);
+}
+.dish-tile[data-unavailable] .dish-tile-photo {
+  opacity: 0.7;
+  filter: grayscale(0.6);
+}
+.dish-tile-price {
+  position: absolute;
+  right: -4%;
+  bottom: 3%;
+  padding: 0.45rem 0.7rem;
+  border-radius: 999px;
+  background: var(--background);
+  color: var(--foreground);
+  font-size: clamp(0.95rem, 0.8rem + 0.4vw, 1.2rem);
+  line-height: 1;
+  rotate: -8deg;
+  box-shadow: var(--shadow-soft);
+}
+.dish-tile-flag {
+  position: absolute;
+  top: 3%;
+  left: -4%;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  rotate: -10deg;
+  box-shadow:
+    0 0 0 2px var(--background),
+    var(--shadow-soft);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .dish-tile:not([data-unavailable]):hover {
+    translate: 0 -4px;
+    box-shadow: var(--shadow-lifted);
+  }
+  .dish-tile:not([data-unavailable]):hover .dish-tile-plate {
+    rotate: -6deg;
+    scale: 1.03;
+  }
+}
+
+/* A big category number drawn in outline, like a sign painter's (the menu's chapters). */
+.outline-number {
+  color: transparent;
+  -webkit-text-stroke: 2px var(--primary);
+  paint-order: stroke fill;
+}
+
+/* A round sticker turning slowly (src/components/home/spin-sticker.tsx). */
+.spin-sticker {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: var(--highlight);
+  color: var(--highlight-foreground);
+  box-shadow: 0 14px 40px rgb(31 20 16 / 0.35);
+}
+.spin-sticker-rim {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  font-family: var(--font-poster);
+  font-size: 15px;
+  font-weight: 800;
+  font-stretch: 75%;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  animation: rim-turn 22s linear infinite;
+}
+.spin-sticker-mark {
+  position: absolute;
+  inset: 28%;
+  width: 44%;
+  height: 44%;
+}
+
+/*
+ * The kitchen's story (home "why"): the statement lights up word by word as it
+ * scrolls through the screen, and the plate beside it turns with the scroll.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .scrub .w > span {
+      animation: word-light linear both;
+      animation-timeline: view();
+      animation-range: entry 60% cover 45%;
+    }
+    .turn-with-scroll {
+      animation: plate-turn linear both;
+      animation-timeline: view();
+    }
+  }
+}
+@keyframes word-light {
+  from {
+    opacity: 0.18;
+  }
+}
+@keyframes plate-turn {
+  from {
+    rotate: -40deg;
+  }
+  to {
+    rotate: 40deg;
+  }
+}
+
+/* Offers pinned up like stickers, each at its own slight angle; they straighten under the pointer. */
+.offer-card {
+  rotate: var(--tilt, 0deg);
+}
+.offer-card:nth-child(3n + 1) {
+  --tilt: -1.6deg;
+}
+.offer-card:nth-child(3n + 2) {
+  --tilt: 1.2deg;
+}
+.offer-card:nth-child(3n) {
+  --tilt: -0.8deg;
+}
+@media (hover: hover) {
+  .offer-card {
+    transition:
+      rotate 500ms var(--ease-out-soft),
+      translate 500ms var(--ease-out-soft),
+      background-color 500ms ease,
+      border-color 500ms ease;
+  }
+  .offer-card:hover {
+    rotate: 0deg;
+  }
+}
+
+/* A Kandyan arch: a photo framed with a round top, like a temple doorway. */
+.arch {
+  border-radius: 999px 999px 1.75rem 1.75rem / 42% 42% 1.75rem 1.75rem;
+}
+
+/*
+ * Guests' words (src/components/home/review-wall.tsx): two rows of tilted
+ * cards sliding past each other. They pause under the pointer, on focus, or
+ * with the button; still for reduced motion (the rows then scroll by hand).
+ */
+.review-wall {
+  position: relative;
+  display: grid;
+  gap: 1.5rem;
+  overflow-x: clip;
+  padding-block: 1rem;
+}
+.review-row {
+  display: flex;
+  width: max-content;
+  animation: band-slide 70s linear infinite;
+}
+.review-row[data-reverse] {
+  animation-direction: reverse;
+}
+.review-wall:is(:hover, :focus-within, [data-paused]) .review-row {
   animation-play-state: paused;
 }
-.group:hover .steam {
-  opacity: 1;
+.review-run {
+  display: flex;
+  gap: 1.5rem;
+  padding-right: 1.5rem;
 }
-.group:hover .steam > span {
-  animation-play-state: running;
+.review-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: clamp(17rem, 14rem + 10vw, 24rem);
+  padding: 1.5rem;
+  border-radius: 1.5rem;
+  background: color-mix(in srgb, var(--secondary-foreground) 8%, var(--secondary));
+  border: 1px solid var(--border);
+  rotate: var(--tilt, 0deg);
 }
-@keyframes steam {
-  0% {
-    opacity: 0;
-    translate: 0 1.5rem;
-    scale: 1 0.6;
-  }
-  40% {
-    opacity: 0.9;
-  }
-  100% {
-    opacity: 0;
-    translate: 0.5rem -3.5rem;
-    scale: 1.7 1.2;
-  }
+.review-wall-toggle {
+  position: absolute;
+  right: 0;
+  bottom: -3.25rem;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  transition: background-color 200ms ease;
 }
+.review-wall-toggle:hover {
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .steam {
-    display: none;
+  .lacquer-band-track,
+  .review-row,
+  .spin-sticker-rim {
+    animation: none;
+  }
+  .review-wall {
+    overflow-x: auto;
   }
 }
 

@@ -1,8 +1,10 @@
 import { ArrowRight, HandHeart, Leaf, Sun } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 
 import { Eyebrow } from "@/components/site/eyebrow";
+import { Kolam } from "@/components/site/kolam";
 import { Ornament } from "@/components/site/ornament";
 import { PageHeader } from "@/components/site/page-header";
 import { Splash } from "@/components/site/splash";
@@ -28,6 +30,13 @@ export async function generateMetadata({
   });
 }
 
+/** The values, each on a lacquer colour, pinned up at slight angles. */
+const VALUE_TONES = [
+  "bg-highlight text-highlight-foreground",
+  "bg-primary text-primary-foreground",
+  "bg-background text-foreground",
+] as const;
+
 export default async function AboutPage() {
   const [t, nav, brand] = await Promise.all([
     getTranslations("About"),
@@ -43,17 +52,31 @@ export default async function AboutPage() {
   return (
     <>
       <Splash />
-      <div className="mx-auto w-full max-w-7xl px-4 pt-14 pb-24 sm:px-6 lg:px-8 lg:pt-24 lg:pb-32">
-        <PageHeader
-          eyebrow={brand.name}
-          title={t("title")}
-          intro={<p className="font-display text-display-md text-foreground">{t("lead")}</p>}
-          image={{ src: siteMedia.story }}
-        />
+      <PageHeader
+        tone="lacquer"
+        eyebrow={brand.name}
+        title={t("title")}
+        intro={<p className="font-display text-display-md">{t("lead")}</p>}
+        image={{ src: siteMedia.story }}
+        band={values.map((v) => v.title)}
+      />
 
-        {/* The story, set like a magazine page: a drop cap, a readable measure, the way to order beside it. */}
-        <div className="mt-6 grid grid-cols-1 gap-10 border-t pt-12 lg:mt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,2fr)] lg:gap-16 lg:pt-16">
-          <aside className="space-y-6 lg:sticky lg:top-28 lg:self-start">
+      {/* The story, set like a magazine page, beside a plate that turns as it scrolls by. */}
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-12 px-4 pt-24 pb-32 sm:px-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20 lg:px-8 lg:pt-32 lg:pb-40">
+        <aside className="order-last space-y-8 lg:sticky lg:top-28 lg:order-none lg:self-start">
+          <div className="relative mx-auto aspect-square w-full max-w-[22rem] lg:mx-0">
+            <div className="absolute -inset-4 rounded-full border border-dashed border-[color-mix(in_srgb,var(--primary)_45%,transparent)]" />
+            <div className="turn-with-scroll absolute inset-0 overflow-hidden rounded-full bg-primary shadow-lifted">
+              <Image
+                src={siteMedia.hero}
+                alt=""
+                fill
+                sizes="(min-width: 1024px) 22rem, 80vw"
+                className="object-cover"
+              />
+            </div>
+          </div>
+          <div className="flex flex-wrap items-center gap-5">
             <Ornament className="w-24" />
             <Button asChild size="lg">
               <Link href="/menu" transitionTypes={LAMP}>
@@ -61,41 +84,42 @@ export default async function AboutPage() {
                 <ArrowRight aria-hidden className="size-4" />
               </Link>
             </Button>
-          </aside>
-          <div className="max-w-[38rem] space-y-6 text-lg leading-relaxed text-pretty text-foreground/85 lg:text-xl lg:leading-relaxed">
-            <p data-reveal className="drop-cap">
-              {t("p1")}
-            </p>
-            <p data-reveal>{t("p2")}</p>
-            <p data-reveal>{t("p3")}</p>
           </div>
+        </aside>
+        <div className="max-w-[38rem] space-y-7 text-lg leading-relaxed text-pretty text-foreground/85 lg:text-xl lg:leading-relaxed">
+          <p data-reveal className="drop-cap">
+            {t("p1")}
+          </p>
+          <p data-reveal>{t("p2")}</p>
+          <p data-reveal>{t("p3")}</p>
         </div>
       </div>
 
-      <section aria-labelledby="values" className="sheet surface-lacquer">
-        <div className="mx-auto w-full max-w-7xl px-4 pt-20 pb-28 sm:px-6 lg:px-8 lg:pt-28 lg:pb-36">
+      <section aria-labelledby="values" className="sheet overflow-hidden surface-leaf">
+        <Kolam
+          size={7}
+          className="pointer-events-none absolute -bottom-28 -left-28 w-[28rem] text-highlight opacity-10"
+        />
+        <div className="relative mx-auto w-full max-w-7xl px-4 pt-20 pb-32 sm:px-6 lg:px-8 lg:pt-28 lg:pb-40">
           <Eyebrow className="opacity-90">{brand.name}</Eyebrow>
-          <h2 id="values" data-reveal="words" className="mt-5 text-display-xl">
+          <h2 id="values" data-reveal="words" className="mt-5 text-display-2xl">
             <SplitWords markup={t("valuesTitle").replace(/[<>]/g, "")} />
           </h2>
-          <ol className="mt-14 grid gap-10 md:grid-cols-3 md:gap-8">
+          <ol className="mt-14 grid gap-6 md:grid-cols-3 lg:mt-16">
             {values.map(({ icon: Icon, title, body }, i) => (
               <li
                 key={title}
                 data-reveal
-                className="space-y-4 border-t border-[var(--border)] pt-6"
+                className={`offer-card flex flex-col gap-4 rounded-[1.75rem] p-7 shadow-lifted ${VALUE_TONES[i % VALUE_TONES.length]}`}
               >
-                <div className="flex items-center justify-between">
-                  <span
-                    aria-hidden
-                    className="font-display text-display-lg text-highlight italic tabular-nums"
-                  >
+                <div className="flex items-start justify-between">
+                  <span aria-hidden className="font-poster text-6xl leading-none tabular-nums">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <Icon aria-hidden className="size-6 opacity-80" />
+                  <Icon aria-hidden className="size-7 opacity-80" />
                 </div>
                 <h3 className="font-display text-2xl">{title}</h3>
-                <p className="text-pretty opacity-85">{body}</p>
+                <p className="text-pretty opacity-90">{body}</p>
               </li>
             ))}
           </ol>

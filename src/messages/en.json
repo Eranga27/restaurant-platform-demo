@@ -136,7 +136,9 @@
     "chefsPick": "Chef's pick",
     "openNowCooking": "Open now · {count, plural, one {# kitchen} other {# kitchens}} cooking",
     "closedOpensAt": "Closed now · opens at {time}",
-    "quickOrder": "Order or book"
+    "quickOrder": "Order or book",
+    "pauseReviews": "Pause the reviews",
+    "playReviews": "Play the reviews"
   },
   "Menu": {
     "title": "Our menu",
@@ -888,7 +890,8 @@
     "call": "Need to order now? Call {phone}."
   },
   "Splash": {
-    "greeting": "Welcome · ආයුබෝවන් · வணக்கம்"
+    "greeting": "Welcome · ආයුබෝවන් · வணக்கம்",
+    "words": "Kottu|Hoppers|Sambol|Lamprais"
   },
   "ErrorPage": {
     "title": "Something went wrong",

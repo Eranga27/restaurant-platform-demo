@@ -51,16 +51,23 @@ export default async function ReservationsPage({
   const wanted = typeof query.branch === "string" ? query.branch : undefined;
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 pt-14 pb-24 sm:px-6 lg:px-8 lg:pt-24">
-      <PageHeader title={t("title")} intro={t("intro")} image={{ src: siteMedia.story }} />
-      <BookingForm
-        branches={branches.map((b) => ({ id: b.id, slug: b.slug, name: b.name, city: b.city }))}
-        initialBranchSlug={wanted}
-        dates={bookableDates(new Date(), brand.reservations)}
-        maxPartySize={brand.reservations.maxPartySize}
-        initialContact={contact}
-        nonce={nonce}
+    <>
+      <PageHeader
+        tone="leaf"
+        title={t("title")}
+        intro={t("intro")}
+        image={{ src: siteMedia.hero, shape: "plate" }}
       />
-    </div>
+      <div className="mx-auto w-full max-w-6xl px-4 pt-14 pb-28 sm:px-6 lg:px-8 lg:pt-20">
+        <BookingForm
+          branches={branches.map((b) => ({ id: b.id, slug: b.slug, name: b.name, city: b.city }))}
+          initialBranchSlug={wanted}
+          dates={bookableDates(new Date(), brand.reservations)}
+          maxPartySize={brand.reservations.maxPartySize}
+          initialContact={contact}
+          nonce={nonce}
+        />
+      </div>
+    </>
   );
 }

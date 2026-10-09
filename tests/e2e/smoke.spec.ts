@@ -55,6 +55,14 @@ test.describe("public site", () => {
     expect(errors).toEqual([]);
   });
 
+  test("the menu stays at the top on arrival", async ({ page }) => {
+    await page.goto("/menu");
+    await expect(page.getByRole("navigation", { name: "Menu categories" })).toBeAttached();
+    // The category tabs centre the current one; that must never scroll the page itself.
+    await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  });
+
   test("menu search and dietary filters narrow the list", async ({ page }) => {
     await page.goto("/menu");
     await page.getByLabel("Search the menu").fill("hopper");
@@ -73,6 +81,22 @@ test.describe("public site", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "ශ්‍රී ලාංකේය ගෙදර කෑම, උණු උණුවේ ඔබේ දොරකඩටම.",
     );
+  });
+
+  test("the header fits the screen in every language, from phones to laptops", async ({
+    page,
+  }, testInfo) => {
+    test.skip(testInfo.project.name !== "desktop", "one run covers every width");
+    for (const width of [390, 768, 1024, 1280, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const locale of ["en", "si", "ta"]) {
+        await page.goto(`/${locale}/branches`);
+        const overflow = await page.evaluate(
+          () => document.documentElement.scrollWidth - document.documentElement.clientWidth,
+        );
+        expect(overflow, `${locale} at ${width}px`).toBeLessThanOrEqual(0);
+      }
+    }
   });
 
   test("branches page shows every branch and its hours", async ({ page }) => {
@@ -237,23 +261,25 @@ test.describe("installable app", () => {
 });
 
 test.describe("home page", () => {
-  test("dish tabs switch by click and by arrow keys", async ({ page }) => {
+  test("bestsellers are plates that open the dish on the menu", async ({ page }) => {
     await page.goto("/");
-    const tabs = page.getByRole("tablist", { name: "Dishes by category" });
-    const first = tabs.getByRole("tab", { name: "Most ordered" });
-    await expect(first).toHaveAttribute("aria-selected", "true");
-    await expect(
-      page.getByRole("tabpanel").getByRole("heading", { name: "Chicken kottu" }),
-    ).toBeVisible();
+    const plates = page.locator("#bestsellers").getByRole("listitem");
+    expect(await plates.count()).toBeGreaterThanOrEqual(3);
+    const kottu = page
+      .locator("#bestsellers")
+      .getByRole("link")
+      .filter({ has: page.getByRole("heading", { name: "Chicken kottu" }) });
+    await expect(kottu).toHaveAttribute("href", "/menu?item=chicken-kottu");
+  });
 
-    await tabs.getByRole("tab", { name: "Rice & Curry" }).click();
-    await expect(
-      page.getByRole("tabpanel").getByRole("heading", { name: "Fish rice & curry" }),
-    ).toBeVisible();
-
-    await page.keyboard.press("ArrowLeft");
-    await expect(first).toBeFocused();
-    await expect(first).toHaveAttribute("aria-selected", "true");
+  test("a keyboard user tabbing through the plates always sees the focused one", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    const links = page.locator("#bestsellers li a");
+    const last = links.last();
+    await last.focus();
+    await expect(last).toBeInViewport();
   });
 
   test("on a phone, the order bar comes in once the hero has gone", async ({ page, isMobile }) => {
@@ -275,7 +301,7 @@ test.describe("motion", () => {
     await page.goto("/");
     const splash = page.locator(".site-splash");
     await expect(splash).toBeVisible();
-    await expect(splash).toHaveCount(0, { timeout: 6_000 });
+    await expect(splash).toHaveCount(0, { timeout: 10_000 });
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
     await page.reload();
@@ -295,7 +321,7 @@ test.describe("motion", () => {
     const errors = trackErrors(page);
     await page.goto("/");
     // The splash covers the page on a first visit; it leaves by itself.
-    await expect(page.locator(".site-splash")).toHaveCount(0, { timeout: 6_000 });
+    await expect(page.locator(".site-splash")).toHaveCount(0, { timeout: 10_000 });
     const video = page.locator("video");
     await page.getByRole("button", { name: "Pause the video" }).click();
     await expect(page.getByRole("button", { name: "Play the video" })).toBeVisible();
