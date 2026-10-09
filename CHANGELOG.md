@@ -4,6 +4,8 @@ All notable changes to this project are documented here. The format is based on 
 
 ## [Unreleased]
 
+## [2.2.0] - Site uplift
+
 ### Added
 
 - Home sections laid over one another like sheets, widening to the edges as they come up; the footer joins them.
@@ -24,6 +26,8 @@ All notable changes to this project are documented here. The format is based on 
 - Form fields are at least 44 px tall with a softer focus glow; radios and checkboxes are brand red.
 - On phones, the home headline stays readable over the brightest frames of the video.
 - The header's "Book a table" appears once (a link on medium screens, a button on large ones) and the header is a little more opaque.
+
+## [2.1.0] - The first drop
 
 ### Changed
 

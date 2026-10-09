@@ -1,6 +1,6 @@
 # Handover
 
-Status and working notes for whoever picks this project up next, person or Claude session. Last updated 7 October 2026, at v2.0.0.
+Status and working notes for whoever picks this project up next, person or Claude session. Last updated 9 October 2026, at v2.2.0.
 
 **New Claude session: read this file first.** Then read `AGENTS.md` (project conventions), `docs/PLAN.md` (the original plan) and `docs/DECISIONS.md` (D1 to D94 and B1 to B7; these override the plan). Check facts against the repository: this file describes the state on the date above.
 
@@ -17,22 +17,24 @@ A white-label online ordering platform for Sri Lankan restaurants, built as a sa
 
 Everything planned is built, merged, tagged and live. There are no open pull requests and no work in progress.
 
-| Version | What                                                                 | PR     |
-| ------- | -------------------------------------------------------------------- | ------ |
-| v0.1.0  | Phase 0: setup, CI, security headers, brand config, styleguide       | #1     |
-| v0.2.0  | Phase 1: public site, menu, branches, i18n scaffolding, SEO          | #2, #7 |
-| v0.3.0  | Phase 2: cart, checkout, pricing engine, cash on delivery, tracking  | #8, #9 |
-| v0.4.0  | Phase 3: PayHere payments, webhook, retries, refund policy           | #10    |
-| v0.5.0  | Phase 4: branch dashboard, live order board, alerts, print tickets   | #11    |
-| v0.6.0  | Phase 5: table bookings, events and catering, quotes, deposits       | #12    |
-| v0.7.0  | Phase 6: admin panel, two-step sign-in (TOTP), reports, audit log    | #13    |
-| v0.8.0  | Phase 7: accounts, reorder, loyalty, reviews, PWA, Sinhala and Tamil | #14    |
-| v0.9.0  | Phase 8: UI/UX polish (splash, scroll reveals, page transitions)     | #15    |
-| v1.0.0  | Phase 9: hardening, accessibility, `/demo` tour, launch docs         | #16    |
-| v1.1.0  | Phase 10: editorial redesign (chapters, map, printed menu)           | #17    |
-| v1.2.0  | Home hero video with a curtain transition                            | #18    |
-| v1.3.0  | Restaurant feel: Sri Lankan palette, lamp splash, offer-first home   | #20    |
-| v2.0.0  | V2: staged splash, live hero, dish tabs, card menu, phone order bar  | #21    |
+| Version | What                                                                  | PR     |
+| ------- | --------------------------------------------------------------------- | ------ |
+| v0.1.0  | Phase 0: setup, CI, security headers, brand config, styleguide        | #1     |
+| v0.2.0  | Phase 1: public site, menu, branches, i18n scaffolding, SEO           | #2, #7 |
+| v0.3.0  | Phase 2: cart, checkout, pricing engine, cash on delivery, tracking   | #8, #9 |
+| v0.4.0  | Phase 3: PayHere payments, webhook, retries, refund policy            | #10    |
+| v0.5.0  | Phase 4: branch dashboard, live order board, alerts, print tickets    | #11    |
+| v0.6.0  | Phase 5: table bookings, events and catering, quotes, deposits        | #12    |
+| v0.7.0  | Phase 6: admin panel, two-step sign-in (TOTP), reports, audit log     | #13    |
+| v0.8.0  | Phase 7: accounts, reorder, loyalty, reviews, PWA, Sinhala and Tamil  | #14    |
+| v0.9.0  | Phase 8: UI/UX polish (splash, scroll reveals, page transitions)      | #15    |
+| v1.0.0  | Phase 9: hardening, accessibility, `/demo` tour, launch docs          | #16    |
+| v1.1.0  | Phase 10: editorial redesign (chapters, map, printed menu)            | #17    |
+| v1.2.0  | Home hero video with a curtain transition                             | #18    |
+| v1.3.0  | Restaurant feel: Sri Lankan palette, lamp splash, offer-first home    | #20    |
+| v2.0.0  | V2: staged splash, live hero, dish tabs, card menu, phone order bar   | #21    |
+| v2.1.0  | Preloader "the first drop": kithul treacle poured into the logo       | #24    |
+| v2.2.0  | Site uplift: sheet sections, button sweeps, page photos, booking card | #24    |
 
 The roadmap in `docs/PLAN.md` lists eight phases; the owner later added UI/UX polish before v1.0 (D48), and after it the design overhaul, the hero video and the restaurant-feel redesign (D81 to D87). `CHANGELOG.md` has the details of each release.
 
@@ -66,10 +68,10 @@ The roadmap in `docs/PLAN.md` lists eight phases; the owner later added UI/UX po
   - Workflows:
     - `ci.yml`: lint, format, typecheck, unit and database tests, seed check, dependency audit, build, smoke tests; plus a database job that starts a local Supabase and runs the order, payment, dashboard and account journeys.
     - `codeql.yml`: code scanning.
-    - `supabase-keepalive.yml`: pings the free project daily so it doesn't pause.
+    - `supabase-keepalive.yml`: pings the free project daily so it doesn't pause, once the repository has the `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` Actions secrets. Without them (the case on 9 October 2026) it skips each run and still shows a green tick.
 - **Vercel:**
   - Connected to the GitHub repository. Each PR gets a preview link from the Vercel bot.
-  - Production is `https://kithulco.vercel.app` (`NEXT_PUBLIC_SITE_URL` is set to it). Don't test `restaurant-platform-demo.vercel.app`: it belongs to an unrelated project. The `-eranga-bowatte.vercel.app` addresses sit behind Vercel's login.
+  - Production is `https://kithulco.vercel.app`. `NEXT_PUBLIC_SITE_URL` isn't set on Vercel; the site falls back to Vercel's production domain (`src/lib/public-env.ts`), which is this address. Don't test `restaurant-platform-demo.vercel.app`: it belongs to an unrelated project. The `-eranga-bowatte.vercel.app` addresses sit behind Vercel's login.
 - **Supabase:**
   - Project "Sample-Restaurant", Tokyo region, Postgres 17, free plan.
   - All seven migrations in `supabase/migrations/` are applied on the hosted database.
@@ -153,7 +155,7 @@ Environment variables are listed, by name, in `.env.example` and the README.
 ## 7. Checking your work
 
 - **Everyday checks:**
-  - `npm run check` runs lint, formatting, the typecheck and 1,785 unit and database tests.
+  - `npm run check` runs lint, formatting, the typecheck and 1,792 unit and database tests.
   - The database tests run one after another, because parallel PGlite instances run out of memory.
 - **Building on the laptop:** the laptop is short of memory. A plain `npm run build` can crash with "Zone Allocation failed". Use:
 
